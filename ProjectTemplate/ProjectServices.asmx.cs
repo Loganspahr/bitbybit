@@ -116,7 +116,8 @@ namespace ProjectTemplate
             }
             if (daysToLiveInt <= 0)
             {
-                daysToLiveInt = 31;
+                // Default to 99999 days if the user enters a negative number or 0 to signify no expiration
+                daysToLiveInt = 99999;
             }
 
             string sqlSelect = "insert into questions (questionText, expiryDate, submittedBy) " +

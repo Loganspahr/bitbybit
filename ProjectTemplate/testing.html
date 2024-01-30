@@ -1,0 +1,223 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title></title>
+	<!--DO NOT FORGET THIS SCRIPT TAG SO YOU CAN USE JQUERY!!!!!-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<!--YOUR OWN JAVASCRIPT CAN GO RIGHT HERE-->
+	<script type="text/javascript">
+		function TestButtonHandler() {
+			var webMethod = "ProjectServices.asmx/TestConnection";
+			var parameters = "{}";
+
+			//jQuery ajax method
+			$.ajax({
+				type: "POST",
+				url: webMethod,
+				data: parameters,
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				success: function (msg) {
+					var responseFromServer = msg.d;
+					alert(responseFromServer);
+				},
+				error: function (e) {
+					alert("this code will only execute if javascript is unable to access the webservice");
+				}
+			});
+		}
+
+		// webMethod UnsolicitedFeedback expects the following inputs: string userID, string problemArea, string complaint, string proposedSolution
+		// userID is the user's ID, which should come from a session variable created when the user logs in
+		// problemArea is limited to 20 characters, and should be input by the user (it should be a general description of what their complaint relates to)
+		// complaint is limited to 50 characters, and should be input by the user (it should be a description of their complaint)
+		// proposedSolution is limited to 1000 characters, and should be input by the user (it should be a description of their proposed solution)
+
+		// This function should be called when the user clicks the submit button on the Unsolicited Feedback page
+		// An integer will be returned from the server and stored in "responseFromServer"
+		// If "responseFromServer" is a positive number, it represents the ID of the new feedback entry in the database.
+		// If "responseFromServer" is a negative number, it represents there was an error in the submission and it was not accepted.
+		// This ID can be used to retrieve the feedback entry from the database to display to the user to confirm it was submitted.
+		// Potential future functionality: This entry could be placed in an editable form, and the user could edit it and resubmit it.
+		// The button could be changed to a "Submit Edits" button, and the function could be changed to call a different webMethod (not yet written) to handle editing.
+        function UnsolicitedFeedbackHandler() {
+            var webMethod = "ProjectServices.asmx/UnsolicitedFeedback";
+			var parameters = "{}";
+            var parameters = "{\"userID\":\"" + encodeURI($('#userID').val()) + "\",\"problemArea\":\"" + encodeURI($('#problemArea').val()) + "\",\"complaint\":\"" + encodeURI($('#complaint').val()) + "\",\"proposedSolution\":\"" + encodeURI($('#proposedSolution').val()) + "\"}";
+
+            //jQuery ajax method
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    var responseFromServer = msg.d;
+                    alert(responseFromServer);
+                },
+                error: function (e) {
+                    alert("this code will only execute if javascript is unable to access the webservice");
+                }
+            });
+        }
+        
+        // webMethod SubmitQuestion expects the following inputs: string userID, string questionText, string daysToLive
+        // userID is the user's ID, which should come from a session variable created when the user logs in
+        // questionText is limited to 1000 characters, and should be input by the user (it should be a description of their question)
+        // daysToLive is an integer representing the number of days the question should remain open before being automatically closed
+        // if daysToLive is 0, the question will remain open indefinitely (technically 99999 days)
+        // if daysToLive is negative or not an integer, the question will remain open indefinitely (technically 99999 days)
+        // Future functionality: Supervisors can see a list of their open questions and close them manually
+
+        // This function should be called when the user clicks the submit button on the Submit Question page
+        // An integer will be returned from the server and stored in "responseFromServer"
+        // If "responseFromServer" is a positive number, it represents the ID of the new question entry in the database.
+        // If "responseFromServer" is a negative number, it represents there was an error in the submission and it was not accepted.
+        // This ID can be used to retrieve the question entry from the database to display to the user to confirm it was submitted.
+        // Potential future functionality: This entry could be placed in an editable form, and the user could edit it and resubmit it.
+        // The button could be changed to a "Submit Edits" button, and the function could be changed to call a different webMethod (not yet written) to handle editing.
+        function SubmitQuestionHandler() {
+            var webMethod = "ProjectServices.asmx/SubmitQuestion";
+            var parameters = "{}";
+            var parameters = "{\"userID\":\"" + encodeURI($('#userID').val()) + "\",\"questionText\":\"" + encodeURI($('#questionText').val()) + "\",\"daysToLive\":\"" + encodeURI($('#daysToLive').val()) + "\"}";
+
+            //jQuery ajax method
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    var responseFromServer = msg.d;
+                    alert(responseFromServer);
+                },
+                error: function (e) {
+                    alert("this code will only execute if javascript is unable to access the webservice");
+                }
+            });
+        }
+        // webMethod SubmitAnswer expects the following inputs: string userID, string answerText, string questionID
+        // userID is the user's ID, which should come from a session variable created when the user logs in
+        // answerText is limited to 1000 characters, and should be input by the user (it should be a description of their answer)
+        // questionID is the ID of the question that is being answered.  This should be passed to the function from the page that calls it, not entered by user.
+
+        // This function should be called when the user clicks the submit button on the Submit Answer page
+        // An integer will be returned from the server and stored in "responseFromServer"
+        // If "responseFromServer" is a positive number, it represents the ID of the new answer entry in the database.
+        // If "responseFromServer" is a negative number, it represents there was an error in the submission and it was not accepted.
+        // This ID can be used to retrieve the answer entry from the database to display to the user to confirm it was submitted.
+        // Potential future functionality: This entry could be placed in an editable form, and the user could edit it and resubmit it.
+        // The button could be changed to a "Submit Edits" button, and the function could be changed to call a different webMethod (not yet written) to handle editing.
+        function SubmitAnswerHandler() {
+            var webMethod = "ProjectServices.asmx/SubmitAnswer";
+            var parameters = "{}";
+            var parameters = "{\"userID\":\"" + encodeURI($('#userID').val()) + "\",\"answerText\":\"" + encodeURI($('#answerText').val()) + "\",\"questionID\":\"" + encodeURI($('#questionID').val()) + "\"}";
+
+            //jQuery ajax method
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    var responseFromServer = msg.d;
+                    alert(responseFromServer);
+                },
+                error: function (e) {
+                    alert("this code will only execute if javascript is unable to access the webservice");
+                }
+            });
+        }
+	</script>
+	<!--END OF YOUR OWN JAVASCRIPT-->
+
+	<!--AND YOUR OWN CSS CAN GO HERE AS WELL-->
+	<style>
+
+	</style>
+	<!--END OF YOUR OWN CSS-->
+</head >
+<body>
+    <button onclick="javascript: TestButtonHandler();">Click here to test connection!</button>
+    <hr />
+
+    <div class="unsolicitedFeedback">
+        <form onsubmit="UnsolicitedFeedbackHandler(); return false;">
+            <div class="left">Submit Unsolicited Feedback</div>
+            <div>
+                Character limits: problemArea: 20, complaint: 50, proposedSolution: 1000<br />
+                These limits are enforced but the current character counts and character limits are not displayed.
+                userID should be stored as a session variable and not entered from form, but for now: (valid userID = test1)<br />
+                userID: <input type="text" id="userID" required/>
+            </div>
+            <div>
+                Problem Area: <input type="text" id="problemArea" size="20" maxlength="20" required/>
+            </div>
+            <div>
+                Complaint: <input type="text" id="complaint" size="50" maxlength="50" required/>
+            </div>
+            <div>
+                <textarea id="proposedSolution" rows="10" cols="50" maxlength="1000" placeholder="Enter proposed solution..."required ></textarea>
+            </div>
+            <div>
+                <button type="submit">Save</button>
+            </div>
+            <hr />
+        </form>
+
+    </div>
+
+    <div class="submitQuestion">
+        <form onsubmit="SubmitQuestionHandler(); return false;">
+            <div class="left">Submit Question</div>
+            <div>
+                Character limit: questionText: 1000<br />
+                This limit is enforced but the current character count and character limit are not displayed.
+                userID should be stored as a session variable and not entered from form, but for now: (valid userID = test1)<br />
+                userID: <input type="text" id="userID" required/>
+            </div>
+            <div>
+                <textarea id="questionText" rows="10" cols="50" maxlength="1000" placeholder="Enter question..." required></textarea>
+            </div>
+            <div>
+                Days to live (enter 0 for no expiration): <input type="text" id="daysToLive" size="3" maxlength="3" />
+            </div>
+            <div>
+                <button type="submit">Save</button>
+            </div>
+            <hr />
+        </form>
+    </div>
+
+    <div class="submitAnswer">
+        <form onsubmit="SubmitAnswerHandler(); return false;">
+            <div class="left">Submit Answer</div>
+            <div>
+                Selected question would be displayed here, and questionID would be stored as a session variable
+            </div>
+            <div>
+                Character limit: answerText: 1000<br />
+                This limit is enforced but the current character count and character limit are not displayed.
+                userID should be stored as a session variable and not entered from form, but for now: (valid userID = test1)<br />
+                userID: <input type="text" id="userID" required/>
+            </div>
+            <div>
+                <textarea id="answerText" rows="10" cols="50" maxlength="1000" placeholder="Enter answer..." required></textarea>
+            </div>
+            <div>
+                questionID should be stored as a session variable and not entered from form, but for now: (valid userID = test1)<br />
+                questionID: <input type="text" id="questionID" required/>
+            </div>
+            <div>
+                <button type="submit">Save</button>
+            </div>
+            <hr />
+        </form>
+    </div>
+</body>
+</html >
