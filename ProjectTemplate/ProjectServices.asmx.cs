@@ -65,77 +65,113 @@ namespace ProjectTemplate
         }
 
 
+
+
         [WebMethod(EnableSession = true)]
         public bool LogOn(string uid, string pass)
         {
-
             bool success = false;
+
             string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
-            string sqlSelect = "SELECT id, supervisor FROM users WHERE userid=@idValue and pass=@passValue";
+            string sqlSelect = "SELECT id, supervisor FROM employees WHERE userid=@idValue and pass=@passValue";
             MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
             MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
 
             sqlCommand.Parameters.AddWithValue("@idValue", HttpUtility.UrlDecode(uid));
             sqlCommand.Parameters.AddWithValue("@passValue", HttpUtility.UrlDecode(pass));
 
-
             MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
             DataTable sqlDt = new DataTable();
             sqlDa.Fill(sqlDt);
-            for (int i = 0; i < 3; i++)
+
+            if (sqlDt.Rows.Count > 0)
             {
 
-                if (sqlDt.Rows.Count > 0)
-                {
-                    Session["id"] = sqlDt.Rows[0]["id"];
-                    Session["supervisor"] = sqlDt.Rows[0]["supervisor"];
-                    success = true;
-                    break;
-                }
-                Console.WriteLine(i);
-                if (i > 3)
-                {
-                    break;
-                }
+                Session["id"] = sqlDt.Rows[0]["id"];
+                Session["supervisor"] = sqlDt.Rows[0]["supervisor"];
+                success = true;
             }
+
             return success;
         }
 
+
+
+
         [WebMethod(EnableSession = true)]
-        public bool PasswordReset(string uid, string pass, string newpass)
+        //this returns a bool of true if the reset took place, which will allow us to display a message either way
+        public bool PasswordReset(string userid, string pass, string newpass)
         {
             bool success = false;
             string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
-            string sqlSelect = "SELECT id FROM users WHERE userid=@idValue and pass=@passValue";
+            string sqlSelect = "SELECT id FROM employees WHERE userid=@useridValue and pass=@passValue; UPDATE employees SET pass = @newPassValue WHERE userid=@useridValue and pass=@passValue";
             MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
             MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
 
-            sqlCommand.Parameters.AddWithValue("@idValue", HttpUtility.UrlDecode(uid));
+
+            sqlCommand.Parameters.AddWithValue("@useridValue", HttpUtility.UrlDecode(userid));
             sqlCommand.Parameters.AddWithValue("@passValue", HttpUtility.UrlDecode(pass));
             sqlCommand.Parameters.AddWithValue("@newPassValue", HttpUtility.UrlDecode(newpass));
 
             MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
             DataTable sqlDt = new DataTable();
             sqlDa.Fill(sqlDt);
+
             if (sqlDt.Rows.Count > 0)
             {
-                Session["id"] = sqlDt.Rows[0]["id"];
-                string sqlSelect2 = "update users set pass=@newPassValue";
+
+
                 sqlConnection.Open();
                 try
                 {
                     sqlCommand.ExecuteNonQuery();
+                    success = true;
+
                 }
                 catch (Exception e)
                 {
                 }
                 sqlConnection.Close();
-                success = true;
             }
             return success;
         }
 
-           
+
+        //EXAMPLE OF AN INSERT QUERY WITH PARAMS PASSED IN.  BONUS GETTING THE INSERTED ID FROM THE DB!
+        [WebMethod(EnableSession = true)]
+        public bool RequestAccount(string pid, string userid, string pass, string department, string supervisor)
+        {
+            bool success = false;
+            string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+            string sqlSelect = "INSERT into employees (id, userid, pass, department, supervisor) Values(@idValue, @uidValue, @passValue, @departmentValue, @supervisorValue)";
+
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+            sqlCommand.Parameters.AddWithValue("@idValue", HttpUtility.UrlDecode(pid));
+            sqlCommand.Parameters.AddWithValue("@uidValue", HttpUtility.UrlDecode(userid));
+            sqlCommand.Parameters.AddWithValue("@passValue", HttpUtility.UrlDecode(pass));
+            sqlCommand.Parameters.AddWithValue("@departmentValue", HttpUtility.UrlDecode(department));
+            sqlCommand.Parameters.AddWithValue("@supervisorValue", HttpUtility.UrlDecode(supervisor));
+
+
+            sqlConnection.Open();
+
+            try
+            {
+                sqlCommand.ExecuteScalar();
+                success = true;
+            }
+            catch (Exception e)
+            {
+            }
+            sqlConnection.Close();
+
+            return success;
+        }
+
+
+
         [WebMethod(EnableSession = true)]
         public int UnsolicitedFeedback(string userID, string problemArea, string complaint, string proposedSolution)
         {
