@@ -133,6 +133,84 @@
                 }
             });
         }
+
+        //this is to display questions available to be answered
+        function QuestionListHandler() {
+            var webMethod = "ProjectServices.asmx/GetQuestions";
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    if (msg.d.length > 0) {
+                       $("#questionListDisplay").empty();
+                        for (var i = 0; i < msg.d.length; i++) {
+                            question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>" +
+                                "<span class='questionText'>" + msg.d[i].question +
+                                "</span> <span class='optionsTag'><a href='#' onclick='AnswerHandler(" + msg.d[i].id + ")'>respond (not implemented)</a></div> <hr>";
+                            $("#questionListDisplay").append(question);
+                        }
+                    }
+                },
+                error: function (e) {
+                    alert("boo...");
+                }
+            });
+        }
+
+        //this is to display questions posted by the current supervisor
+        function SupervisorQuestionListHandler() {
+            var webMethod = "ProjectServices.asmx/GetMyQuestions";
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    if (msg.d.length > 0) {
+                        $("#myQuestionListDisplay").empty();
+                        for (var i = 0; i < msg.d.length; i++) {
+                            question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>" +
+                                "<span class='questionText'>" + msg.d[i].question +
+                                "</span> <span class='optionsTag'><a href='#' onclick='AnswerListHandler(" + msg.d[i].id + ")'>view responses</a></div> <hr>";
+                            $("#myQuestionListDisplay").append(question);
+                        }
+                    }
+                },
+                error: function (e) {
+                    alert("boo...");
+                }
+            });
+        }
+        //this is to display answers available to be reviewed
+        function AnswerListHandler(questionID) {
+            var webMethod = "ProjectServices.asmx/GetAnswers";
+            var parameters = "{\"questionID\":\"" + questionID + "\"}";
+
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    alert("yay! it worked! now do something with the data!");
+                    if (msg.d.length > 0) {
+                        $("#answerListDisplay").empty();
+                        for (var i = 0; i < msg.d.length; i++) {
+                            answer = "<div class='answerRow' id='questR" + msg.d[i].id + "'>" +
+                                "<span class='answerText'>" + msg.d[i].answer +
+                                "</span> <span class='optionsTag'><a href='#' onclick='AnswerHandler(" + msg.d[i].id + ")'>mark as reviewed (not implemented)</a></div> <hr>";
+                            $("#answerListDisplay").append(answer);
+                        }
+                    }
+                },
+                error: function (e) {
+                    alert("boo...");
+                }
+            });
+        }
 	</script>
 	<!--END OF YOUR OWN JAVASCRIPT-->
 
@@ -153,16 +231,16 @@
                 Character limits: problemArea: 20, complaint: 50, proposedSolution: 1000<br />
                 These limits are enforced but the current character counts and character limits are not displayed.
                 userID should be stored as a session variable and not entered from form, but for now: (valid userID = test1)<br />
-                userID: <input type="text" id="userID" required/>
+                userID: <input type="text" id="userID" required />
             </div>
             <div>
-                Problem Area: <input type="text" id="problemArea" size="20" maxlength="20" required/>
+                Problem Area: <input type="text" id="problemArea" size="20" maxlength="20" required />
             </div>
             <div>
-                Complaint: <input type="text" id="complaint" size="50" maxlength="50" required/>
+                Complaint: <input type="text" id="complaint" size="50" maxlength="50" required />
             </div>
             <div>
-                <textarea id="proposedSolution" rows="10" cols="50" maxlength="1000" placeholder="Enter proposed solution..."required ></textarea>
+                <textarea id="proposedSolution" rows="10" cols="50" maxlength="1000" placeholder="Enter proposed solution..." required></textarea>
             </div>
             <div>
                 <button type="submit">Save</button>
@@ -179,7 +257,7 @@
                 Character limit: questionText: 1000<br />
                 This limit is enforced but the current character count and character limit are not displayed.
                 userID should be stored as a session variable and not entered from form, but for now: (valid userID = test1)<br />
-                userID: <input type="text" id="userID" required/>
+                userID: <input type="text" id="userID" required />
             </div>
             <div>
                 <textarea id="questionText" rows="10" cols="50" maxlength="1000" placeholder="Enter question..." required></textarea>
@@ -204,20 +282,62 @@
                 Character limit: answerText: 1000<br />
                 This limit is enforced but the current character count and character limit are not displayed.
                 userID should be stored as a session variable and not entered from form, but for now: (valid userID = test1)<br />
-                userID: <input type="text" id="userID" required/>
+                userID: <input type="text" id="userID" required />
             </div>
             <div>
                 <textarea id="answerText" rows="10" cols="50" maxlength="1000" placeholder="Enter answer..." required></textarea>
             </div>
             <div>
                 questionID should be stored as a session variable and not entered from form, but for now: (valid userID = test1)<br />
-                questionID: <input type="text" id="questionID" required/>
+                questionID: <input type="text" id="questionID" required />
             </div>
             <div>
                 <button type="submit">Save</button>
             </div>
             <hr />
         </form>
+    </div>
+
+    <div class="questionList">
+        <div class="left">Question List</div>
+        <div>
+            This should be a list of questions available for the logged-in user to answer.<br />
+            Note: does not currently check if the user has answered the question already.<br />
+            <button onclick="javascript: QuestionListHandler();">Click here to test Question List!</button>
+        </div>
+        <div id="questionListDisplay">
+            List should go here!
+        </div>
+        <hr />
+    </div>
+
+    <div class="myQuestionList">
+        <div class="left">Supervisor Question List</div>
+        <div>
+            This should be a list of questions posted by the supervisor to select which to answer.<br />
+            Currently sets the ID to 5 , which is a valid supervisor ID.<br />
+            The question "What do we do about the rats?" has answers to display.<br />
+            <button onclick="javascript: SupervisorQuestionListHandler();">Click here to test Supervisor Question List!</button>
+        </div>
+        <div id="myQuestionListDisplay">
+            List should go here!
+        </div>
+        <hr />
+    </div>
+
+    <div class="answerList">
+        <div class="left">Answer List</div>
+        <div>
+            This should be a list of answers available for the logged-in supervisor to review.<br />
+            Currently sets the ID to 5 , which is a valid supervisor ID.<br />
+            Also currently selects question 2 by default ("What do we do about the rats?") as it has answers to display.<br />
+            Note: does not currently check if the answer is marked as reviewed.<br />
+            <button onclick="javascript: AnswerListHandler('2');">Click here to test Answer List!</button>
+        </div>
+        <div id="answerListDisplay">
+            List should go here!
+        </div>
+        <hr />
     </div>
 </body>
 </html >

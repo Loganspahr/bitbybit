@@ -96,9 +96,11 @@
         function loginHandler() {
             var webMethod = "ProjectServices.asmx/LogOn";
             var parameters = JSON.stringify({
-                uid: $('#username').val(),
-                pass: $('#password').val()
+                uid: encodeURI($('#username').val()),
+                pass: encodeURI($('#password').val())
             });
+            var parameters = "{\"uid\":\"" + encodeURI($('#username').val()) + "\",\"pass\":\"" + encodeURI($('#password').val()) + "\"}";
+
 
             $.ajax({
                 type: "POST",
@@ -143,7 +145,9 @@
                 }
             });
         }
-
+        </script>
+    </body>
+</html>
 
 
 

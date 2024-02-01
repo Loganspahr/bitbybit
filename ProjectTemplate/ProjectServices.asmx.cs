@@ -7,6 +7,7 @@ using MySql.Data;
 using MySql.Data.MySqlClient;
 using System.Data;
 using System.Data.SqlClient;
+using System.Security.Principal;
 
 namespace ProjectTemplate
 {
@@ -302,6 +303,130 @@ namespace ProjectTemplate
             //return value will be the answerID of the row we just inserted.  If the insert failed,
             //it will be -1 instead.  This value can be used to display the answer back to the user after
             //they submit it, or to display a message if the submission failed.
+        }
+
+        [WebMethod(EnableSession = true)]
+        public Feedback[] GetQuestions()
+        {//LOGIC: get all questions for this user and return them!
+            // This sets session variables for testing as a normal employee
+            Session["id"] = 1;
+            Session["supervisor"] = 5;
+            Session["issupervisor"] = 0;
+            if (Convert.ToInt32(Session["id"]) != 0)
+            {
+                DataTable sqlDt = new DataTable("questionList");
+
+                string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+                //requests just have active set to 0
+                string sqlSelect = "select id, questionText, expiryDate from questions where submittedBy=@supervisor and expiryDate > CURDATE() order by expiryDate";
+
+                MySqlConnection sqlConnection = new MySqlConnection(getConString());
+                MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+               
+                sqlCommand.Parameters.AddWithValue("@supervisor", Session["supervisor"]);
+
+                MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
+                sqlDa.Fill(sqlDt);
+
+                List<Feedback> questionList = new List<Feedback>();
+                for (int i = 0; i < sqlDt.Rows.Count; i++)
+                {
+                    questionList.Add(new Feedback
+                    {
+                        id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
+                        question = sqlDt.Rows[i]["questionText"].ToString(),
+                        expiryDate = sqlDt.Rows[i]["expiryDate"].ToString(),
+                    });
+                }
+                //convert the list of accounts to an array and return!
+                return questionList.ToArray();
+            }
+            else
+            {
+                return new Feedback[0];
+            }
+        }
+
+        [WebMethod(EnableSession = true)]
+        public Feedback[] GetMyQuestions()
+        {//LOGIC: get all questions posted by this supervisor and return them!
+            // This sets session variables for testing as a supervisor
+            Session["id"] = 5;
+            Session["issupervisor"] = 1;
+            if (Convert.ToInt32(Session["id"]) != 0)
+            {
+                DataTable sqlDt = new DataTable("questionList");
+
+                string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+                //requests just have active set to 0
+                string sqlSelect = "select id, questionText, expiryDate from questions where submittedBy=@id order by expiryDate";
+
+                MySqlConnection sqlConnection = new MySqlConnection(getConString());
+                MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+                sqlCommand.Parameters.AddWithValue("@id", Session["id"]);
+
+                MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
+                sqlDa.Fill(sqlDt);
+
+                List<Feedback> questionList = new List<Feedback>();
+                for (int i = 0; i < sqlDt.Rows.Count; i++)
+                {
+                    questionList.Add(new Feedback
+                    {
+                        id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
+                        question = sqlDt.Rows[i]["questionText"].ToString(),
+                        expiryDate = sqlDt.Rows[i]["expiryDate"].ToString(),
+                    });
+                }
+                //convert the list of accounts to an array and return!
+                return questionList.ToArray();
+            }
+            else
+            {
+                return new Feedback[0];
+            }
+        }
+
+        [WebMethod(EnableSession = true)]
+        public Feedback[] GetAnswers(string questionID)
+        {//LOGIC: get all answers for a given question and return them!
+            // This sets session variables for testing as a supervisor
+            Session["id"] = 5;
+            Session["issupervisor"] = 1;
+            if (Convert.ToInt32(Session["id"]) != 0)
+            {
+                int questionIDInt = Convert.ToInt32(questionID);
+                DataTable sqlDt = new DataTable("answerList");
+
+                string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+                //requests just have active set to 0
+                string sqlSelect = "select id, feedback from answers where question=@questionValue and reviewed <> 1";
+
+                MySqlConnection sqlConnection = new MySqlConnection(getConString());
+                MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+                sqlCommand.Parameters.AddWithValue("@questionValue", questionIDInt);
+
+                MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
+                sqlDa.Fill(sqlDt);
+
+                List<Feedback> answerList = new List<Feedback>();
+                for (int i = 0; i < sqlDt.Rows.Count; i++)
+                {
+                    answerList.Add(new Feedback
+                    {
+                        id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
+                        answer = sqlDt.Rows[i]["feedback"].ToString(),
+                    });
+                }
+                //convert the list of accounts to an array and return!
+                return answerList.ToArray();
+            }
+            else
+            {
+                return new Feedback[0];
+            }
         }
     }
 }
