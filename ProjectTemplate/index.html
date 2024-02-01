@@ -1,98 +1,14 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Login Page</title>
-    <!-- DO NOT FORGET THIS SCRIPT TAG SO YOU CAN USE JQUERY! -->
+    <meta charset="utf-8" />
+    <title></title>
+    <!--DO NOT FORGET THIS SCRIPT TAG SO YOU CAN USE JQUERY!!!!!-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #fff;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
 
-        .login-container {
-            width: 100%;
-            max-width: 330px;
-            padding: 15px;
-            margin: 20px auto;
-            border: 1px solid #C1BFBF;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            background-color: #fff;
-        }
-
-            .login-container h2 {
-                color: #8C1D40; /* ASU Maroon */
-                text-align: center;
-                margin-bottom: 20px;
-            }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-            .form-group label {
-                display: block;
-                margin-bottom: 5px;
-                color: #5C6670; /* ASU Gray */
-            }
-
-            .form-group input {
-                width: calc(100% - 20px);
-                padding: 10px;
-                margin-bottom: 10px;
-                border: 1px solid #C1BFBF;
-                border-radius: 3px;
-            }
-
-        .login-container button {
-            width: calc(100% - 20px);
-            padding: 10px;
-            border: none;
-            border-radius: 3px;
-            background-color: #8C1D40; /* ASU Maroon */
-            color: #FFC627; /* ASU Gold */
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-            .login-container button:hover {
-                background-color: #991F3D; /* A darker shade of ASU Maroon */
-            }
-    </style>
-</head>
-<body>
-
-    <!-- Button for testing the connection -->
-    <button onclick="TestButtonHandler();">Click here to test connection!</button>
-    <hr />
-
-    <div class="login-container">
-        <h2>Login</h2>
-        <form id="loginForm" onsubmit="loginHandler(); return false;">
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required placeholder="Enter your username">
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required placeholder="Enter your password">
-            </div>
-
-            <button type="submit">Sign In</button>
-        </form>
-    </div>
-
+    <!--YOUR OWN JAVASCRIPT CAN GO RIGHT HERE-->
     <script type="text/javascript">
+<<<<<<< HEAD
         function loginHandler() {
             var webMethod = "ProjectServices.asmx/LogOn";
             var parameters = JSON.stringify({
@@ -126,10 +42,13 @@
             });
         }
 
+=======
+>>>>>>> logon
         function TestButtonHandler() {
             var webMethod = "ProjectServices.asmx/TestConnection";
             var parameters = "{}";
 
+            //jQuery ajax method
             $.ajax({
                 type: "POST",
                 url: webMethod,
@@ -145,9 +64,28 @@
                 }
             });
         }
+<<<<<<< HEAD
         </script>
     </body>
 </html>
+=======
+    </script>
+    <!--END OF YOUR OWN JAVASCRIPT-->
+    <!--AND YOUR OWN CSS CAN GO HERE AS WELL-->
+    <style>
+    </style>
+    <!--END OF YOUR OWN CSS-->
+</head>
+<body>
+    <button onclick="javascript: TestButtonHandler();">Click here to test connection!</button>
+    <hr />
+</body>
+</html>
+
+
+
+
+>>>>>>> logon
 
 
 
