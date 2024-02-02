@@ -1,18 +1,161 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <title></title>
-    <!--DO NOT FORGET THIS SCRIPT TAG SO YOU CAN USE JQUERY!!!!!-->
+    <meta charset="UTF-8">
+    <title>Company Feedback System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 330px;
+            padding: 15px;
+            margin-top: 10px;
+            border: 1px solid #C1BFBF;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+
+            .login-container h2 {
+                color: #8C1D40; /* ASU Maroon */
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+                color: #5C6670; /* ASU Gray */
+            }
+
+            .form-group input {
+                width: calc(100% - 20px);
+                padding: 10px;
+                margin-bottom: 10px;
+                border: 1px solid #C1BFBF;
+                border-radius: 3px;
+            }
+
+        .login-container button {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: none;
+            border-radius: 3px;
+            background-color: #8C1D40; /* ASU Maroon */
+            color: #FFC627; /* ASU Gold */
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            .login-container button:hover {
+                background-color: #991F3D; /* A darker shade of ASU Maroon */
+            }
+
+        .hidden {
+            display: none;
+        }
+    </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
 
-    <!--YOUR OWN JAVASCRIPT CAN GO RIGHT HERE-->
-    <script type="text/javascript">
-        function TestButtonHandler() {
-            var webMethod = "ProjectServices.asmx/TestConnection";
-            var parameters = "{}";
+    <!-- Login Section -->
+    <div id="loginSection" class="login-container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required placeholder="Enter your username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
+            </div>
+            <button type="button" onclick="loginHandler()">Sign In</button>
+        </form>
+    </div>
 
-            //jQuery ajax method
+    <!-- Supervisor Section -->
+    <div id="SupervisorHome" class="container hidden">
+        <h2>Supervisor Dashboard</h2>
+        <!-- Supervisor-specific content will go here -->
+    </div>
+
+    <!-- Employee Section -->
+    <div id="EmployeeHome" class="container hidden">
+        <h2>Employee Dashboard</h2>
+        <!-- Employee-specific content will go here -->
+    </div>
+
+    <!-- Post Questions Section -->
+    <div id="postQuestionsSection" class="container hidden">
+        <h2>Post a Question</h2>
+        <form id="postQuestionForm">
+            <label for="question">Your Question:</label>
+            <textarea id="question" name="question" required placeholder="Type your question here..."></textarea>
+            <label for="duration">Days to Live:</label>
+            <input type="number" id="duration" name="duration" placeholder="0 for indefinite">
+            <button type="submit">Post Question</button>
+        </form>
+    </div>
+
+    <!-- Unsolicited Feedback Section -->
+    <div id="unsolicitedFeedbackSection" class="container hidden">
+        <h2>Unsolicited Feedback</h2>
+        <form id="unsolicitedFeedbackForm">
+            <label for="problemArea">Problem Area:</label>
+            <input type="text" id="problemArea" name="problemArea" required placeholder="Problem Area (max 20 characters)" maxlength="20">
+            <label for="complaint">Complaint:</label>
+            <input type="text" id="complaint" name="complaint" required placeholder="Complaint (max 50 characters)" maxlength="50">
+            <label for="proposedSolution">Proposed Solution:</label>
+            <textarea id="proposedSolution" name="proposedSolution" required placeholder="Your proposed solution (max 1000 characters)" maxlength="1000"></textarea>
+            <button type="submit">Submit Feedback</button>
+        </form>
+    </div>
+
+    <script>
+        // Initial display setup
+        $('#loginSection').show();
+        $('.container').hide(); // Hide all containers
+
+        // Function for showing a particular section
+        function showSection(sectionId) {
+            $('.container').hide(); // Hide all sections
+            $('#' + sectionId).removeClass('hidden').show(); // Show the requested section
+        }
+
+        // Login handler function
+        function loginHandler() {
+            var username = $('#username').val().trim();
+            var password = $('#password').val().trim();
+
+            if (username === '' || password === '') {
+                alert('Please fill in both username and password.');
+                return;
+            }
+
+            var webMethod = "ProjectServices.asmx/LogOn";
+            var parameters = JSON.stringify({
+                uid: username,
+                pass: password
+            });
+
             $.ajax({
                 type: "POST",
                 url: webMethod,
@@ -20,26 +163,52 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (msg) {
-                    var responseFromServer = msg.d;
-                    alert(responseFromServer);
+                    if (msg.d.success) {
+                        if (msg.d.role === "supervisor") {
+                            showSection('SupervisorHome');
+                        } else {
+                            showSection('EmployeeHome');
+                        }
+                    } else {
+                        alert('Login failed: Incorrect username or password.');
+                    }
                 },
                 error: function (e) {
-                    alert("this code will only execute if javascript is unable to access the webservice");
+                    alert("There was an issue with the login request.");
                 }
             });
         }
+
+        // Placeholder for submitQuestionHandler function
+        function submitQuestionHandler() {
+            // You need to add the logic for question submission here
+        }
+
+        // Placeholder for unsolicitedFeedbackHandler function
+        function unsolicitedFeedbackHandler() {
+            // You need to add the logic for feedback submission here
+        }
+
+        // Add event listeners to forms
+        $('#postQuestionForm').submit(function (e) {
+            e.preventDefault(); // Prevent the default form submission
+            submitQuestionHandler();
+        });
+
+        $('#unsolicitedFeedbackForm').submit(function (e) {
+            e.preventDefault(); // Prevent the default form submission
+            unsolicitedFeedbackHandler();
+        });
+
     </script>
-    <!--END OF YOUR OWN JAVASCRIPT-->
-    <!--AND YOUR OWN CSS CAN GO HERE AS WELL-->
-    <style>
-    </style>
-    <!--END OF YOUR OWN CSS-->
-</head>
-<body>
-    <button onclick="javascript: TestButtonHandler();">Click here to test connection!</button>
-    <hr />
 </body>
 </html>
+
+
+
+
+
+
 
 
 
