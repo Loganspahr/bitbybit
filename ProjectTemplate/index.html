@@ -94,13 +94,13 @@
     <!-- Supervisor Section -->
     <div id="SupervisorHome" class="container hidden">
         <h2>Supervisor Dashboard</h2>
-        <!-- Supervisor-specific content will go here -->
+        <!-- Supervisor-specific content I need to add here -->
     </div>
 
     <!-- Employee Section -->
     <div id="EmployeeHome" class="container hidden">
         <h2>Employee Dashboard</h2>
-        <!-- Employee-specific content will go here -->
+        <!-- Employee-specific content I need to add here -->
     </div>
 
     <!--YOUR OWN JAVASCRIPT CAN GO RIGHT HERE-->
@@ -131,6 +131,28 @@
                 }
             });
         }
+
+        // Placeholder for submitQuestionHandler function
+        function submitQuestionHandler() {
+            // You need to add the logic for question submission here
+        }
+
+        // Placeholder for unsolicitedFeedbackHandler function
+        function unsolicitedFeedbackHandler() {
+            // You need to add the logic for feedback submission here
+        }
+
+        // Add event listeners to forms
+        $('#postQuestionForm').submit(function (e) {
+            e.preventDefault(); // Prevent the default form submission
+            submitQuestionHandler();
+        });
+
+        $('#unsolicitedFeedbackForm').submit(function (e) {
+            e.preventDefault(); // Prevent the default form submission
+            unsolicitedFeedbackHandler();
+        });
+
     </script>
 </body>
 </html>
@@ -139,6 +161,7 @@
 
 
 >>>>>>> logon
+
 
 
 
