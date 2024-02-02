@@ -93,12 +93,7 @@
     <Content Include="Global.asax" />
     <Content Include="logon.js" />
     <Content Include="logon.css" />
-    <Content Include="unsolicited-feedback.js" />
-    <Content Include="unsolicited-feedback.html" />
-    <Content Include="post-questions.js" />
-    <Content Include="post-questions.html" />
     <Content Include="styles.css" />
-    <Content Include="supervisorHome.html" />
     <Content Include="employeeHome.html" />
     <Content Include="logon.html" />
     <Content Include="testing.html" />

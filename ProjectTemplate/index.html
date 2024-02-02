@@ -105,9 +105,27 @@
 
     <!--YOUR OWN JAVASCRIPT CAN GO RIGHT HERE-->
     <script type="text/javascript">
-        function TestButtonHandler() {
-            var webMethod = "ProjectServices.asmx/TestConnection";
-            var parameters = "{}";
+        // Function for showing a particular section
+        function showSection(sectionId) {
+            $('.container').hide(); // Hide all sections
+            $('#' + sectionId).removeClass('hidden').show(); // Show the requested section
+        }
+
+        // Login handler function
+        function loginHandler() {
+            var username = $('#username').val().trim();
+            var password = $('#password').val().trim();
+
+            if (username === '' || password === '') {
+                alert('Please fill in both username and password.');
+                return;
+            }
+
+            var webMethod = "ProjectServices.asmx/LogOn";
+            var parameters = JSON.stringify({
+                uid: username,
+                pass: password
+            });
 
             $.ajax({
                 type: "POST",
@@ -153,14 +171,39 @@
             unsolicitedFeedbackHandler();
         });
 
+        // Logan's added code
+        function TestButtonHandler() {
+            var webMethod = "ProjectServices.asmx/TestConnection";
+            var parameters = "{}";
+
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    if (msg.d.success) {
+                        if (msg.d.role === "supervisor") {
+                            showSection('SupervisorHome');
+                        } else {
+                            showSection('EmployeeHome');
+                        }
+                    } else {
+                        alert('Login failed: Incorrect username or password.');
+                    }
+                },
+                error: function (e) {
+                    alert("There was an issue with the login request.");
+                }
+            });
+        }
     </script>
 </body>
 </html>
 
 
 
-
->>>>>>> logon
 
 
 
