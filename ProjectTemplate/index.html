@@ -100,6 +100,9 @@
                 <input type="password" id="password" name="password" required placeholder="Enter your password">
             </div>
             <button type="button" onclick="loginHandler()">Sign In</button>
+            <br />
+            <button onclick="javascript: lazyloginHandler('supervisor');">Login as Supervisor</button>
+            <button onclick="javascript: lazyloginHandler('employee');">Login as Employee</button>
         </form>
     </div>
 
@@ -108,6 +111,7 @@
         <h2>Supervisor Dashboard</h2>
         <!-- Supervisor-specific content goes here -->
         <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I have posted</button>
+        <button onclick="javascript: showPanel('SubmitQuestion')">Click here to submit a question</button>
         <button onclick="javascript: logoffHandler();">Log Off</button>
     </div>
 
@@ -116,6 +120,7 @@
         <h2>Employee Dashboard</h2>
         <!-- Employee-specific content goes here -->
         <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I can answer</button>
+        <button onclick="javascript: showPanel('unsolicitedFeedback')">Click here to submit feedback</button>
         <button onclick="javascript: logoffHandler();">Log Off</button>
     </div>
 
@@ -145,8 +150,54 @@
         <button onclick="javascript: logoffHandler();">Log Off</button>
     </div>
 
+    <div id="SubmitQuestion" class="contentPanel">
+        <form it="postQuestionForm" onsubmit="submitQuestionHandler(); return false;">
+            <div class="left">Submit Question</div>
+            <div>
+                Character limit: questionText: 1000<br />
+                This limit is enforced but the current character count and character limit are not displayed.
+            </div>
+            <div>
+                <textarea id="questionText" rows="10" cols="50" maxlength="1000" placeholder="Enter question..." required></textarea>
+            </div>
+            <div>
+                Days to live (enter 0 for no expiration): <input type="text" id="daysToLive" size="3" maxlength="3" />
+            </div>
+            <div>
+                <button type="submit">Save</button>
+            </div>
+            <hr />
+        </form>
+        <button onclick="javascript: DashboardHandler();">Cancel</button>
+    </div>
+
+    <div id="unsolicitedFeedback" class="contentPanel">
+        <form id="unsolicitedFeedbackForm" onsubmit="UnsolicitedFeedbackHandler(); return false;">
+            <div class="left">Submit Unsolicited Feedback</div>
+            <div>
+                Character limits: problemArea: 20, complaint: 50, proposedSolution: 1000<br />
+                These limits are enforced but the current character counts and character limits are not displayed.
+            </div>
+            <div>
+                Problem Area: <input type="text" id="problemArea" size="20" maxlength="20" required />
+            </div>
+            <div>
+                Complaint: <input type="text" id="complaint" size="50" maxlength="50" required />
+            </div>
+            <div>
+                <textarea id="proposedSolution" rows="10" cols="50" maxlength="1000" placeholder="Enter proposed solution..." required></textarea>
+            </div>
+            <div>
+                <button type="submit">Save</button>
+            </div>
+            <hr />
+        </form>
+
+    </div>
+
     <!--YOUR OWN JAVASCRIPT CAN GO RIGHT HERE-->
     <script type="text/javascript">
+
         //this function executes once jQuery has successfully loaded and is
         //ready for business.  Usually, if we're wiring up event handlers via jQuery
         //then this is where they go.
@@ -201,6 +252,8 @@
         function clearData() {
             $('#username').val("");
             $('#password').val("");
+            $('#questionText').val("");
+            // more will be added as more panels are added
         }
 
         function DashboardHandler() {
@@ -282,7 +335,25 @@
         }
         // Placeholder for submitQuestionHandler function
         function submitQuestionHandler() {
-            // need to add the logic for question submission here
+            var webMethod = "ProjectServices.asmx/SubmitQuestion";
+            var parameters = "{}";
+            var parameters = "{\"questionText\":\"" + encodeURI($('#questionText').val()) + "\",\"daysToLive\":\"" + encodeURI($('#daysToLive').val()) + "\"}";
+            alert(parameters);
+            //jQuery ajax method
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    var responseFromServer = msg.d;
+                    alert(responseFromServer);
+                },
+                error: function (e) {
+                    alert("this code will only execute if javascript is unable to access the webservice");
+                }
+            });
         }
 
         // Placeholder for unsolicitedFeedbackHandler function
@@ -301,37 +372,10 @@
             unsolicitedFeedbackHandler();
         });
 
-        // Logan's added code
-        function TestButtonHandler() {
-            var webMethod = "ProjectServices.asmx/TestConnection";
-            var parameters = "{}";
-
-            $.ajax({
-                type: "POST",
-                url: webMethod,
-                data: parameters,
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (msg) {
-                    if (msg.d.success) {
-                        if (msg.d.role === "supervisor") {
-                            showSection('SupervisorHome');
-                        } else {
-                            showSection('EmployeeHome');
-                        }
-                    } else {
-                        alert('Login failed: Incorrect username or password.');
-                    }
-                },
-                error: function (e) {
-                    alert("There was an issue with the login request.");
-                }
-            });
-        }
-        //this is to display questions available to be answered
+        //this is to display questions available to be answered or reviewed
         function QuestionListHandler() {
             showPanel("QuestionList");
-            var webMethod = "ProjectServices.asmx/GetSuperFlag";
+            var webMethod = "ProjectServices.asmx/IsSupervisor";
             $.ajax({
                 type: "POST",
                 url: webMethod,
@@ -402,6 +446,32 @@
                 }
             });
         }
+
+        function lazyloginHandler(role) {
+            var webMethod = "ProjectServices.asmx/Login";
+            var parameters = "{\"role\":\"" + role + "\"}";
+
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    if (msg.d === 1) {
+                        showPanel('SupervisorHome')
+                    } else if (msg.d === 0) {
+                        showPanel('EmployeeHome')
+                    } else {
+                        alert('Login failed: Incorrect username or password.');
+                    }
+                },
+                error: function (e) {
+                    alert("boo...hiss");
+                }
+            });
+        }
+
     </script>
 </body>
 </html>

@@ -29,7 +29,8 @@ namespace ProjectTemplate
         ////////////////////////////////////////////////////////////////////////
         ///call this method anywhere that you need the connection string!
         ////////////////////////////////////////////////////////////////////////
-        private string getConString() {
+        private string getConString()
+        {
             return "SERVER=107.180.1.16; PORT=3306; DATABASE=" + dbName + "; UID=" + dbID + "; PASSWORD=" + dbPass;
         }
         ////////////////////////////////////////////////////////////////////////
@@ -64,9 +65,6 @@ namespace ProjectTemplate
                 return "Something went wrong, please check your credentials and db name and try again.  Error: " + e.Message;
             }
         }
-
-
-
 
         [WebMethod(EnableSession = true)]
         public int LogOn(string uid, string pass)
@@ -189,9 +187,9 @@ namespace ProjectTemplate
 
 
         [WebMethod(EnableSession = true)]
-        public int UnsolicitedFeedback(string userID, string problemArea, string complaint, string proposedSolution)
+        public int UnsolicitedFeedback(string problemArea, string complaint, string proposedSolution)
         {
-			int unsolicitedFeedbackID = -333;
+            int unsolicitedFeedbackID = -333;
             string sqlSelect = "insert into unsolicitedFeedback (problemArea, complaint, proposedSolution, submittedBy) " +
                 "values(@problemAreaValue, @complaintValue, @proposedSolutionValue, @idValue); SELECT LAST_INSERT_ID();";
 
@@ -201,33 +199,33 @@ namespace ProjectTemplate
             sqlCommand.Parameters.AddWithValue("@problemAreaValue", HttpUtility.UrlDecode(problemArea));
             sqlCommand.Parameters.AddWithValue("@complaintValue", HttpUtility.UrlDecode(complaint));
             sqlCommand.Parameters.AddWithValue("@proposedSolutionValue", HttpUtility.UrlDecode(proposedSolution));
-            sqlCommand.Parameters.AddWithValue("@idValue", HttpUtility.UrlDecode(userID));
+            sqlCommand.Parameters.AddWithValue("@idValue", Convert.ToInt32(Session["id"]));
 
             sqlConnection.Open();
             try
             {
                 unsolicitedFeedbackID = Convert.ToInt32(sqlCommand.ExecuteScalar());
-				
+
                 //if the query worked, unsolicitedFeedbackID will have the value of the primary key of the
-				//row we just inserted into the unsolicitedFeedback table
+                //row we just inserted into the unsolicitedFeedback table
             }
             catch (Exception e)
             {
-				unsolicitedFeedbackID = -1;
+                unsolicitedFeedbackID = -1;
                 //something went wrong, so we don't have an unsolicitedFeedbackID to work with
                 //so we need to set it to something that we can check for later
                 //in this case, -1 will (hopefully) never be a valid unsolicitedFeedbackID
                 //so we can check for that later when this method is called
             }
             sqlConnection.Close();
-			return unsolicitedFeedbackID;
-			//return value will be the unsolicitedFeedbackID of the row we just inserted.  If the insert failed,
-			//it will be -1 instead.  This value can be used to display the feedback back to the user after
-			//they submit it, or to display a message if the submission failed.
+            return unsolicitedFeedbackID;
+            //return value will be the unsolicitedFeedbackID of the row we just inserted.  If the insert failed,
+            //it will be -1 instead.  This value can be used to display the feedback back to the user after
+            //they submit it, or to display a message if the submission failed.
         }
 
         [WebMethod(EnableSession = true)]
-        public int SubmitQuestion(string userID, string questionText, string daysToLive)
+        public int SubmitQuestion(string questionText, string daysToLive)
         {
             int questionID = -333;
             int daysToLiveInt = 0;
@@ -257,7 +255,7 @@ namespace ProjectTemplate
 
             sqlCommand.Parameters.AddWithValue("@questionTextValue", HttpUtility.UrlDecode(questionText));
             sqlCommand.Parameters.AddWithValue("@expiryDateValue", HttpUtility.UrlDecode(expiryDateStr));
-            sqlCommand.Parameters.AddWithValue("@idValue", HttpUtility.UrlDecode(userID));
+            sqlCommand.Parameters.AddWithValue("@idValue", Convert.ToInt32(Session["id"]));
 
             sqlConnection.Open();
             try
@@ -334,7 +332,7 @@ namespace ProjectTemplate
 
                 MySqlConnection sqlConnection = new MySqlConnection(getConString());
                 MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
-               
+
                 sqlCommand.Parameters.AddWithValue("@supervisor", Session["supervisor"]);
 
                 MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
@@ -429,6 +427,7 @@ namespace ProjectTemplate
             }
         }
 
+        // NOTE: THIS IS ONLY HERE FOR LAZY DEVS TO ONE-CLICK SIGN IN - NEEDS TO BE REMOVED FROM FINAL CODE
         [WebMethod(EnableSession = true)]
         public int Login(string role)
         {
@@ -436,25 +435,19 @@ namespace ProjectTemplate
             {
                 Session["id"] = 5;
                 Session["issupervisor"] = 1;
-                return Convert.ToInt32(Session["id"]);
+                return Convert.ToInt32(Session["issupervisor"]);
             }
             else if (role == "employee")
             {
                 Session["id"] = 1;
                 Session["issupervisor"] = 0;
                 Session["supervisor"] = 5;
-                return Convert.ToInt32(Session["id"]);
+                return Convert.ToInt32(Session["issupervisor"]);
             }
             else
             {
-                return 0;
+                return -1;
             }
-        }
-
-        [WebMethod(EnableSession = true)]
-        public int GetSuperFlag()
-        {
-            return Convert.ToInt32(Session["issupervisor"]);
         }
     }
 }
