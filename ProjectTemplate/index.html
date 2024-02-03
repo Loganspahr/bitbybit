@@ -70,13 +70,25 @@
         .hidden {
             display: none;
         }
+
+        .contentPanel {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            height: 100%;
+            width: 100%;
+            visibility: hidden;
+            flex: 1;
+            /*border: 1px solid gray;
+			border-radius: 25px;*/
+        }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 <body>
 
     <!-- Login Section -->
-    <div id="loginSection" class="login-container">
+    <div id="loginSection" class="login-container contentPanel">
         <h2>Login</h2>
         <form id="loginForm">
             <div class="form-group">
@@ -92,23 +104,128 @@
     </div>
 
     <!-- Supervisor Section -->
-    <div id="SupervisorHome" class="container hidden">
+    <div id="SupervisorHome" class="contentPanel">
         <h2>Supervisor Dashboard</h2>
         <!-- Supervisor-specific content goes here -->
+        <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I have posted</button>
+        <button onclick="javascript: logoffHandler();">Log Off</button>
     </div>
 
     <!-- Employee Section -->
-    <div id="EmployeeHome" class="container hidden">
+    <div id="EmployeeHome" class="contentPanel">
         <h2>Employee Dashboard</h2>
         <!-- Employee-specific content goes here -->
+        <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I can answer</button>
+        <button onclick="javascript: logoffHandler();">Log Off</button>
+    </div>
+
+    <div id="QuestionList" class="contentPanel">
+        <div class="left">Question List</div>
+        <div>
+            This should be a list of questions available for the logged-in user to answer.<br />
+            If the logged-in user is a supervisor, it should be a list of questions they have posted.<br />
+            Note: does not currently check if the user has answered the question already.<br />
+        </div>
+        <div id="questionListDisplay">
+            List should go here!
+        </div>
+        <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
+        <button onclick="javascript: logoffHandler();">Log Off</button>
+    </div>
+
+    <div id="AnswerList" class="contentPanel">
+        <div class="left">Answer List</div>
+        <div>
+            Note: does not currently check if the answer is marked as reviewed.<br />
+        </div>
+        <div id="answerListDisplay">
+            List should go here!
+        </div>
+        <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
+        <button onclick="javascript: logoffHandler();">Log Off</button>
     </div>
 
     <!--YOUR OWN JAVASCRIPT CAN GO RIGHT HERE-->
     <script type="text/javascript">
+        //this function executes once jQuery has successfully loaded and is
+        //ready for business.  Usually, if we're wiring up event handlers via jQuery
+        //then this is where they go.
+        jQuery(function () {
+            //when the app loads, check to see if the user is logged in.  If so, show their dashboard.  If not, show the logon panel to start with!
+            var webMethod = "ProjectServices.asmx/IsSupervisor";
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    if (msg.d === -1) {
+                        showPanel('loginSection');
+                    } else {
+                        if (msg.d === 1) {
+                            showPanel('SupervisorHome');
+                        } else {
+                            showPanel('EmployeeHome');
+                        }
+                    }
+                },
+                error: function (e) {
+                    alert("boo...");
+                }
+            });
+        });
+
         // Function for showing a particular section
         function showSection(sectionId) {
             $('.container').hide(); // Hide all sections
             $('#' + sectionId).removeClass('hidden').show(); // Show the requested section
+        }
+        //we're using a stacked card approach for our main viewing area
+        //this array holds the ids of our cards and the method
+        //allows us to easly switch the interface from one to the other
+        var contentPanels = ['loginSection', 'SupervisorHome', 'EmployeeHome', 'QuestionList', 'AnswerList', 'SubmitAnswer', 'unsolicitedFeedback', 'SubmitQuestion'];
+        //this function toggles which panel is showing, and also clears data from all panels
+        function showPanel(panelId) {
+            clearData();
+            for (var i = 0; i < contentPanels.length; i++) {
+                if (panelId == contentPanels[i]) {
+                    $("#" + contentPanels[i]).css("visibility", "visible");
+                }
+                else {
+                    $("#" + contentPanels[i]).css("visibility", "hidden");
+                }
+            }
+        }
+
+        //this function clears data from all panels
+        function clearData() {
+            $('#username').val("");
+            $('#password').val("");
+        }
+
+        function DashboardHandler() {
+            //return the user to their dashboard
+            var webMethod = "ProjectServices.asmx/IsSupervisor";
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    if (msg.d === -1) {
+                        showPanel('loginSection');
+                    } else {
+                        if (msg.d === 1) {
+                            showPanel('SupervisorHome');
+                        } else {
+                            showPanel('EmployeeHome');
+                        }
+                    }
+                },
+                error: function (e) {
+                    alert("boo...");
+                }
+            });
         }
 
         // Login handler function
@@ -126,7 +243,6 @@
                 uid: username,
                 pass: password
             });
-
             $.ajax({
                 type: "POST",
                 url: webMethod,
@@ -134,12 +250,10 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (msg) {
-                    if (msg.d.success) {
-                        if (msg.d.role === "supervisor") {
-                            showSection('SupervisorHome');
-                        } else {
-                            showSection('EmployeeHome');
-                        }
+                    if (msg.d === 1) {
+                        showPanel('SupervisorHome');
+                    } else if (msg.d === 0) {
+                        showPanel('EmployeeHome');
                     } else {
                         alert('Login failed: Incorrect username or password.');
                     }
@@ -150,6 +264,22 @@
             });
         }
 
+        function logoffHandler() {
+            var webMethod = "ProjectServices.asmx/LogOff";
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    clearData();
+                    showPanel('loginSection');
+                },
+                error: function (e) {
+                    alert("There was an issue with the logoff request.");
+                }
+            });
+        }
         // Placeholder for submitQuestionHandler function
         function submitQuestionHandler() {
             // need to add the logic for question submission here
@@ -195,6 +325,80 @@
                 },
                 error: function (e) {
                     alert("There was an issue with the login request.");
+                }
+            });
+        }
+        //this is to display questions available to be answered
+        function QuestionListHandler() {
+            showPanel("QuestionList");
+            var webMethod = "ProjectServices.asmx/GetSuperFlag";
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    issupervisor = msg.d;
+                    var webMethod2 = "ProjectServices.asmx/GetQuestions";
+                    $.ajax({
+                        type: "POST",
+                        url: webMethod2,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (msg) {
+                            if (msg.d.length > 0) {
+                                $("#questionListDisplay").empty();
+                                for (var i = 0; i < msg.d.length; i++) {
+                                    if (issupervisor == 1) {
+                                        question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>" +
+                                            "<span class='questionText'>" + msg.d[i].question +
+                                            "</span> <span class='optionsTag'><a href='#' onclick='AnswerListHandler(" + msg.d[i].id + ")'> review responses (not implemented)</a></div> <hr>";
+                                    }
+                                    else {
+                                        question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>" +
+                                            "<span class='questionText'>" + msg.d[i].question +
+                                            "</span> <span class='optionsTag'><a href='#' onclick='AnswerHandler(" + msg.d[i].id + ")'>respond (not implemented)</a></div> <hr>";
+                                    }
+                                    $("#questionListDisplay").append(question);
+                                }
+                            }
+                        },
+                        error: function (e) {
+                            alert("boo...2");
+                        }
+                    });
+                },
+                error: function (e) {
+                    alert("boo...");
+                }
+            });
+        }
+
+        //this is to display answers available to be reviewed
+        function AnswerListHandler(questionID) {
+            showPanel("AnswerList");
+            var webMethod = "ProjectServices.asmx/GetAnswers";
+            var parameters = "{\"questionID\":\"" + questionID + "\"}";
+
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    if (msg.d.length > 0) {
+                        $("#answerListDisplay").empty();
+                        for (var i = 0; i < msg.d.length; i++) {
+                            answer = "<div class='answerRow' id='questR" + msg.d[i].id + "'>" +
+                                "<span class='answerText'>" + msg.d[i].answer +
+                                "</span> <span class='optionsTag'><a href='#' onclick='AnswerHandler(" + msg.d[i].id + ")'>mark as reviewed (not implemented)</a></div> <hr>";
+                            $("#answerListDisplay").append(answer);
+                        }
+                    }
+                },
+                error: function (e) {
+                    alert("boo...");
                 }
             });
         }

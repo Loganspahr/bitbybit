@@ -69,12 +69,10 @@ namespace ProjectTemplate
 
 
         [WebMethod(EnableSession = true)]
-        public bool LogOn(string uid, string pass)
+        public int LogOn(string uid, string pass)
         {
-            bool success = false;
-
             string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
-            string sqlSelect = "SELECT id, supervisor FROM employees WHERE userid=@idValue and pass=@passValue";
+            string sqlSelect = "SELECT id, supervisor, issupervisor FROM users WHERE userid=@idValue and pass=@passValue";
             MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
             MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
 
@@ -90,14 +88,31 @@ namespace ProjectTemplate
 
                 Session["id"] = sqlDt.Rows[0]["id"];
                 Session["supervisor"] = sqlDt.Rows[0]["supervisor"];
-                success = true;
+                Session["issupervisor"] = sqlDt.Rows[0]["issupervisor"];
+                return Convert.ToInt32(Session["issupervisor"]);
             }
 
-            return success;
+            return -1;
         }
 
+        [WebMethod(EnableSession = true)]
+        public void LogOff()
+        {
+            Session.Abandon();
+        }
 
-
+        [WebMethod(EnableSession = true)]
+        public int IsSupervisor()
+        {
+            if (Session["issupervisor"] != null)
+            {
+                return Convert.ToInt32(Session["issupervisor"]);
+            }
+            else
+            {
+                return -1;
+            }
+        }
 
         [WebMethod(EnableSession = true)]
         //this returns a bool of true if the reset took place, which will allow us to display a message either way

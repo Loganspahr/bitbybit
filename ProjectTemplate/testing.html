@@ -165,7 +165,7 @@
         }
 
         //this is to display questions available to be answered
-        function QuestionListHandler(issupervisor) {
+        function QuestionListHandler() {
             var webMethod = "ProjectServices.asmx/GetSuperFlag";
             $.ajax({
                 type: "POST",
@@ -362,7 +362,7 @@
             This should be a list of questions available for the logged-in user to answer.<br />
             If the logged-in user is a supervisor, it should be a list of questions they have posted.<br />
             Note: does not currently check if the user has answered the question already.<br />
-            <button onclick="javascript: QuestionListHandler(GetSupervisorFlag());">Click here to test Question List!</button>
+            <button onclick="javascript: QuestionListHandler();">Click here to test Question List!</button>
         </div>
         <div id="questionListDisplay">
             List should go here!
