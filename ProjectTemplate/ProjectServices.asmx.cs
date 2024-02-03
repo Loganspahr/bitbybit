@@ -309,10 +309,7 @@ namespace ProjectTemplate
         public Feedback[] GetQuestions()
         {//LOGIC: get all questions for this user and return them!
             // This sets session variables for testing as a normal employee
-            Session["id"] = 1;
-            Session["supervisor"] = 5;
-            Session["issupervisor"] = 0;
-            if (Convert.ToInt32(Session["id"]) != 0)
+            if (Convert.ToInt32(Session["issupervisor"]) == 0)
             {
                 DataTable sqlDt = new DataTable("questionList");
 
@@ -341,19 +338,7 @@ namespace ProjectTemplate
                 //convert the list of accounts to an array and return!
                 return questionList.ToArray();
             }
-            else
-            {
-                return new Feedback[0];
-            }
-        }
-
-        [WebMethod(EnableSession = true)]
-        public Feedback[] GetMyQuestions()
-        {//LOGIC: get all questions posted by this supervisor and return them!
-            // This sets session variables for testing as a supervisor
-            Session["id"] = 5;
-            Session["issupervisor"] = 1;
-            if (Convert.ToInt32(Session["id"]) != 0)
+            else if (Convert.ToInt32(Session["issupervisor"]) == 1)
             {
                 DataTable sqlDt = new DataTable("questionList");
 
@@ -427,6 +412,34 @@ namespace ProjectTemplate
             {
                 return new Feedback[0];
             }
+        }
+
+        [WebMethod(EnableSession = true)]
+        public int Login(string role)
+        {
+            if (role == "supervisor")
+            {
+                Session["id"] = 5;
+                Session["issupervisor"] = 1;
+                return Convert.ToInt32(Session["id"]);
+            }
+            else if (role == "employee")
+            {
+                Session["id"] = 1;
+                Session["issupervisor"] = 0;
+                Session["supervisor"] = 5;
+                return Convert.ToInt32(Session["id"]);
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        [WebMethod(EnableSession = true)]
+        public int GetSuperFlag()
+        {
+            return Convert.ToInt32(Session["issupervisor"]);
         }
     }
 }

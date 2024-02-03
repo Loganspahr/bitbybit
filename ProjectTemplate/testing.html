@@ -8,7 +8,33 @@
 
 	<!--YOUR OWN JAVASCRIPT CAN GO RIGHT HERE-->
 	<script type="text/javascript">
-		function TestButtonHandler() {
+        //we're using a stacked card approach for our main viewing area
+        //this array holds the ids of our cards and the method
+        //allows us to easly switch the interface from one to the other
+        var contentPanels = ['loginSection', 'SupervisorHome', 'EmployeeHome', 'QuestionList', 'AnswerList', 'SubmitAnswer', 'unsolicitedFeedback', 'SubmitQuestion'];
+        //this function toggles which panel is showing, and also clears data from all panels
+        function showPanel(panelId) {
+            clearData();
+            for (var i = 0; i < contentPanels.length; i++) {
+                if (panelId == contentPanels[i]) {
+                    $("#" + contentPanels[i]).css("visibility", "visible");
+                }
+                else {
+                    $("#" + contentPanels[i]).css("visibility", "hidden");
+                }
+            }
+        }
+
+        //this function clears data from all panels
+        function clearData() {
+            $("#accountsBox").empty();
+            $("#requestsBox").empty();
+            clearNewAccount();
+            clearLogon();
+            clearEditAccount();
+        }
+
+        function TestButtonHandler() {
 			var webMethod = "ProjectServices.asmx/TestConnection";
 			var parameters = "{}";
 
@@ -134,24 +160,49 @@
             });
         }
 
+        function GetSupervisorFlag() {
+
+        }
+
         //this is to display questions available to be answered
-        function QuestionListHandler() {
-            var webMethod = "ProjectServices.asmx/GetQuestions";
+        function QuestionListHandler(issupervisor) {
+            var webMethod = "ProjectServices.asmx/GetSuperFlag";
             $.ajax({
                 type: "POST",
                 url: webMethod,
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (msg) {
-                    if (msg.d.length > 0) {
-                       $("#questionListDisplay").empty();
-                        for (var i = 0; i < msg.d.length; i++) {
-                            question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>" +
-                                "<span class='questionText'>" + msg.d[i].question +
-                                "</span> <span class='optionsTag'><a href='#' onclick='AnswerHandler(" + msg.d[i].id + ")'>respond (not implemented)</a></div> <hr>";
-                            $("#questionListDisplay").append(question);
+                    issupervisor = msg.d;
+                    alert(issupervisor)
+                    var webMethod2 = "ProjectServices.asmx/GetQuestions";
+                    $.ajax({
+                        type: "POST",
+                        url: webMethod2,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (msg) {
+                            if (msg.d.length > 0) {
+                                $("#questionListDisplay").empty();
+                                for (var i = 0; i < msg.d.length; i++) {
+                                    if (issupervisor == 1) {
+                                        question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>" +
+                                            "<span class='questionText'>" + msg.d[i].question +
+                                            "</span> <span class='optionsTag'><a href='#' onclick='AnswerListHandler(" + msg.d[i].id + ")'> review responses (not implemented)</a></div> <hr>";
+                                    }
+                                    else {
+                                        question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>" +
+                                            "<span class='questionText'>" + msg.d[i].question +
+                                            "</span> <span class='optionsTag'><a href='#' onclick='AnswerHandler(" + msg.d[i].id + ")'>respond (not implemented)</a></div> <hr>";
+                                    }
+                                    $("#questionListDisplay").append(question);
+                                }
+                            }
+                        },
+                        error: function (e) {
+                            alert("boo...2");
                         }
-                    }
+                    });
                 },
                 error: function (e) {
                     alert("boo...");
@@ -159,30 +210,6 @@
             });
         }
 
-        //this is to display questions posted by the current supervisor
-        function SupervisorQuestionListHandler() {
-            var webMethod = "ProjectServices.asmx/GetMyQuestions";
-            $.ajax({
-                type: "POST",
-                url: webMethod,
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (msg) {
-                    if (msg.d.length > 0) {
-                        $("#myQuestionListDisplay").empty();
-                        for (var i = 0; i < msg.d.length; i++) {
-                            question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>" +
-                                "<span class='questionText'>" + msg.d[i].question +
-                                "</span> <span class='optionsTag'><a href='#' onclick='AnswerListHandler(" + msg.d[i].id + ")'>view responses</a></div> <hr>";
-                            $("#myQuestionListDisplay").append(question);
-                        }
-                    }
-                },
-                error: function (e) {
-                    alert("boo...");
-                }
-            });
-        }
         //this is to display answers available to be reviewed
         function AnswerListHandler(questionID) {
             var webMethod = "ProjectServices.asmx/GetAnswers";
@@ -211,6 +238,34 @@
                 }
             });
         }
+
+        // this is temporary to log in a user for testing
+        function loginHandler(role) {
+            var webMethod = "ProjectServices.asmx/Login";
+            var parameters = "{\"role\":\"" + role + "\"}";
+
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    var responseFromServer = msg.d;
+                    alert(responseFromServer);
+                },
+                error: function (e) {
+                    alert("boo...");
+                }
+            });
+        }
+
+        //this is to display questions available to be answered
+        function AnswerHandler(questionID) {
+            // There needs to be a call here to a webMethod that will display the selected question and allow the user to submit an answer
+            // This will be handled by hiding the question list and showing the answer form, and populating the question in the answer form
+            // This function call will then display the selected question and provide a textarea for the user to submit an answer
+        }
 	</script>
 	<!--END OF YOUR OWN JAVASCRIPT-->
 
@@ -223,8 +278,11 @@
 <body>
     <button onclick="javascript: TestButtonHandler();">Click here to test connection!</button>
     <hr />
-
-    <div class="unsolicitedFeedback">
+    <div id="login">
+        <button onclick="javascript: loginHandler('supervisor');">Login as Supervisor</button>
+        <button onclick="javascript: loginHandler('employee');">Login as Employee</button>
+    </div>
+    <div id="unsolicitedFeedback">
         <form onsubmit="UnsolicitedFeedbackHandler(); return false;">
             <div class="left">Submit Unsolicited Feedback</div>
             <div>
@@ -250,7 +308,7 @@
 
     </div>
 
-    <div class="submitQuestion">
+    <div id="SubmitQuestion">
         <form onsubmit="SubmitQuestionHandler(); return false;">
             <div class="left">Submit Question</div>
             <div>
@@ -272,7 +330,7 @@
         </form>
     </div>
 
-    <div class="submitAnswer">
+    <div id="SubmitAnswer">
         <form onsubmit="SubmitAnswerHandler(); return false;">
             <div class="left">Submit Answer</div>
             <div>
@@ -298,12 +356,13 @@
         </form>
     </div>
 
-    <div class="questionList">
+    <div id="QuestionList">
         <div class="left">Question List</div>
         <div>
             This should be a list of questions available for the logged-in user to answer.<br />
+            If the logged-in user is a supervisor, it should be a list of questions they have posted.<br />
             Note: does not currently check if the user has answered the question already.<br />
-            <button onclick="javascript: QuestionListHandler();">Click here to test Question List!</button>
+            <button onclick="javascript: QuestionListHandler(GetSupervisorFlag());">Click here to test Question List!</button>
         </div>
         <div id="questionListDisplay">
             List should go here!
@@ -311,21 +370,7 @@
         <hr />
     </div>
 
-    <div class="myQuestionList">
-        <div class="left">Supervisor Question List</div>
-        <div>
-            This should be a list of questions posted by the supervisor to select which to answer.<br />
-            Currently sets the ID to 5 , which is a valid supervisor ID.<br />
-            The question "What do we do about the rats?" has answers to display.<br />
-            <button onclick="javascript: SupervisorQuestionListHandler();">Click here to test Supervisor Question List!</button>
-        </div>
-        <div id="myQuestionListDisplay">
-            List should go here!
-        </div>
-        <hr />
-    </div>
-
-    <div class="answerList">
+    <div id="AnswerList">
         <div class="left">Answer List</div>
         <div>
             This should be a list of answers available for the logged-in supervisor to review.<br />
