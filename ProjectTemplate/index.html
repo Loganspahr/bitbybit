@@ -80,7 +80,7 @@
             visibility: hidden;
             flex: 1;
             /*border: 1px solid gray;
-			border-radius: 25px;*/
+            border-radius: 25px;*/
         }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -161,7 +161,26 @@
                 <textarea id="questionText" rows="10" cols="50" maxlength="1000" placeholder="Enter question..." required></textarea>
             </div>
             <div>
-                Days to live (enter 0 for no expiration): <input type="text" id="daysToLive" size="3" maxlength="3" />
+                Days to live (enter 0 for no expiration): <input type="text" id="daysToLive" size="3" maxlength="3" placeholder="0" />
+            </div>
+            <div>
+                <button type="submit">Save</button>
+            </div>
+            <hr />
+        </form>
+        <button onclick="javascript: DashboardHandler();">Cancel</button>
+    </div>
+
+    <div id="SubmitAnswer" class="contentPanel">
+        <form it="postQuestionForm" onsubmit="submitAnswerHandler(); return false;">
+            <div class="left">Submit Question</div>
+            <div id="selectedQuestion">Question should be displayed here.</div>
+            <div>
+                Character limit: answerText: 1000<br />
+                This limit is enforced but the current character count and character limit are not displayed.
+            </div>
+            <div>
+                <textarea id="answerText" rows="10" cols="50" maxlength="1000" placeholder="Enter question..." required></textarea>
             </div>
             <div>
                 <button type="submit">Save</button>
@@ -192,6 +211,7 @@
             </div>
             <hr />
         </form>
+        <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
 
     </div>
 
@@ -253,6 +273,11 @@
             $('#username').val("");
             $('#password').val("");
             $('#questionText').val("");
+            $('#problemArea').val("");
+            $('#complaint').val("");
+            $('#proposedSolution').val("");
+            $('#answerText').val("");
+            $('#daysToLive').val("");
             // more will be added as more panels are added
         }
 
@@ -338,7 +363,6 @@
             var webMethod = "ProjectServices.asmx/SubmitQuestion";
             var parameters = "{}";
             var parameters = "{\"questionText\":\"" + encodeURI($('#questionText').val()) + "\",\"daysToLive\":\"" + encodeURI($('#daysToLive').val()) + "\"}";
-            alert(parameters);
             //jQuery ajax method
             $.ajax({
                 type: "POST",
@@ -348,8 +372,15 @@
                 dataType: "json",
                 success: function (msg) {
                     var responseFromServer = msg.d;
-                    alert(responseFromServer);
+                    if (responseFromServer > 0) {
+                        alert("Question submitted successfully");
+                        showPanel('SupervisorHome');
+                    }
+                    else {
+                        alert("Feedback submission failed");
+                    }
                 },
+
                 error: function (e) {
                     alert("this code will only execute if javascript is unable to access the webservice");
                 }
@@ -357,8 +388,32 @@
         }
 
         // Placeholder for unsolicitedFeedbackHandler function
-        function unsolicitedFeedbackHandler() {
-            // I need to add the logic for feedback submission here
+        function UnsolicitedFeedbackHandler() {
+            var webMethod = "ProjectServices.asmx/UnsolicitedFeedback";
+            var parameters = "{}";
+            var parameters = "{\"problemArea\":\"" + encodeURI($('#problemArea').val()) + "\",\"complaint\":\"" + encodeURI($('#complaint').val()) + "\",\"proposedSolution\":\"" + encodeURI($('#proposedSolution').val()) + "\"}";
+
+            //jQuery ajax method
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    var responseFromServer = msg.d;
+                    if (responseFromServer > 0) {
+                        alert("Feedback submitted successfully");
+                        showPanel('EmployeeHome');
+                    }
+                    else {
+                        alert("Feedback submission failed");
+                    }
+                },
+                error: function (e) {
+                    alert("this code will only execute if javascript is unable to access the webservice");
+                }
+            });
         }
 
         // Add event listeners to forms
@@ -447,6 +502,8 @@
             });
         }
 
+        // NOTE THIS IS ONLY HERE BECAUSE I AM A LAZY DEVELOPER AND GOT TIRED OF TYPING IN CREDENTIALS
+        // THIS WILL NEED TO BE DELETED BEFORE THE PROJECT IS SUBMITTED
         function lazyloginHandler(role) {
             var webMethod = "ProjectServices.asmx/Login";
             var parameters = "{\"role\":\"" + role + "\"}";
