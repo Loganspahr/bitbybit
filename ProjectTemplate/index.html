@@ -102,132 +102,140 @@
 </head>
 <body>
 
-    <!-- Login Section -->
-    <div id="loginSection" class="login-container contentPanel">
-        <h2>Login</h2>
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required placeholder="Enter your username">
-            </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required placeholder="Enter your password">
-            </div>
-            <button type="button" onclick="loginHandler()">Sign In</button>
-            <br />
-            <button onclick="javascript: lazyloginHandler('supervisor');">Login as Supervisor</button>
-            <button onclick="javascript: lazyloginHandler('employee');">Login as Employee</button>
-        </form>
-    </div>
-
-    <!-- Supervisor Section -->
-    <div id="SupervisorHome" class="contentPanel">
-        <h2>Supervisor Dashboard</h2>
-        <!-- Supervisor-specific content goes here -->
-        <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I have posted</button>
-        <button onclick="javascript: showPanel('SubmitQuestion')">Click here to submit a question</button>
-        <button onclick="javascript: logoffHandler();">Log Off</button>
-    </div>
-
-    <!-- Employee Section -->
-    <div id="EmployeeHome" class="contentPanel">
-        <h2>Employee Dashboard</h2>
-        <!-- Employee-specific content goes here -->
-        <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I can answer</button>
-        <button onclick="javascript: showPanel('unsolicitedFeedback')">Click here to submit feedback</button>
-        <button onclick="javascript: logoffHandler();">Log Off</button>
-    </div>
-
-    <div id="QuestionList" class="contentPanel">
-        <div class="left">Question List</div>
-        <div>
-            This should be a list of questions available for the logged-in user to answer.<br />
-            If the logged-in user is a supervisor, it should be a list of questions they have posted.<br />
-            Note: does not currently check if the user has answered the question already.<br />
+    <div class="titleContainer">
+        <div id="menu" class="menu">
+            <a href="#" onclick="LogOff()">log off</a>
         </div>
-        <div id="questionListDisplay">
-            List should go here!
+    </div>
+
+    <div class="contentContainer">
+        <!-- Login Section -->
+        <div id="login-container" class="login-container contentPanel">
+            <h2>Login</h2>
+            <form id="loginForm" onsubmit="LogOn($('#userId').val(), $('#pass').val()); return false;">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="userId" name="username" required placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="pass" name="password" required placeholder="Enter your password">
+                </div>
+                <button type="submit">Sign In</button>
+                <br />
+                <button onclick="javascript: lazyloginHandler('supervisor');">Login as Supervisor</button>
+                <button onclick="javascript: lazyloginHandler('employee');">Login as Employee</button>
+            </form>
         </div>
-        <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
-        <button onclick="javascript: logoffHandler();">Log Off</button>
-    </div>
 
-    <div id="AnswerList" class="contentPanel">
-        <div class="left">Answer List</div>
-        <div>
-            Note: does not currently check if the answer is marked as reviewed.<br />
+        <!-- Supervisor Section -->
+        <div id="SupervisorHome" class="contentPanel">
+            <h2>Supervisor Dashboard</h2>
+            <!-- Supervisor-specific content goes here -->
+            <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I have posted</button>
+            <button onclick="javascript: showPanel('SubmitQuestion')">Click here to submit a question</button>
+            <button onclick="javascript: LogOff();">Log Off</button>
         </div>
-        <div id="answerListDisplay">
-            List should go here!
+
+        <!-- Employee Section -->
+        <div id="EmployeeHome" class="contentPanel">
+            <h2>Employee Dashboard</h2>
+            <!-- Employee-specific content goes here -->
+            <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I can answer</button>
+            <button onclick="javascript: showPanel('unsolicitedFeedback')">Click here to submit feedback</button>
+            <button onclick="javascript: LogOff();">Log Off</button>
         </div>
-        <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
-        <button onclick="javascript: logoffHandler();">Log Off</button>
-    </div>
 
-    <div id="SubmitQuestion" class="contentPanel">
-        <form it="postQuestionForm" onsubmit="submitQuestionHandler(); return false;">
-            <div class="left">Submit Question</div>
+        <div id="QuestionList" class="contentPanel">
+            <div class="left">Question List</div>
             <div>
-                Character limit: questionText: 1000<br />
-                This limit is enforced but the current character count and character limit are not displayed.
+                This should be a list of questions available for the logged-in user to answer.<br />
+                If the logged-in user is a supervisor, it should be a list of questions they have posted.<br />
+                Note: does not currently check if the user has answered the question already.<br />
             </div>
-            <div>
-                <textarea id="questionText" rows="10" cols="50" maxlength="1000" placeholder="Enter question..." required></textarea>
+            <div id="questionListDisplay">
+                List should go here!
             </div>
-            <div>
-                Days to live (enter 0 for no expiration): <input type="text" id="daysToLive" size="3" maxlength="3" placeholder="0" />
-            </div>
-            <div>
-                <button type="submit">Save</button>
-            </div>
-            <hr />
-        </form>
-        <button onclick="javascript: DashboardHandler();">Cancel</button>
-    </div>
+            <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
+            <button onclick="javascript: LogOff();">Log Off</button>
+        </div>
 
-    <div id="SubmitAnswer" class="contentPanel">
-        <form it="postQuestionForm" onsubmit="submitAnswerHandler(); return false;">
-            <div class="left">Submit Question</div>
-            <div id="selectedQuestion">Question should be displayed here.</div>
+        <div id="AnswerList" class="contentPanel">
+            <div class="left">Answer List</div>
             <div>
-                Character limit: answerText: 1000<br />
-                This limit is enforced but the current character count and character limit are not displayed.
+                Note: does not currently check if the answer is marked as reviewed.<br />
             </div>
-            <div>
-                <textarea id="answerText" rows="10" cols="50" maxlength="1000" placeholder="Enter question..." required></textarea>
+            <div id="answerListDisplay">
+                List should go here!
             </div>
-            <div>
-                <button type="submit">Save</button>
-            </div>
-            <hr />
-        </form>
-        <button onclick="javascript: DashboardHandler();">Cancel</button>
-    </div>
+            <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
+            <button onclick="javascript: LogOff();">Log Off</button>
+        </div>
 
-    <div id="unsolicitedFeedback" class="contentPanel">
-        <form id="unsolicitedFeedbackForm" onsubmit="UnsolicitedFeedbackHandler(); return false;">
-            <div class="left">Submit Unsolicited Feedback</div>
-            <div>
-                Character limits: problemArea: 20, complaint: 50, proposedSolution: 1000<br />
-                These limits are enforced but the current character counts and character limits are not displayed.
-            </div>
-            <div>
-                Problem Area: <input type="text" id="problemArea" size="20" maxlength="20" required />
-            </div>
-            <div>
-                Complaint: <input type="text" id="complaint" size="50" maxlength="50" required />
-            </div>
-            <div>
-                <textarea id="proposedSolution" rows="10" cols="50" maxlength="1000" placeholder="Enter proposed solution..." required></textarea>
-            </div>
-            <div>
-                <button type="submit">Save</button>
-            </div>
-            <hr />
-        </form>
-        <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
+        <div id="SubmitQuestion" class="contentPanel">
+            <form it="postQuestionForm" onsubmit="submitQuestionHandler(); return false;">
+                <div class="left">Submit Question</div>
+                <div>
+                    Character limit: questionText: 1000<br />
+                    This limit is enforced but the current character count and character limit are not displayed.
+                </div>
+                <div>
+                    <textarea id="questionText" rows="10" cols="50" maxlength="1000" placeholder="Enter question..." required></textarea>
+                </div>
+                <div>
+                    Days to live (enter 0 for no expiration): <input type="text" id="daysToLive" size="3" maxlength="3" placeholder="0" />
+                </div>
+                <div>
+                    <button type="submit">Save</button>
+                </div>
+                <hr />
+            </form>
+            <button onclick="javascript: DashboardHandler();">Cancel</button>
+        </div>
 
+        <div id="SubmitAnswer" class="contentPanel">
+            <form it="postQuestionForm" onsubmit="submitAnswerHandler(); return false;">
+                <div class="left">Submit Question</div>
+                <div id="selectedQuestion">Question should be displayed here.</div>
+                <div>
+                    Character limit: answerText: 1000<br />
+                    This limit is enforced but the current character count and character limit are not displayed.
+                </div>
+                <div>
+                    <textarea id="answerText" rows="10" cols="50" maxlength="1000" placeholder="Enter question..." required></textarea>
+                </div>
+                <div>
+                    <button type="submit">Save</button>
+                </div>
+                <hr />
+            </form>
+            <button onclick="javascript: DashboardHandler();">Cancel</button>
+        </div>
+
+        <div id="unsolicitedFeedback" class="contentPanel">
+            <form id="unsolicitedFeedbackForm" onsubmit="UnsolicitedFeedbackHandler(); return false;">
+                <div class="left">Submit Unsolicited Feedback</div>
+                <div>
+                    Character limits: problemArea: 20, complaint: 50, proposedSolution: 1000<br />
+                    These limits are enforced but the current character counts and character limits are not displayed.
+                </div>
+                <div>
+                    Problem Area: <input type="text" id="problemArea" size="20" maxlength="20" required />
+                </div>
+                <div>
+                    Complaint: <input type="text" id="complaint" size="50" maxlength="50" required />
+                </div>
+                <div>
+                    <textarea id="proposedSolution" rows="10" cols="50" maxlength="1000" placeholder="Enter proposed solution..." required></textarea>
+                </div>
+                <div>
+                    <button type="submit">Save</button>
+                </div>
+                <hr />
+            </form>
+            <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
+
+        </div>
     </div>
 
     <!--YOUR OWN JAVASCRIPT CAN GO RIGHT HERE-->
@@ -246,7 +254,7 @@
                 dataType: "json",
                 success: function (msg) {
                     if (msg.d === -1) {
-                        showPanel('loginSection');
+                        showPanel('login-container');
                     } else {
                         if (msg.d === 1) {
                             showPanel('SupervisorHome');
@@ -261,15 +269,10 @@
             });
         });
 
-        // Function for showing a particular section
-        function showSection(sectionId) {
-            $('.container').hide(); // Hide all sections
-            $('#' + sectionId).removeClass('hidden').show(); // Show the requested section
-        }
         //we're using a stacked card approach for our main viewing area
         //this array holds the ids of our cards and the method
         //allows us to easly switch the interface from one to the other
-        var contentPanels = ['loginSection', 'SupervisorHome', 'EmployeeHome', 'QuestionList', 'AnswerList', 'SubmitAnswer', 'unsolicitedFeedback', 'SubmitQuestion'];
+        var contentPanels = ['login-container', 'SupervisorHome', 'EmployeeHome', 'QuestionList', 'AnswerList', 'SubmitAnswer', 'unsolicitedFeedback', 'SubmitQuestion', 'accountspanel', 'requestspanel'];
         //this function toggles which panel is showing, and also clears data from all panels
         // Toggles which panel is showing, and also clears data from all panels
         function showPanel(panelId) {
@@ -287,14 +290,17 @@
 
         //this function clears data from all panels
         function clearData() {
-            $('#username').val("");
-            $('#password').val("");
             $('#questionText').val("");
             $('#problemArea').val("");
             $('#complaint').val("");
             $('#proposedSolution').val("");
             $('#answerText').val("");
             $('#daysToLive').val("");
+            $("#accountsBox").empty();
+            $("#requestsBox").empty();
+            //clearNewAccount();
+            clearLogon();
+            //clearEditAccount();
             // more will be added as more panels are added
         }
 
@@ -308,7 +314,7 @@
                 dataType: "json",
                 success: function (msg) {
                     if (msg.d === -1) {
-                        showPanel('loginSection');
+                        showPanel('login-container');
                     } else {
                         if (msg.d === 1) {
                             showPanel('SupervisorHome');
@@ -324,20 +330,10 @@
         }
 
         // Login handler function
-        function loginHandler() {
-            var username = $('#username').val().trim();
-            var password = $('#password').val().trim();
-
-            if (username === '' || password === '') {
-                alert('Please fill in both username and password.');
-                return;
-            }
-
+        function LogOn(userId, pass) {
             var webMethod = "ProjectServices.asmx/LogOn";
-            var parameters = JSON.stringify({
-                uid: username,
-                pass: password
-            });
+            var parameters = "{\"userId\":\"" + encodeURI(userId) + "\",\"pass\":\"" + encodeURI(pass) + "\"}";
+
             $.ajax({
                 type: "POST",
                 url: webMethod,
@@ -346,12 +342,15 @@
                 dataType: "json",
                 success: function (msg) {
                     if (msg.d === 1) {
+                        alert("logon successful");
                         showPanel('SupervisorHome');
                     } else if (msg.d === 0) {
+                        alert("logon successful");
                         showPanel('EmployeeHome');
                     } else {
                         alert('Login failed: Incorrect username or password.');
                     }
+                    LoadAccounts();
                 },
                 error: function (e) {
                     alert("There was an issue with the login request.");
@@ -359,7 +358,7 @@
             });
         }
 
-        function logoffHandler() {
+        function LogOff() {
             var webMethod = "ProjectServices.asmx/LogOff";
             $.ajax({
                 type: "POST",
@@ -367,14 +366,162 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (msg) {
-                    clearData();
-                    showPanel('loginSection');
+                    if (msg.d) {
+                        clearData();
+                        alert("All sessions have been ended");
+                        showPanel('login-container');
+                        HideMenu();
+                    }
+                    else {
+                    }
                 },
                 error: function (e) {
                     alert("There was an issue with the logoff request.");
                 }
             });
         }
+
+        var accountsArray;
+        var admin = false;
+
+        //resets the logon inputs
+        function clearLogon() {
+            $('#userId').val("");
+            $('#pass').val("");
+        }
+
+        var accountWindowShowing = false;
+        //and here's a function that adjusts the menu options if you're an admin or a user
+        //and if you're looking at accounts or requests
+        function ShowMenu() {
+
+            $("#menu").css("visibility", "visible");
+            if (admin) {
+                if (accountWindowShowing) {
+                    $("#adminLink").text("requests");
+                }
+                else {
+                    $("#adminLink").text("accounts");
+                }
+            }
+        }
+
+        //just hides the menu
+        function HideMenu() {
+
+            $("#menu").css("visibility", "hidden");
+            $("#adminLink").text("");
+        }
+
+
+        //a simple ajax call that passes the id to be approved
+        function approveAccount(id) {
+            var webMethod = "ProjectServices.asmx/ActivateAccount";
+            var parameters = "{\"id\":\"" + encodeURI(id) + "\"}";
+
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    showPanel('requestsPanel');
+                    LoadRequests();
+                },
+                error: function (e) {
+                    alert("boo...");
+                }
+            });
+        }
+
+        //virtually identical with approve
+        function rejectAccount(id) {
+            var webMethod = "ProjectServices.asmx/RejectAccount";
+            var parameters = "{\"id\":\"" + encodeURI(id) + "\"}";
+
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    showPanel('requestsPanel');
+                    LoadRequests();
+                },
+                error: function (e) {
+                    alert("rejectAccount error");
+                }
+            });
+        }
+
+
+        function LoadAccounts() {
+            var webMethod = "ProjectServices.asmx/GetAccounts";
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    if (msg.d.length > 0) {
+
+                        accountsArray = msg.d;
+
+                        $("#accountsBox").empty();
+                        admin = false;
+                        for (var i = 0; i < accountsArray.length; i++) {
+                            var acct;
+                            if (accountsArray[i].userId != null) {
+                                acct = "<div class='accountRow' id='acct" + accountsArray[i].id + "'>" +
+                                    "<a class='nameTag' href='mailto:" + accountsArray[i].email + "'>" +
+                                    accountsArray[i].firstName + " " + accountsArray[i].lastName +
+                                    "</a> <a href='#' onclick='LoadAccount(" + accountsArray[i].id + ")' class='optionsTag'>edit</a></div><hr>"
+                                admin = true;
+                            }
+                            else {
+                                acct = "<div class='accountRow' id='acct" + accountsArray[i].id + "'>" +
+                                    "<a class='nameTag' href='mailto:" + accountsArray[i].email + "'>" +
+                                    accountsArray[i].firstName + " " + accountsArray[i].lastName +
+                                    "</a></div><hr>"
+                            }
+                            $("#accountsBox").append(
+                                acct
+                            );
+                        }
+                    }
+                    accountWindowShowing = true;
+                    ShowMenu();
+                },
+                error: function (e) {
+                    alert("loadaccounts error");
+                }
+            });
+        }
+
+        var currentAccount;
+        //load up an account for editing
+        function LoadAccount(id) {
+            showPanel('editAccountPanel');
+            currentAccount = null;
+            //find the account with a matching id in our array
+            for (var i = 0; i < accountsArray.length; i++) {
+                if (accountsArray[i].id == id) {
+                    currentAccount = accountsArray[i]
+                }
+            }
+            //set up our inputs
+            if (currentAccount != null) {
+                $('#editLogonId').val(currentAccount.userId);
+                $('#editpass').val(currentAccount.pass);
+                $('#editdepartment').val(currentAccount.department);
+                $('#editsupervisor').val(currentAccount.supervisor);
+                $('#editissupervisor').val(currentAccount.issupervisor);
+            }
+        }
+
+
         // Placeholder for submitQuestionHandler function
         function submitQuestionHandler() {
             var webMethod = "ProjectServices.asmx/SubmitQuestion";

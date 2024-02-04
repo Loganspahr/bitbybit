@@ -36,45 +36,15 @@ namespace ProjectTemplate
         ////////////////////////////////////////////////////////////////////////
 
 
-
-        /////////////////////////////////////////////////////////////////////////
-        //don't forget to include this decoration above each method that you want
-        //to be exposed as a web service!
         [WebMethod(EnableSession = true)]
-        /////////////////////////////////////////////////////////////////////////
-        public string TestConnection()
-        {
-            try
-            {
-                string testQuery = "select * from test";
-
-                ////////////////////////////////////////////////////////////////////////
-                ///here's an example of using the getConString method!
-                ////////////////////////////////////////////////////////////////////////
-                MySqlConnection con = new MySqlConnection(getConString());
-                ////////////////////////////////////////////////////////////////////////
-
-                MySqlCommand cmd = new MySqlCommand(testQuery, con);
-                MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
-                DataTable table = new DataTable();
-                adapter.Fill(table);
-                return "Success!";
-            }
-            catch (Exception e)
-            {
-                return "Something went wrong, please check your credentials and db name and try again.  Error: " + e.Message;
-            }
-        }
-
-        [WebMethod(EnableSession = true)]
-        public int LogOn(string uid, string pass)
+        public int LogOn(string userId, string pass)
         {
             string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
             string sqlSelect = "SELECT id, supervisor, issupervisor FROM users WHERE userid=@idValue and pass=@passValue";
             MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
             MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
 
-            sqlCommand.Parameters.AddWithValue("@idValue", HttpUtility.UrlDecode(uid));
+            sqlCommand.Parameters.AddWithValue("@idValue", HttpUtility.UrlDecode(userId));
             sqlCommand.Parameters.AddWithValue("@passValue", HttpUtility.UrlDecode(pass));
 
             MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
@@ -94,9 +64,10 @@ namespace ProjectTemplate
         }
 
         [WebMethod(EnableSession = true)]
-        public void LogOff()
+        public bool LogOff()
         {
             Session.Abandon();
+            return true;
         }
 
         [WebMethod(EnableSession = true)]
@@ -118,7 +89,7 @@ namespace ProjectTemplate
         {
             bool success = false;
             string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
-            string sqlSelect = "SELECT id FROM employees WHERE userid=@useridValue and pass=@passValue; UPDATE employees SET pass = @newPassValue WHERE userid=@useridValue and pass=@passValue";
+            string sqlSelect = "SELECT id FROM users WHERE userid=@useridValue and pass=@passValue; UPDATE users SET pass = @newPassValue WHERE userid=@useridValue and pass=@passValue";
             MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
             MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
 
@@ -153,11 +124,11 @@ namespace ProjectTemplate
 
         //EXAMPLE OF AN INSERT QUERY WITH PARAMS PASSED IN.  BONUS GETTING THE INSERTED ID FROM THE DB!
         [WebMethod(EnableSession = true)]
-        public bool RequestAccount(string pid, string userid, string pass, string department, string supervisor)
+        public bool RequestAccount(string pid, string userid, string pass, string department, string issupervisor)
         {
             bool success = false;
             string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
-            string sqlSelect = "INSERT into employees (id, userid, pass, department, supervisor) Values(@idValue, @uidValue, @passValue, @departmentValue, @supervisorValue)";
+            string sqlSelect = "INSERT into users (id, userid, pass, department, issupervisor) Values(@idValue, @uidValue, @passValue, @departmentValue, @issupervisorValue)";
 
             MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
             MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
@@ -166,7 +137,7 @@ namespace ProjectTemplate
             sqlCommand.Parameters.AddWithValue("@uidValue", HttpUtility.UrlDecode(userid));
             sqlCommand.Parameters.AddWithValue("@passValue", HttpUtility.UrlDecode(pass));
             sqlCommand.Parameters.AddWithValue("@departmentValue", HttpUtility.UrlDecode(department));
-            sqlCommand.Parameters.AddWithValue("@supervisorValue", HttpUtility.UrlDecode(supervisor));
+            sqlCommand.Parameters.AddWithValue("@issupervisorValue", HttpUtility.UrlDecode(issupervisor));
 
 
             sqlConnection.Open();
@@ -184,7 +155,64 @@ namespace ProjectTemplate
             return success;
         }
 
+        [WebMethod(EnableSession = true)]
+        public Account[] GetAccounts()
+        {
 
+            if (Session["id"] != null)
+            {
+                DataTable sqlDt = new DataTable("accounts");
+
+                string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+                string sqlSelect = "select id, userid, pass,department,supervisor, issupervisor from users where id > 0  order by department";
+                // note - i need to add a line possibly in this code to check the accountlocked, where accountlocked < 3 and hang the code above
+                MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+                MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+                //gonna use this to fill a data table
+                MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
+                //filling the data table
+                sqlDa.Fill(sqlDt);
+
+                //loop through each row in the dataset, creating instances
+                //of our container class Account.  Fill each acciount with
+                //data from the rows, then dump them in a list.
+                List<Account> accounts = new List<Account>();
+                for (int i = 0; i < sqlDt.Rows.Count; i++)
+                {
+                    //only share user id and pass info with admins!
+                    if (Convert.ToInt32(Session["issupervisor"]) == 1)
+                    {
+                        accounts.Add(new Account
+                        {
+                            id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
+                            userId = sqlDt.Rows[i]["userId"].ToString(),
+                            pass = sqlDt.Rows[i]["pass"].ToString(),
+                            department = sqlDt.Rows[i]["department"].ToString(),
+                            supervisor = sqlDt.Rows[i]["supervisor"] != DBNull.Value ? Convert.ToInt32(sqlDt.Rows[i]["supervisor"]) : 0,
+                            issupervisor = sqlDt.Rows[i]["issupervisor"].ToString()
+
+                        });
+                    }
+                    else
+                    {
+                        accounts.Add(new Account
+                        {
+                            id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
+                            userId = sqlDt.Rows[i]["userId"].ToString(),
+                            department = sqlDt.Rows[i]["department"].ToString(),
+                            issupervisor = sqlDt.Rows[i]["issupervisor"].ToString()
+                        });
+                    }
+                }
+                //convert the list of accounts to an array and return!
+                return accounts.ToArray();
+            }
+            else
+            {
+                return new Account[0];
+            }
+        }
 
         [WebMethod(EnableSession = true)]
         public int UnsolicitedFeedback(string problemArea, string complaint, string proposedSolution)

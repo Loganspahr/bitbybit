@@ -102,6 +102,7 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="account.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="feedback.cs" />
     <Compile Include="Global.asax.cs">
