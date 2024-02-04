@@ -16,18 +16,42 @@
             height: 100vh;
         }
 
-        .login-container {
+        .login-container,
+        .contentPanel {
             width: 100%;
             max-width: 330px;
+            margin: auto; /* This will center the div if the outer container is a flex container */
+            display: none; /* Start with all panels hidden */
+            flex-direction: column; /* Stack children vertically */
             padding: 15px;
-            margin-top: 10px;
             border: 1px solid #C1BFBF;
             border-radius: 5px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             background-color: #fff;
         }
 
-            .login-container h2 {
+            .contentPanel button,
+            .login-container button {
+                width: calc(100% - 20px);
+                padding: 10px;
+                border: none;
+                border-radius: 3px;
+                background-color: #8C1D40; /* ASU Maroon */
+                color: #FFC627; /* ASU Gold */
+                font-size: 16px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+                margin-top: 10px; /* Space between buttons */
+            }
+
+                /* Button hover effect */
+                .contentPanel button:hover,
+                .login-container button:hover {
+                    background-color: #991F3D; /* A darker shade of ASU Maroon */
+                }
+
+            .login-container h2,
+            .contentPanel h2 {
                 color: #8C1D40; /* ASU Maroon */
                 text-align: center;
                 margin-bottom: 20px;
@@ -47,42 +71,33 @@
                 width: calc(100% - 20px);
                 padding: 10px;
                 margin-bottom: 10px;
-                border: 1px solid #C1BFBF;
+                border: 1px solid #8C1D40; /* ASU Maroon */
                 border-radius: 3px;
-            }
-
-        .login-container button {
-            width: calc(100% - 20px);
-            padding: 10px;
-            border: none;
-            border-radius: 3px;
-            background-color: #8C1D40; /* ASU Maroon */
-            color: #FFC627; /* ASU Gold */
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-            .login-container button:hover {
-                background-color: #991F3D; /* A darker shade of ASU Maroon */
             }
 
         .hidden {
             display: none;
         }
 
-        .contentPanel {
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            height: 100%;
-            width: 100%;
-            visibility: hidden;
-            flex: 1;
-            /*border: 1px solid gray;
-            border-radius: 25px;*/
+        /* No space above the first button */
+        .login-container button:first-of-type,
+        .contentPanel button:first-of-type {
+            margin-top: 0;
+        }
+
+        /* Add space below the last button */
+        .login-container button:last-of-type,
+        .contentPanel button:last-of-type {
+            margin-bottom: 10px;
+        }
+
+        /* If I need to adjust the space around the button */
+        .login-container button:not(:last-of-type),
+        .contentPanel button:not(:last-of-type) {
+            margin-bottom: 10px;
         }
     </style>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 <body>
@@ -256,17 +271,19 @@
         //allows us to easly switch the interface from one to the other
         var contentPanels = ['loginSection', 'SupervisorHome', 'EmployeeHome', 'QuestionList', 'AnswerList', 'SubmitAnswer', 'unsolicitedFeedback', 'SubmitQuestion'];
         //this function toggles which panel is showing, and also clears data from all panels
+        // Toggles which panel is showing, and also clears data from all panels
         function showPanel(panelId) {
             clearData();
-            for (var i = 0; i < contentPanels.length; i++) {
-                if (panelId == contentPanels[i]) {
-                    $("#" + contentPanels[i]).css("visibility", "visible");
+            contentPanels.forEach(function (panel) {
+                var element = document.getElementById(panel);
+                if (panelId == panel) {
+                    element.style.display = 'flex'; // Show the requested panel
+                } else {
+                    element.style.display = 'none'; // Hide other panels
                 }
-                else {
-                    $("#" + contentPanels[i]).css("visibility", "hidden");
-                }
-            }
+            });
         }
+
 
         //this function clears data from all panels
         function clearData() {
