@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <title>Company Feedback System</title>
     <style>
+
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #fff;
+            /* Updated gradient background to match ASU maroon colors */
+            /* mixed gold with red*/
+            background: linear-gradient(to bottom, #8C1D40, #a3555c, #b76e7a, #FFC627);
             margin: 0;
             padding: 0;
             display: flex;
@@ -90,9 +93,10 @@
                 color: #5C6670; /* ASU Gray */
             }
 
+            /* Ensuring inputs and textareas fit their parent containers */
             .form-group input,
             .form-group textarea {
-                width: 100%; /* Full width */
+                width: calc(100% - 20px); /* Full width - padding */
                 padding: 10px;
                 margin-bottom: 10px;
                 border: 1px solid #C1BFBF;
@@ -100,9 +104,17 @@
                 box-sizing: border-box; /* Include padding in the width */
             }
 
+        /* Ensures textareas do not overflow their parent container */
+        .contentPanel textarea {
+            width: 100%; /* Adjust width to fit the parent container */
+            height: auto; /* Auto height based on content */
+            resize: vertical; /* Allows only vertical resizing */
+        }
+
         .hidden {
             display: none;
         }
+
 
     </style>
 
@@ -110,9 +122,9 @@
 </head>
 <body>
 
-    <div class="titleContainer">
+   <!-- <div class="titleContainer">
         <div id="menu" class="menu">
-            <a href="#" onclick="LogOff()">log off</a>
+            <a href="#" onclick="LogOff()">log off</a> -->
         </div>
     </div>
 
@@ -140,6 +152,7 @@
         <div id="SupervisorHome" class="contentPanel">
             <h2>Supervisor Dashboard</h2>
             <!-- Supervisor-specific content goes here -->
+            <a href="#" onclick="LogOff()">log off</a> <!--add log off to only show in supervisor screen-->
             <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I have posted</button>
             <button onclick="javascript: showPanel('SubmitQuestion')">Click here to submit a question</button>
             <button onclick="javascript: LogOff();">Log Off</button>
@@ -149,6 +162,7 @@
         <div id="EmployeeHome" class="contentPanel">
             <h2>Employee Dashboard</h2>
             <!-- Employee-specific content goes here -->
+            <a href="#" onclick="LogOff()">log off</a>
             <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I can answer</button>
             <button onclick="javascript: showPanel('unsolicitedFeedback')">Click here to submit feedback</button>
             <button onclick="javascript: LogOff();">Log Off</button>

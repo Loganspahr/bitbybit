@@ -91,11 +91,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
-    <Content Include="logon.js" />
-    <Content Include="logon.css" />
-    <Content Include="styles.css" />
-    <Content Include="employeeHome.html" />
-    <Content Include="logon.html" />
     <Content Include="testing.html" />
     <Content Include="index.html" />
     <Content Include="ProjectServices.asmx" />
