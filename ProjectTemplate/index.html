@@ -5,7 +5,7 @@
     <title>Company Feedback System</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             background-color: #fff;
             margin: 0;
             padding: 0;
@@ -16,23 +16,46 @@
             height: 100vh;
         }
 
-        .login-container,
-        .contentPanel {
+        .titleContainer {
+            position: fixed;
+            top: 0;
             width: 100%;
-            max-width: 330px;
-            margin: auto; /* This will center the div if the outer container is a flex container */
-            display: none; /* Start with all panels hidden */
-            flex-direction: column; /* Stack children vertically */
-            padding: 15px;
+            background: #8C1D40; /* ASU Maroon */
+            color: #FFC627; /* ASU Gold */
+            padding: 10px 0;
+            text-align: center;
+            font-size: 24px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu a {
+            color: #FFC627; /* ASU Gold */
+            text-decoration: none;
+            padding: 5px 10px;
+            display: inline-block;
+        }
+
+        .contentContainer {
+            margin-top: 50px; /* Give space for the fixed header */
+            width: 100%;
+            max-width: 400px; /* Adjusted for better spacing */
+            box-sizing: border-box;
+        }
+
+        .login-container, .contentPanel {
+            display: none; /* Initially hidden */
+            flex-direction: column;
+            padding: 20px;
             border: 1px solid #C1BFBF;
             border-radius: 5px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             background-color: #fff;
+            margin-bottom: 20px;
         }
 
-            .contentPanel button,
-            .login-container button {
-                width: calc(100% - 20px);
+            .login-container button,
+            .contentPanel button {
+                width: 100%; /* Full width */
                 padding: 10px;
                 border: none;
                 border-radius: 3px;
@@ -41,12 +64,12 @@
                 font-size: 16px;
                 cursor: pointer;
                 transition: background-color 0.3s;
-                margin-top: 10px; /* Space between buttons */
+                margin-top: 10px; /* Consistent space between buttons */
             }
 
                 /* Button hover effect */
-                .contentPanel button:hover,
-                .login-container button:hover {
+                .login-container button:hover,
+                .contentPanel button:hover {
                     background-color: #991F3D; /* A darker shade of ASU Maroon */
                 }
 
@@ -67,35 +90,20 @@
                 color: #5C6670; /* ASU Gray */
             }
 
-            .form-group input {
-                width: calc(100% - 20px);
+            .form-group input,
+            .form-group textarea {
+                width: 100%; /* Full width */
                 padding: 10px;
                 margin-bottom: 10px;
-                border: 1px solid #8C1D40; /* ASU Maroon */
+                border: 1px solid #C1BFBF;
                 border-radius: 3px;
+                box-sizing: border-box; /* Include padding in the width */
             }
 
         .hidden {
             display: none;
         }
 
-        /* No space above the first button */
-        .login-container button:first-of-type,
-        .contentPanel button:first-of-type {
-            margin-top: 0;
-        }
-
-        /* Add space below the last button */
-        .login-container button:last-of-type,
-        .contentPanel button:last-of-type {
-            margin-bottom: 10px;
-        }
-
-        /* If I need to adjust the space around the button */
-        .login-container button:not(:last-of-type),
-        .contentPanel button:not(:last-of-type) {
-            margin-bottom: 10px;
-        }
     </style>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
