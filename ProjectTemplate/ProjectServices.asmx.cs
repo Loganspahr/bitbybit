@@ -66,6 +66,7 @@ namespace ProjectTemplate
         [WebMethod(EnableSession = true)]
         public bool LogOff()
         {
+            Session.Clear();
             Session.Abandon();
             return true;
         }
@@ -309,7 +310,7 @@ namespace ProjectTemplate
         }
 
         [WebMethod(EnableSession = true)]
-        public int SubmitAnswer(string userID, string answerText, string questionID)
+        public int SubmitAnswer(string answerText, string questionID)
         {
             int answerID = -333;
             int questionIDInt = Convert.ToInt32(questionID);
@@ -320,7 +321,7 @@ namespace ProjectTemplate
             MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
 
             sqlCommand.Parameters.AddWithValue("@feedbackValue", HttpUtility.UrlDecode(answerText));
-            sqlCommand.Parameters.AddWithValue("@idValue", HttpUtility.UrlDecode(userID));
+            sqlCommand.Parameters.AddWithValue("@idValue", Convert.ToInt32(Session["id"]));
             sqlCommand.Parameters.AddWithValue("@questionValue", questionIDInt);
 
             sqlConnection.Open();
@@ -417,9 +418,6 @@ namespace ProjectTemplate
         [WebMethod(EnableSession = true)]
         public Feedback[] GetAnswers(string questionID)
         {//LOGIC: get all answers for a given question and return them!
-            // This sets session variables for testing as a supervisor
-            Session["id"] = 5;
-            Session["issupervisor"] = 1;
             if (Convert.ToInt32(Session["id"]) != 0)
             {
                 int questionIDInt = Convert.ToInt32(questionID);

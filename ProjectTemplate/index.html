@@ -124,9 +124,9 @@
 
    <!-- <div class="titleContainer">
         <div id="menu" class="menu">
-            <a href="#" onclick="LogOff()">log off</a> -->
+            <a href="#" onclick="LogOff()">log off</a>
         </div>
-    </div>
+    </div> -->
 
     <div class="contentContainer">
         <!-- Login Section -->
@@ -134,11 +134,11 @@
             <h2>Login</h2>
             <form id="loginForm" onsubmit="LogOn($('#userId').val(), $('#pass').val()); return false;">
                 <div class="form-group">
-                    <label for="username">Username:</label>
+                    <label for="userId">Username:</label>
                     <input type="text" id="userId" name="username" required placeholder="Enter your username">
                 </div>
                 <div class="form-group">
-                    <label for="password">Password:</label>
+                    <label for="pass">Password:</label>
                     <input type="password" id="pass" name="password" required placeholder="Enter your password">
                 </div>
                 <button type="submit">Sign In</button>
@@ -174,6 +174,7 @@
                 This should be a list of questions available for the logged-in user to answer.<br />
                 If the logged-in user is a supervisor, it should be a list of questions they have posted.<br />
                 Note: does not currently check if the user has answered the question already.<br />
+                <hr />
             </div>
             <div id="questionListDisplay">
                 List should go here!
@@ -256,6 +257,14 @@
                 <hr />
             </form>
             <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
+
+        </div>
+
+        <div id="accountspanel" class="contentPanel">
+
+        </div>
+
+        <div id="requestspanel" class="contentPanel">
 
         </div>
     </div>
@@ -615,7 +624,6 @@
 
         //this is to display questions available to be answered or reviewed
         function QuestionListHandler() {
-            showPanel("QuestionList");
             var webMethod = "ProjectServices.asmx/IsSupervisor";
             $.ajax({
                 type: "POST",
@@ -635,14 +643,25 @@
                                 $("#questionListDisplay").empty();
                                 for (var i = 0; i < msg.d.length; i++) {
                                     if (issupervisor == 1) {
-                                        question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>" +
-                                            "<span class='questionText'>" + msg.d[i].question +
-                                            "</span> <span class='optionsTag'><a href='#' onclick='AnswerListHandler(" + msg.d[i].id + ")'> review responses (not implemented)</a></div> <hr>";
+                                        question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>"
+                                            + "<span class='questionText'>" + msg.d[i].question + "</span><br /> <span class='expiryDate'>Expiry Date: "
+                                            + msg.d[i].expiryDate.split(' ')[0] + " </span> <br /> <span class='optionsTag'><a href='#' onclick='AnswerListHandler("
+                                            + msg.d[i].id + ")'> review responses</a></span> </div> <hr>";
                                     }
                                     else {
-                                        question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>" +
-                                            "<span class='questionText'>" + msg.d[i].question +
-                                            "</span> <span class='optionsTag'><a href='#' onclick='AnswerHandler(" + msg.d[i].id + ")'>respond (not implemented)</a></div> <hr>";
+                                        if (i == 3) {
+                                            try {
+                                                question = "<div class='questionRow' id='questMore'><span class='questionText'> You have " + (msg.d.length - i) +
+                                                    " more questions available.  Please respond to the above questions first.</span></div> <hr>";
+                                                $("#questionListDisplay").append(question);
+                                            }
+                                            finally {
+                                                return;
+                                            }
+                                        }
+                                        question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>" + "<span class='questionText'>" + msg.d[i].question
+                                            + "<br /> <span class='expiryDate'>Expiry Date: " + msg.d[i].expiryDate.split(' ')[0] + "</span>"
+                                            + "</span><br /> <span class='optionsTag'><a href='#' onclick='AnswerHandler(" + msg.d[i].id + ")'>respond (NYI)</a> </div> <hr>";
                                     }
                                     $("#questionListDisplay").append(question);
                                 }
@@ -650,6 +669,9 @@
                         },
                         error: function (e) {
                             alert("boo...2");
+                        },
+                        complete: function () {
+                            showPanel("QuestionList");
                         }
                     });
                 },
