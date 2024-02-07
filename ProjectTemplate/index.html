@@ -114,9 +114,8 @@
         .hidden {
             display: none;
         }
-
-
     </style>
+
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
@@ -124,9 +123,13 @@
 
    <!-- <div class="titleContainer">
         <div id="menu" class="menu">
+<<<<<<< HEAD
             <a href="#" onclick="LogOff()">log off</a>
         </div>
     </div> -->
+=======
+            <a href="#" onclick="LogOff()">log off</a> -->
+>>>>>>> dropdown
 
     <div class="contentContainer">
         <!-- Login Section -->
@@ -198,10 +201,10 @@
         <div id="SubmitQuestion" class="contentPanel">
             <form it="postQuestionForm" onsubmit="submitQuestionHandler(); return false;">
                 <div class="left">Submit Question</div>
-                <div>
+               <!-- <div>
                     Character limit: questionText: 1000<br />
                     This limit is enforced but the current character count and character limit are not displayed.
-                </div>
+                </div> -->
                 <div>
                     <textarea id="questionText" rows="10" cols="50" maxlength="1000" placeholder="Enter question..." required></textarea>
                 </div>
@@ -238,13 +241,15 @@
         <div id="unsolicitedFeedback" class="contentPanel">
             <form id="unsolicitedFeedbackForm" onsubmit="UnsolicitedFeedbackHandler(); return false;">
                 <div class="left">Submit Unsolicited Feedback</div>
-                <div>
+                <!--<div>
                     Character limits: problemArea: 20, complaint: 50, proposedSolution: 1000<br />
                     These limits are enforced but the current character counts and character limits are not displayed.
-                </div>
+                </div> -->
+                <!-- Problem Area dropdown-->
                 <div>
-                    Problem Area: <input type="text" id="problemArea" size="20" maxlength="20" required />
+                    Problem Area: <select id="problemArea" required></select><!--Changed to select-->
                 </div>
+           
                 <div>
                     Complaint: <input type="text" id="complaint" size="50" maxlength="50" required />
                 </div>
@@ -611,7 +616,43 @@
             });
         }
 
-        // Add event listeners to forms
+        // Added this function for Dropdown menu
+        // Populate Problem Areas Dropdown (New Function)
+        function populateProblemAreasDropdown() {
+            var webMethod = "ProjectServices.asmx/GetProblemAreas";
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var dropdown = $('#problemArea');
+                    dropdown.empty(); // Clear existing options
+                    dropdown.append($('<option></option>').attr('value', '').text('Select a problem area'));
+                    $.each(response.d, function (key, value) {
+                        dropdown.append($('<option></option>').attr('value', value).text(value));
+                    });
+                },
+                error: function (e) {
+                    console.log("Error fetching problem areas: ", e);
+                }
+            });
+        }
+
+        // Call populateProblemAreasDropdown when the page loads
+        $(document).ready(function () {
+            populateProblemAreasDropdown();
+        });
+
+        // Modified UnsolicitedFeedbackHandler to use problemArea dropdown value
+        function UnsolicitedFeedbackHandler() {
+            var problemArea = $('#problemArea').val(); // Get selected problem area
+            var complaint = $('#complaint').val();
+            var proposedSolution = $('#proposedSolution').val();
+            // AJAX request remains the same...
+        }
+
+        // Adds event listeners to forms
         $('#postQuestionForm').submit(function (e) {
             e.preventDefault(); // Prevent the default form submission
             submitQuestionHandler();
@@ -709,6 +750,8 @@
                 }
             });
         }
+
+
 
         // NOTE THIS IS ONLY HERE BECAUSE I AM A LAZY DEVELOPER AND GOT TIRED OF TYPING IN CREDENTIALS
         // THIS WILL NEED TO BE DELETED BEFORE THE PROJECT IS SUBMITTED
