@@ -455,6 +455,39 @@ namespace ProjectTemplate
             }
         }
 
+        // Note: this is for the dropdown menu for the unsolicited feedback
+        [WebMethod(EnableSession = true)]
+        public List<string> GetProblemAreas()
+        {
+            List<string> problemAreas = new List<string>();
+            string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+            // Modified to select distinct problem areas from unsolicitedFeedback table
+            string sqlSelect = "SELECT DISTINCT problemArea FROM unsolicitedFeedback WHERE problemArea IS NOT NULL AND problemArea != ''";
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+            try
+            {
+                sqlConnection.Open();
+                MySqlDataReader reader = sqlCommand.ExecuteReader();
+                while (reader.Read())
+                {
+                    problemAreas.Add(reader["problemArea"].ToString());
+                }
+            }
+            catch (Exception e)
+            {
+                // Handle the exception
+            }
+            finally
+            {
+                sqlConnection.Close();
+            }
+            return problemAreas;
+        }
+
+
+
         // NOTE: THIS IS ONLY HERE FOR LAZY DEVS TO ONE-CLICK SIGN IN - NEEDS TO BE REMOVED FROM FINAL CODE
         [WebMethod(EnableSession = true)]
         public int Login(string role)
