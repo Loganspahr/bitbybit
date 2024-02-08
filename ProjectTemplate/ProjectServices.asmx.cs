@@ -350,7 +350,6 @@ namespace ProjectTemplate
         [WebMethod(EnableSession = true)]
         public Feedback[] GetQuestions()
         {//LOGIC: get all questions for this user and return them!
-            // This sets session variables for testing as a normal employee
             if (Convert.ToInt32(Session["issupervisor"]) == 0)
             {
                 DataTable sqlDt = new DataTable("questionList");
@@ -416,6 +415,37 @@ namespace ProjectTemplate
         }
 
         [WebMethod(EnableSession = true)]
+        public Feedback[] GetQuestionToAnswer(string questionID)
+        {//LOGIC: get the question the user selected to answer and return it!
+            int questionIDInt = Convert.ToInt32(questionID);
+            DataTable sqlDt = new DataTable("question");
+
+            string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+            string sqlSelect = "select id, questionText, expiryDate from questions where id=@idvalue;";
+
+            MySqlConnection sqlConnection = new MySqlConnection(getConString());
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+            sqlCommand.Parameters.AddWithValue("@idvalue", questionIDInt);
+
+            MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
+            sqlDa.Fill(sqlDt);
+
+            List<Feedback> question = new List<Feedback>();
+            for (int i = 0; i < sqlDt.Rows.Count; i++)
+            {
+                question.Add(new Feedback
+                {
+                    id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
+                    question = sqlDt.Rows[i]["questionText"].ToString(),
+                    expiryDate = sqlDt.Rows[i]["expiryDate"].ToString(),
+                });
+            }
+            //convert the list of accounts to an array and return!
+            return question.ToArray();
+        }
+
+        [WebMethod(EnableSession = true)]
         public Feedback[] GetAnswers(string questionID)
         {//LOGIC: get all answers for a given question and return them!
             if (Convert.ToInt32(Session["id"]) != 0)
@@ -460,7 +490,7 @@ namespace ProjectTemplate
             List<string> problemAreas = new List<string>();
             string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
             // Modified to select distinct problem areas from unsolicitedFeedback table
-            string sqlSelect = "SELECT DISTINCT problemArea FROM unsolicitedFeedback WHERE problemArea IS NOT NULL AND problemArea != ''";
+            string sqlSelect = "SELECT DISTINCT problemArea FROM unsolicitedFeedback WHERE problemArea IS NOT NULL AND problemArea != '' ORDER BY problemArea";
             MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
             MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
 

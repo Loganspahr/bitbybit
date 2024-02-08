@@ -172,7 +172,7 @@
         </div>
 
         <div id="QuestionList" class="contentPanel">
-            <div class="left">Question List</div>
+            <h2>Question List</h2>
             <div>
                 This should be a list of questions available for the logged-in user to answer.<br />
                 If the logged-in user is a supervisor, it should be a list of questions they have posted.<br />
@@ -187,7 +187,7 @@
         </div>
 
         <div id="AnswerList" class="contentPanel">
-            <div class="left">Answer List</div>
+            <h2>Answer List</h2>
             <div>
                 Note: does not currently check if the answer is marked as reviewed.<br />
             </div>
@@ -200,7 +200,7 @@
 
         <div id="SubmitQuestion" class="contentPanel">
             <form it="postQuestionForm" onsubmit="submitQuestionHandler(); return false;">
-                <div class="left">Submit Question</div>
+                <h2>Submit Question</h2>
                <!-- <div>
                     Character limit: questionText: 1000<br />
                     This limit is enforced but the current character count and character limit are not displayed.
@@ -220,15 +220,15 @@
         </div>
 
         <div id="SubmitAnswer" class="contentPanel">
-            <form it="postQuestionForm" onsubmit="submitAnswerHandler(); return false;">
-                <div class="left">Submit Question</div>
+            <form id="postAnswerForm" onsubmit="submitAnswerHandler(); return false;">
+                <h2>Submit Answer</h2>
                 <div id="selectedQuestion">Question should be displayed here.</div>
-                <div>
+                <!--<div>
                     Character limit: answerText: 1000<br />
                     This limit is enforced but the current character count and character limit are not displayed.
-                </div>
+                </div> -->
                 <div>
-                    <textarea id="answerText" rows="10" cols="50" maxlength="1000" placeholder="Enter question..." required></textarea>
+                    <textarea id="answerText" rows="10" cols="50" maxlength="1000" placeholder="Enter answer..." required></textarea>
                 </div>
                 <div>
                     <button type="submit">Save</button>
@@ -240,7 +240,7 @@
 
         <div id="unsolicitedFeedback" class="contentPanel">
             <form id="unsolicitedFeedbackForm" onsubmit="UnsolicitedFeedbackHandler(); return false;">
-                <div class="left">Submit Unsolicited Feedback</div>
+                <h2>Submit Unsolicited Feedback</h2>
                 <!--<div>
                     Character limits: problemArea: 20, complaint: 50, proposedSolution: 1000<br />
                     These limits are enforced but the current character counts and character limits are not displayed.
@@ -332,6 +332,7 @@
             $('#proposedSolution').val("");
             $('#answerText').val("");
             $('#daysToLive').val("");
+            $('#questNum').val("");
             $("#accountsBox").empty();
             $("#requestsBox").empty();
             //clearNewAccount();
@@ -557,8 +558,6 @@
             }
         }
 
-
-        // Placeholder for submitQuestionHandler function
         function submitQuestionHandler() {
             var webMethod = "ProjectServices.asmx/SubmitQuestion";
             var parameters = "{}";
@@ -574,10 +573,10 @@
                     var responseFromServer = msg.d;
                     if (responseFromServer > 0) {
                         alert("Question submitted successfully");
-                        showPanel('SupervisorHome');
+                        DashboardHandler()
                     }
                     else {
-                        alert("Feedback submission failed");
+                        alert("Question submission failed");
                     }
                 },
 
@@ -587,8 +586,12 @@
             });
         }
 
-        // Placeholder for unsolicitedFeedbackHandler function
+
+        // Modified UnsolicitedFeedbackHandler to use problemArea dropdown value
         function UnsolicitedFeedbackHandler() {
+            var problemArea = $('#problemArea').val(); // Get selected problem area
+            var complaint = $('#complaint').val();
+            var proposedSolution = $('#proposedSolution').val();
             var webMethod = "ProjectServices.asmx/UnsolicitedFeedback";
             var parameters = "{}";
             var parameters = "{\"problemArea\":\"" + encodeURI($('#problemArea').val()) + "\",\"complaint\":\"" + encodeURI($('#complaint').val()) + "\",\"proposedSolution\":\"" + encodeURI($('#proposedSolution').val()) + "\"}";
@@ -644,14 +647,6 @@
             populateProblemAreasDropdown();
         });
 
-        // Modified UnsolicitedFeedbackHandler to use problemArea dropdown value
-        function UnsolicitedFeedbackHandler() {
-            var problemArea = $('#problemArea').val(); // Get selected problem area
-            var complaint = $('#complaint').val();
-            var proposedSolution = $('#proposedSolution').val();
-            // AJAX request remains the same...
-        }
-
         // Adds event listeners to forms
         $('#postQuestionForm').submit(function (e) {
             e.preventDefault(); // Prevent the default form submission
@@ -702,7 +697,7 @@
                                         }
                                         question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>" + "<span class='questionText'>" + msg.d[i].question
                                             + "<br /> <span class='expiryDate'>Expiry Date: " + msg.d[i].expiryDate.split(' ')[0] + "</span>"
-                                            + "</span><br /> <span class='optionsTag'><a href='#' onclick='AnswerHandler(" + msg.d[i].id + ")'>respond (NYI)</a> </div> <hr>";
+                                            + "</span><br /> <span class='optionsTag'><a href='#' onclick='AnswerHandler(" + msg.d[i].id + ")'>respond</a> </div> <hr>";
                                     }
                                     $("#questionListDisplay").append(question);
                                 }
@@ -718,6 +713,60 @@
                 },
                 error: function (e) {
                     alert("boo...");
+                }
+            });
+        }
+
+        //this is to display question and provide textbox for answer
+        function AnswerHandler(questionID) {
+            showPanel("SubmitAnswer");
+            var webMethod = "ProjectServices.asmx/GetQuestionToAnswer";
+            var parameters = "{\"questionID\":\"" + questionID + "\"}";
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    if (msg.d.length > 0) {
+                        $("#selectedQuestion").empty();
+                        for (var i = 0; i < msg.d.length; i++) {
+                            question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>" +
+                                "<span class='questionText'>" + msg.d[i].question + "</span> <span id='questNum' style='display:none;'>" + msg.d[i].id + "</span><hr>";
+                            $("#selectedQuestion").append(question);
+                        }
+                    }
+                },
+                error: function (e) {
+                    alert("boo...");
+                }
+            });
+        }
+
+        function submitAnswerHandler() {
+            var webMethod = "ProjectServices.asmx/SubmitAnswer";
+            var parameters = "{}";
+            var parameters = "{\"answerText\":\"" + encodeURI($('#answerText').val()) + "\",\"questionID\":\"" + encodeURI($('#questNum').text()) + "\"}";
+            //jQuery ajax method
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    var responseFromServer = msg.d;
+                    if (responseFromServer > 0) {
+                        alert("Answer submitted successfully");
+                        DashboardHandler();
+                    }
+                    else {
+                        alert("Answer submission failed");
+                    }
+                },
+                error: function (e) {
+                    alert("this code will only execute if javascript is unable to access the webservice");
                 }
             });
         }
