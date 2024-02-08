@@ -131,46 +131,85 @@
             <a href="#" onclick="LogOff()">log off</a> -->
 >>>>>>> dropdown
 
-    <div class="contentContainer">
-        <!-- Login Section -->
-        <div id="login-container" class="login-container contentPanel">
-            <h2>Login</h2>
-            <form id="loginForm" onsubmit="LogOn($('#userId').val(), $('#pass').val()); return false;">
-                <div class="form-group">
-                    <label for="userId">Username:</label>
-                    <input type="text" id="userId" name="username" required placeholder="Enter your username">
+            <div class="contentContainer">
+                <!-- Login Section -->
+                <div id="login-container" class="login-container contentPanel">
+                    <h2>Login</h2>
+                    <form id="loginForm" onsubmit="LogOn($('#userId').val(), $('#pass').val()); return false;">
+                        <div class="form-group">
+                            <label for="userId">Username:</label>
+                            <input type="text" id="userId" name="username" required placeholder="Enter your username">
+                        </div>
+                        <div class="form-group">
+                            <label for="pass">Password:</label>
+                            <input type="password" id="pass" name="password" required placeholder="Enter your password">
+                        </div>
+                        <button type="submit">Sign In</button>
+                        <button type="button" onclick="showPanel('resetPasswordPanel')">Reset Password</button>
+                        <br />
+                        <button onclick="javascript: lazyloginHandler('supervisor');">Login as Supervisor</button>
+                        <button onclick="javascript: lazyloginHandler('employee');">Login as Employee</button>
+                    </form>
                 </div>
-                <div class="form-group">
-                    <label for="pass">Password:</label>
-                    <input type="password" id="pass" name="password" required placeholder="Enter your password">
+
+                
+            <!-- The Reset Password form -->
+            <div id="resetPasswordPanel" class="contentPanel hidden">
+                    <h2>Reset Password</h2>
+                    <form id="resetPasswordForm" onsubmit="resetPasswordHandler(); return false;">
+                        <div class="form-group">
+                            <label for="resetUserId">Username:</label>
+                            <input type="text" id="resetUserId" name="resetusername" required placeholder="Enter your username">
+                        </div>
+                        <div class="form-group">
+                            <label for="oldPass">Old Password:</label>
+                            <input type="password" id="oldPass" name="oldpassword" required placeholder="Enter your old password">
+                        </div>
+                        <div class="form-group">
+                            <label for="newPass">New Password:</label>
+                            <input type="password" id="newPass" name="newpassword" required placeholder="Enter your new password">
+                        </div>
+                        <button type="submit">Reset Password</button>
+                        <button type="button" onclick="showPanel('login-container')">Cancel</button>
+                    </form>
                 </div>
-                <button type="submit">Sign In</button>
-                <br />
-                <button onclick="javascript: lazyloginHandler('supervisor');">Login as Supervisor</button>
-                <button onclick="javascript: lazyloginHandler('employee');">Login as Employee</button>
-            </form>
-        </div>
+              
+                <!-- Supervisor Section -->
+                <div id="SupervisorHome" class="contentPanel">
+                    <h2>Supervisor Dashboard</h2>
+                    <!-- Supervisor-specific content goes here -->
+                    <a href="#" onclick="LogOff()">log off</a> <!--add log off to only show in supervisor screen-->
+                    <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I have posted</button>
+                    <button onclick="javascript: showPanel('SubmitQuestion')">Click here to submit a question</button>
+                    <button onclick="javascript: LogOff();">Log Off</button>
+                </div>
 
-        <!-- Supervisor Section -->
-        <div id="SupervisorHome" class="contentPanel">
-            <h2>Supervisor Dashboard</h2>
-            <!-- Supervisor-specific content goes here -->
-            <a href="#" onclick="LogOff()">log off</a> <!--add log off to only show in supervisor screen-->
-            <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I have posted</button>
-            <button onclick="javascript: showPanel('SubmitQuestion')">Click here to submit a question</button>
-            <button onclick="javascript: LogOff();">Log Off</button>
-        </div>
+                <!-- Employee Section -->
+                <div id="EmployeeHome" class="contentPanel">
+                    <h2>Employee Dashboard</h2>
+                    <!-- Employee-specific content goes here -->
+                    <a href="#" onclick="LogOff()">log off</a>
+                    <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I can answer</button>
+                    <button onclick="javascript: showPanel('unsolicitedFeedback')">Click here to submit feedback</button>
+                    <button onclick="javascript: LogOff();">Log Off</button>
+                </div>
 
-        <!-- Employee Section -->
-        <div id="EmployeeHome" class="contentPanel">
-            <h2>Employee Dashboard</h2>
-            <!-- Employee-specific content goes here -->
-            <a href="#" onclick="LogOff()">log off</a>
-            <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I can answer</button>
-            <button onclick="javascript: showPanel('unsolicitedFeedback')">Click here to submit feedback</button>
-            <button onclick="javascript: LogOff();">Log Off</button>
-        </div>
+                <div id="QuestionList" class="contentPanel">
+                    <div class="left">Question List</div>
+                    <div>
+                        This should be a list of questions available for the logged-in user to answer.<br />
+                        If the logged-in user is a supervisor, it should be a list of questions they have posted.<br />
+                        Note: does not currently check if the user has answered the question already.<br />
+                        <hr />
+                    </div>
+                    <div id="questionListDisplay">
+                        List should go here!
+                    </div>
+                    <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
+                    <button onclick="javascript: LogOff();">Log Off</button>
+                </div>
 
+<<<<<<< HEAD
         <div id="QuestionList" class="contentPanel">
             <h2>Question List</h2>
             <!--<div>
@@ -272,6 +311,95 @@
 
         </div>
     </div>
+=======
+                <div id="AnswerList" class="contentPanel">
+                    <div class="left">Answer List</div>
+                    <div>
+                        Note: does not currently check if the answer is marked as reviewed.<br />
+                    </div>
+                    <div id="answerListDisplay">
+                        List should go here!
+                    </div>
+                    <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
+                    <button onclick="javascript: LogOff();">Log Off</button>
+                </div>
+
+                <div id="SubmitQuestion" class="contentPanel">
+                    <form id="postQuestionForm" onsubmit="submitQuestionHandler(); return false;">
+                        <div class="left">Submit Question</div>
+                        <!-- <div>
+                 Character limit: questionText: 1000<br />
+                 This limit is enforced but the current character count and character limit are not displayed.
+             </div> -->
+                        <div>
+                            <textarea id="questionText" rows="10" cols="50" maxlength="1000" placeholder="Enter question..." required></textarea>
+                        </div>
+                        <div>
+                            Days to live (enter 0 for no expiration): <input type="text" id="daysToLive" size="3" maxlength="3" placeholder="0" />
+                        </div>
+                        <div>
+                            <button type="submit">Save</button>
+                        </div>
+                        <hr />
+                    </form>
+                    <button onclick="javascript: DashboardHandler();">Cancel</button>
+                </div>
+
+                <div id="SubmitAnswer" class="contentPanel">
+                    <form it="postQuestionForm" onsubmit="submitAnswerHandler(); return false;">
+                        <div class="left">Submit Question</div>
+                        <div id="selectedQuestion">Question should be displayed here.</div>
+                        <div>
+                            Character limit: answerText: 1000<br />
+                            This limit is enforced but the current character count and character limit are not displayed.
+                        </div>
+                        <div>
+                            <textarea id="answerText" rows="10" cols="50" maxlength="1000" placeholder="Enter question..." required></textarea>
+                        </div>
+                        <div>
+                            <button type="submit">Save</button>
+                        </div>
+                        <hr />
+                    </form>
+                    <button onclick="javascript: DashboardHandler();">Cancel</button>
+                </div>
+
+                <div id="unsolicitedFeedback" class="contentPanel">
+                    <form id="unsolicitedFeedbackForm" onsubmit="UnsolicitedFeedbackHandler(); return false;">
+                        <div class="left">Submit Unsolicited Feedback</div>
+                        <!--<div>
+                Character limits: problemArea: 20, complaint: 50, proposedSolution: 1000<br />
+                These limits are enforced but the current character counts and character limits are not displayed.
+            </div> -->
+                        <!-- Problem Area dropdown-->
+                        <div>
+                            Problem Area: <select id="problemArea" required></select><!--Changed to select-->
+                        </div>
+
+                        <div>
+                            Complaint: <input type="text" id="complaint" size="50" maxlength="50" required />
+                        </div>
+                        <div>
+                            <textarea id="proposedSolution" rows="10" cols="50" maxlength="1000" placeholder="Enter proposed solution..." required></textarea>
+                        </div>
+                        <div>
+                            <button type="submit">Save</button>
+                        </div>
+                        <hr />
+                    </form>
+                    <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
+
+                </div>
+
+                <div id="accountspanel" class="contentPanel">
+
+                </div>
+
+                <div id="requestspanel" class="contentPanel">
+
+                </div>
+            </div>
+>>>>>>> reset
 
     <!--YOUR OWN JAVASCRIPT CAN GO RIGHT HERE-->
     <script type="text/javascript">
@@ -799,6 +927,61 @@
             });
         }
 
+         // Reset Password Handler
+         function resetPasswordHandler() {
+            var userId = $('#resetUserId').val();
+            var oldPass = $('#oldPass').val();
+            var newPass = $('#newPass').val();
+
+            // Construct the web method endpoint
+            var webMethod = "ProjectServices.asmx/PasswordReset";
+            // Prepare the data to be sent in the request
+            var parameters = "{\"userid\":\"" + encodeURI(userId) + "\",\"pass\":\"" + encodeURI(oldPass) + "\",\"newpass\":\"" + encodeURI(newPass) + "\"}";
+
+            // Makes the AJAX call
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                contentType: "application/json; charset=utf-8",
+                data: parameters,
+                dataType: "json",
+                success: function (response) {
+                    if (response.d) {
+                        alert("Password successfully reset. Please log in with your new password.");
+                        // Optionally, hide the reset password panel and show the login panel again
+                        showPanel('login-container');
+                    } else {
+                        alert("Failed to reset password. Please check your details and try again.");
+                    }
+                },
+                error: function () {
+                    alert("Error processing your request. Please try again later.");
+                }
+            });
+        }
+
+        // Attached the reset password form submit event handler
+        $('#resetPasswordForm').submit(function (e) {
+            e.preventDefault(); // Prevent the default form submission
+            resetPasswordHandler();
+        });
+
+        // added show panel to make sure password reset page shows
+        function showPanel(panelId) {
+            var panels = ['login-container', 'resetPasswordPanel', 'SupervisorHome', 'EmployeeHome', 'QuestionList', 'AnswerList', 'SubmitAnswer', 'unsolicitedFeedback', 'SubmitQuestion', 'accountspanel', 'requestspanel'];
+            panels.forEach(function (panel) {
+                var element = document.getElementById(panel);
+                if (element) {
+                    if (panelId === panel) {
+                        element.style.display = 'flex'; // Make sure the correct panel is shown
+                    } else {
+                        element.style.display = 'none'; // Hide all other panels
+                    }
+                } else {
+                    console.error("Panel not found: ", panel);
+                }
+            });
+        }
 
 
         // NOTE THIS IS ONLY HERE BECAUSE I AM A LAZY DEVELOPER AND GOT TIRED OF TYPING IN CREDENTIALS
