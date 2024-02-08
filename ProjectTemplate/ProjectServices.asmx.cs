@@ -356,11 +356,12 @@ namespace ProjectTemplate
 
                 string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
                 //requests just have active set to 0
-                string sqlSelect = "select id, questionText, expiryDate from questions where submittedBy=@supervisor and expiryDate > CURDATE() order by expiryDate";
+                string sqlSelect = "select id, questionText, expiryDate from questions where submittedBy=@supervisor and expiryDate > CURDATE() and id not in (select question from answers where submittedBy=@idvalue) order by expiryDate;";
 
                 MySqlConnection sqlConnection = new MySqlConnection(getConString());
                 MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
 
+                sqlCommand.Parameters.AddWithValue("@idvalue", Session["id"]);
                 sqlCommand.Parameters.AddWithValue("@supervisor", Session["supervisor"]);
 
                 MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
