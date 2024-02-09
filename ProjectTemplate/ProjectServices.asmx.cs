@@ -9,6 +9,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Security.Principal;
 using System.Text.RegularExpressions;
+using System.Configuration;
 
 namespace ProjectTemplate
 {
@@ -568,7 +569,43 @@ namespace ProjectTemplate
             return problemAreas;
         }
 
+        // New web method for Unsolicited Feedback
+        [WebMethod(EnableSession = true)]
+        public List<Feedback> GetUnsolicitedFeedback()
+        {
+            // This checks if the session indicates the user is a supervisor
+            if (Session["issupervisor"] != null && Convert.ToInt32(Session["issupervisor"]) == 1)
+            {
+                List<Feedback> feedbackList = new List<Feedback>();
+                string sqlConnectString = ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+                string sqlSelect = "SELECT * FROM unsolicitedFeedback WHERE reviewed = 0";
 
+                using (MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString))
+                {
+                    MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+                    sqlConnection.Open();
+                    MySqlDataReader reader = sqlCommand.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        Feedback feedback = new Feedback
+                        {
+                            id = Convert.ToInt32(reader["id"]),
+                            problemArea = reader["problemArea"].ToString(),
+                            complaint = reader["complaint"].ToString(),
+                            suggestion = reader["proposedSolution"].ToString(),
+                        };
+                        feedbackList.Add(feedback);
+                    }
+                    sqlConnection.Close();
+                }
+                return feedbackList;
+            }
+            else
+            {
+                // Return empty list or handle accordingly if the user is not a supervisor
+                return new List<Feedback>();
+            }
+        }
 
         // NOTE: THIS IS ONLY HERE FOR LAZY DEVS TO ONE-CLICK SIGN IN - NEEDS TO BE REMOVED FROM FINAL CODE
         [WebMethod(EnableSession = true)]
@@ -591,6 +628,7 @@ namespace ProjectTemplate
             {
                 return -1;
             }
+
         }
     }
 }

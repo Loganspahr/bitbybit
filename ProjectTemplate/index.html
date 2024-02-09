@@ -108,12 +108,13 @@
         .contentPanel textarea {
             width: 100%; /* Adjust width to fit the parent container */
             height: auto; /* Auto height based on content */
-            resize: vertical; /* Allows only vertical resizing */
+            resize: none; /* Allows only vertical resizing */
         }
 
         .hidden {
             display: none;
         }
+
     </style>
 
 
@@ -121,14 +122,13 @@
 </head>
 <body>
 
-   <!-- <div class="titleContainer">
-        <div id="menu" class="menu">
+    <!-- <div class="titleContainer">
+         <div id="menu" class="menu">
 
-            <a href="#" onclick="LogOff()">log off</a>
-        </div>
-    </div> -->
-
-          <!--  <a href="#" onclick="LogOff()">log off</a> -->
+             <a href="#" onclick="LogOff()">log off</a>
+         </div>
+     </div> -->
+    <!--  <a href="#" onclick="LogOff()">log off</a> -->
 
 
     <div class="contentContainer">
@@ -154,9 +154,9 @@
             </form>
         </div>
 
-                
-    <!-- The Reset Password form -->
-    <div id="resetPasswordPanel" class="contentPanel hidden">
+
+        <!-- The Reset Password form -->
+        <div id="resetPasswordPanel" class="contentPanel hidden">
             <h2>Reset Password</h2>
             <form id="resetPasswordForm" onsubmit="resetPasswordHandler(); return false;">
                 <div class="form-group">
@@ -175,7 +175,7 @@
                 <button type="button" onclick="showPanel('login-container')">Cancel</button>
             </form>
         </div>
-              
+
         <!-- Supervisor Section -->
         <div id="SupervisorHome" class="contentPanel">
             <h2>Supervisor Dashboard</h2>
@@ -199,10 +199,10 @@
         <div id="QuestionList" class="contentPanel">
             <h2>Question List</h2>
             <!--<div>
-                This should be a list of questions available for the logged-in user to answer.<br />
-                If the logged-in user is a supervisor, it should be a list of questions they have posted.<br />
-                <hr />
-            </div>-->
+            This should be a list of questions available for the logged-in user to answer.<br />
+            If the logged-in user is a supervisor, it should be a list of questions they have posted.<br />
+            <hr />
+        </div>-->
             <div id="questionListDisplay">
                 List should go here!
             </div>
@@ -213,8 +213,8 @@
         <div id="AnswerList" class="contentPanel">
             <h2>Answer List</h2>
             <!--<div>
-        Note: does not currently check if the answer is marked as reviewed.<br />
-    </div>-->
+            Note: does not currently check if the answer is marked as reviewed.<br />
+        </div>-->
             <div id="selectedQuestion">Question should be displayed here.</div>
             <div id="answerListDisplay">
                 List should go here!
@@ -226,10 +226,10 @@
         <div id="SubmitQuestion" class="contentPanel">
             <form id="postQuestionForm" onsubmit="submitQuestionHandler(); return false;">
                 <h2>Submit Question</h2>
-               <!-- <div>
-                    Character limit: questionText: 1000<br />
-                    This limit is enforced but the current character count and character limit are not displayed.
-                </div> -->
+                <!-- <div>
+                 Character limit: questionText: 1000<br />
+                 This limit is enforced but the current character count and character limit are not displayed.
+             </div> -->
                 <div>
                     <textarea id="questionText" rows="10" cols="50" maxlength="1000" placeholder="Enter question..." required></textarea>
                 </div>
@@ -249,9 +249,9 @@
                 <h2>Submit Answer</h2>
                 <div id="selectedQuestion">Question should be displayed here.</div>
                 <!--<div>
-                    Character limit: answerText: 1000<br />
-                    This limit is enforced but the current character count and character limit are not displayed.
-                </div> -->
+                Character limit: answerText: 1000<br />
+                This limit is enforced but the current character count and character limit are not displayed.
+            </div> -->
                 <div>
                     <textarea id="answerText" rows="10" cols="50" maxlength="1000" placeholder="Enter answer..." required></textarea>
                 </div>
@@ -267,14 +267,14 @@
             <form id="unsolicitedFeedbackForm" onsubmit="UnsolicitedFeedbackHandler(); return false;">
                 <h2>Submit Unsolicited Feedback</h2>
                 <!--<div>
-                    Character limits: problemArea: 20, complaint: 50, proposedSolution: 1000<br />
-                    These limits are enforced but the current character counts and character limits are not displayed.
-                </div> -->
+                Character limits: problemArea: 20, complaint: 50, proposedSolution: 1000<br />
+                These limits are enforced but the current character counts and character limits are not displayed.
+            </div> -->
                 <!-- Problem Area dropdown-->
                 <div>
                     Problem Area: <select id="problemArea" required></select><!--Changed to select-->
                 </div>
-           
+
                 <div>
                     Complaint: <input type="text" id="complaint" size="50" maxlength="50" required />
                 </div>
@@ -297,6 +297,15 @@
         <div id="requestspanel" class="contentPanel">
 
         </div>
+        <!-- Added the Unsolicited Feedback Review Section-->
+        <div id="UnsolicitedFeedbackReview" class="contentPanel hidden">
+            <h2>Unsolicited Feedback Review</h2>
+            <div id="unsolicitedFeedbackDisplay">
+                <!-- Unsolicited feedback entries will be dynamically inserted here -->
+            </div>
+            <button onclick="javascript: DashboardHandler();">Return to Dashboard</button>
+        </div>
+
     </div>
 
 
@@ -915,7 +924,7 @@
         }
 
         // Reset Password Handler
-         function resetPasswordHandler() {
+        function resetPasswordHandler() {
             var userId = $('#resetUserId').val();
             var oldPass = $('#oldPass').val();
             var newPass = $('#newPass').val();
@@ -994,6 +1003,41 @@
                 },
                 error: function (e) {
                     alert("boo...hiss");
+                }
+            });
+        }
+
+        // Added the loadUnsolicitedFeedbackReview function
+        function loadUnsolicitedFeedbackReview() {
+            var webMethod = "ProjectServices.asmx/GetUnsolicitedFeedback";
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var feedbacks = response.d;
+                    var displayArea = $('#unsolicitedFeedbackDisplay');
+                    displayArea.empty(); // Clear previous entries
+
+                    if (feedbacks.length > 0) {
+                        feedbacks.forEach(function (feedback) {
+                            var feedbackEntry = $("<div class='feedbackEntry'></div>");
+                            feedbackEntry.html(
+                                "<p><strong>Problem Area:</strong> " + feedback.problemArea + "</p>" +
+                                "<p><strong>Complaint:</strong> " + feedback.complaint + "</p>" +
+                                "<p><strong>Proposed Solution:</strong> " + feedback.suggestion + "</p>"
+                         
+                            );
+                            displayArea.append(feedbackEntry);
+                        });
+                    } else {
+                        displayArea.html("<p>No unsolicited feedback available for review.</p>");
+                    }
+                },
+                error: function (e) {
+                    console.error("Error fetching unsolicited feedback: ", e);
+                    alert('Error loading unsolicited feedback. Please try again.');
                 }
             });
         }
