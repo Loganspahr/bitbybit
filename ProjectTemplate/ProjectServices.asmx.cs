@@ -8,6 +8,7 @@ using MySql.Data.MySqlClient;
 using System.Data;
 using System.Data.SqlClient;
 using System.Security.Principal;
+using System.Text.RegularExpressions;
 
 namespace ProjectTemplate
 {
@@ -386,7 +387,8 @@ namespace ProjectTemplate
 
                 string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
                 //requests just have active set to 0
-                string sqlSelect = "select id, questionText, expiryDate from questions where submittedBy=@id order by expiryDate";
+                //string sqlSelect = "select id, questionText, expiryDate from questions where submittedBy=@id order by expiryDate";
+                string sqlSelect = "select questions.id, questionText, expiryDate, COUNT(*) as numAnswers from questions, answers where questions.id = answers.question and reviewed=0 GROUP BY question ORDER BY expiryDate;";
 
                 MySqlConnection sqlConnection = new MySqlConnection(getConString());
                 MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
@@ -404,6 +406,7 @@ namespace ProjectTemplate
                         id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
                         question = sqlDt.Rows[i]["questionText"].ToString(),
                         expiryDate = sqlDt.Rows[i]["expiryDate"].ToString(),
+                        numAnswers = Convert.ToInt32(sqlDt.Rows[i]["numAnswers"]),
                     });
                 }
                 //convert the list of accounts to an array and return!
@@ -447,16 +450,22 @@ namespace ProjectTemplate
         }
 
         [WebMethod(EnableSession = true)]
-        public Feedback[] GetAnswers(string questionID)
-        {//LOGIC: get all answers for a given question and return them!
+        public Feedback[] GetAnswers(string questionID, string seeall)
+        {//LOGIC: get all unreviewed answers for a given question and return them!
+         // If seeall is 1, then return all answers, reviewed or not
             if (Convert.ToInt32(Session["id"]) != 0)
             {
                 int questionIDInt = Convert.ToInt32(questionID);
+                int seeallInt = Convert.ToInt32(seeall);
                 DataTable sqlDt = new DataTable("answerList");
 
                 string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
                 //requests just have active set to 0
-                string sqlSelect = "select id, feedback from answers where question=@questionValue and reviewed <> 1";
+                string sqlSelect = "select id, feedback, reviewed from answers where question=@questionValue and reviewed <> 1 and discarded <> 1;";
+                if (seeallInt == 1)
+                {
+                    sqlSelect = "select id, feedback, reviewed from answers where question=@questionValue and discarded <> 1;";
+                }
 
                 MySqlConnection sqlConnection = new MySqlConnection(getConString());
                 MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
@@ -473,9 +482,53 @@ namespace ProjectTemplate
                     {
                         id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
                         answer = sqlDt.Rows[i]["feedback"].ToString(),
+                        reviewed = Convert.ToInt32(sqlDt.Rows[i]["reviewed"]),
                     });
                 }
-                //convert the list of accounts to an array and return!
+                //convert the list of answers to an array and return!
+                return answerList.ToArray();
+            }
+            else
+            {
+                return new Feedback[0];
+            }
+        }
+
+        [WebMethod(EnableSession = true)]
+        public Feedback[] AnswerReviewed(string questionID, string answerID, string discarded)
+        {//LOGIC: set the reviewed flag to 1, discarded flag to 0 or 1 then return remaining answers
+            if (Convert.ToInt32(Session["id"]) != 0)
+            {
+                int questionIDInt = Convert.ToInt32(questionID);
+                int answerIDInt = Convert.ToInt32(answerID);
+                int discardedInt = Convert.ToInt32(discarded);
+                DataTable sqlDt = new DataTable("answerList");
+
+                string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+                string sqlSelect = "update answers set reviewed=1, reviewedBy=@supervisor, discarded=@discardedValue where id=@answerValue;"
+                    + "select id, feedback from answers where question=@questionValue and reviewed <> 1;";
+
+                MySqlConnection sqlConnection = new MySqlConnection(getConString());
+                MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+                sqlCommand.Parameters.AddWithValue("@questionValue", questionIDInt);
+                sqlCommand.Parameters.AddWithValue("@answerValue", answerIDInt);
+                sqlCommand.Parameters.AddWithValue("@discardedValue", discardedInt);
+                sqlCommand.Parameters.AddWithValue("@supervisor", Convert.ToInt32(Session["id"]));
+
+                MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
+                sqlDa.Fill(sqlDt);
+
+                List<Feedback> answerList = new List<Feedback>();
+                for (int i = 0; i < sqlDt.Rows.Count; i++)
+                {
+                    answerList.Add(new Feedback
+                    {
+                        id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
+                        answer = sqlDt.Rows[i]["feedback"].ToString(),
+                    });
+                }
+                //convert the list of answers to an array and return!
                 return answerList.ToArray();
             }
             else

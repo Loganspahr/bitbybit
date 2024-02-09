@@ -17,5 +17,7 @@ namespace ProjectTemplate
         public string complaint;
         public string suggestion;
         public string expiryDate;
+        public int numAnswers;
+        public int reviewed;
     }
 }

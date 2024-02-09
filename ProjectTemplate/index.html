@@ -131,83 +131,70 @@
           <!--  <a href="#" onclick="LogOff()">log off</a> -->
 
 
-            <div class="contentContainer">
-                <!-- Login Section -->
-                <div id="login-container" class="login-container contentPanel">
-                    <h2>Login</h2>
-                    <form id="loginForm" onsubmit="LogOn($('#userId').val(), $('#pass').val()); return false;">
-                        <div class="form-group">
-                            <label for="userId">Username:</label>
-                            <input type="text" id="userId" name="username" required placeholder="Enter your username">
-                        </div>
-                        <div class="form-group">
-                            <label for="pass">Password:</label>
-                            <input type="password" id="pass" name="password" required placeholder="Enter your password">
-                        </div>
-                        <button type="submit">Sign In</button>
-                        <button type="button" onclick="showPanel('resetPasswordPanel')">Reset Password</button>
-                        <br />
-                        <button onclick="javascript: lazyloginHandler('supervisor');">Login as Supervisor</button>
-                        <button onclick="javascript: lazyloginHandler('employee');">Login as Employee</button>
-                    </form>
+    <div class="contentContainer">
+        <!-- Login Section -->
+        <div id="login-container" class="login-container contentPanel">
+            <h2>Login</h2>
+            <form id="loginForm" onsubmit="LogOn($('#userId').val(), $('#pass').val()); return false;">
+                <div class="form-group">
+                    <label for="userId">Username:</label>
+                    <input type="text" id="userId" name="username" required placeholder="Enter your username">
                 </div>
+                <div class="form-group">
+                    <label for="pass">Password:</label>
+                    <input type="password" id="pass" name="password" required placeholder="Enter your password">
+                </div>
+                <button type="submit">Sign In</button>
+                <button type="button" onclick="showPanel('resetPasswordPanel')">Reset Password</button>
+                <br />
+                <hr />
+                <h2>Lazy Quick Developer Logins</h2>
+                <button onclick="javascript: lazyloginHandler('supervisor');">Login as Supervisor</button>
+                <button onclick="javascript: lazyloginHandler('employee');">Login as Employee</button>
+            </form>
+        </div>
 
                 
-            <!-- The Reset Password form -->
-            <div id="resetPasswordPanel" class="contentPanel hidden">
-                    <h2>Reset Password</h2>
-                    <form id="resetPasswordForm" onsubmit="resetPasswordHandler(); return false;">
-                        <div class="form-group">
-                            <label for="resetUserId">Username:</label>
-                            <input type="text" id="resetUserId" name="resetusername" required placeholder="Enter your username">
-                        </div>
-                        <div class="form-group">
-                            <label for="oldPass">Old Password:</label>
-                            <input type="password" id="oldPass" name="oldpassword" required placeholder="Enter your old password">
-                        </div>
-                        <div class="form-group">
-                            <label for="newPass">New Password:</label>
-                            <input type="password" id="newPass" name="newpassword" required placeholder="Enter your new password">
-                        </div>
-                        <button type="submit">Reset Password</button>
-                        <button type="button" onclick="showPanel('login-container')">Cancel</button>
-                    </form>
+    <!-- The Reset Password form -->
+    <div id="resetPasswordPanel" class="contentPanel hidden">
+            <h2>Reset Password</h2>
+            <form id="resetPasswordForm" onsubmit="resetPasswordHandler(); return false;">
+                <div class="form-group">
+                    <label for="resetUserId">Username:</label>
+                    <input type="text" id="resetUserId" name="resetusername" required placeholder="Enter your username">
                 </div>
+                <div class="form-group">
+                    <label for="oldPass">Old Password:</label>
+                    <input type="password" id="oldPass" name="oldpassword" required placeholder="Enter your old password">
+                </div>
+                <div class="form-group">
+                    <label for="newPass">New Password:</label>
+                    <input type="password" id="newPass" name="newpassword" required placeholder="Enter your new password">
+                </div>
+                <button type="submit">Reset Password</button>
+                <button type="button" onclick="showPanel('login-container')">Cancel</button>
+            </form>
+        </div>
               
-                <!-- Supervisor Section -->
-                <div id="SupervisorHome" class="contentPanel">
-                    <h2>Supervisor Dashboard</h2>
-                    <!-- Supervisor-specific content goes here -->
-                    <a href="#" onclick="LogOff()">log off</a> <!--add log off to only show in supervisor screen-->
-                    <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I have posted</button>
-                    <button onclick="javascript: showPanel('SubmitQuestion')">Click here to submit a question</button>
-                    <button onclick="javascript: LogOff();">Log Off</button>
-                </div>
+        <!-- Supervisor Section -->
+        <div id="SupervisorHome" class="contentPanel">
+            <h2>Supervisor Dashboard</h2>
+            <!-- Supervisor-specific content goes here -->
+            <a href="#" onclick="LogOff()">log off</a> <!--add log off to only show in supervisor screen-->
+            <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I have posted</button>
+            <button onclick="javascript: showPanel('SubmitQuestion')">Click here to submit a question</button>
+            <button onclick="javascript: LogOff();">Log Off</button>
+        </div>
 
-                <!-- Employee Section -->
-                <div id="EmployeeHome" class="contentPanel">
-                    <h2>Employee Dashboard</h2>
-                    <!-- Employee-specific content goes here -->
-                    <a href="#" onclick="LogOff()">log off</a>
-                    <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I can answer</button>
-                    <button onclick="javascript: showPanel('unsolicitedFeedback')">Click here to submit feedback</button>
-                    <button onclick="javascript: LogOff();">Log Off</button>
-                </div>
-
-                <div id="QuestionList" class="contentPanel">
-                    <div class="left">Question List</div>
-                    <div>
-                        This should be a list of questions available for the logged-in user to answer.<br />
-                        If the logged-in user is a supervisor, it should be a list of questions they have posted.<br />
-                        Note: does not currently check if the user has answered the question already.<br />
-                        <hr />
-                    </div>
-                    <div id="questionListDisplay">
-                        List should go here!
-                    </div>
-                    <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
-                    <button onclick="javascript: LogOff();">Log Off</button>
-                </div>
+        <!-- Employee Section -->
+        <div id="EmployeeHome" class="contentPanel">
+            <h2>Employee Dashboard</h2>
+            <!-- Employee-specific content goes here -->
+            <a href="#" onclick="LogOff()">log off</a>
+            <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I can answer</button>
+            <button onclick="javascript: showPanel('unsolicitedFeedback')">Click here to submit feedback</button>
+            <button onclick="javascript: LogOff();">Log Off</button>
+        </div>
 
         <div id="QuestionList" class="contentPanel">
             <h2>Question List</h2>
@@ -225,9 +212,10 @@
 
         <div id="AnswerList" class="contentPanel">
             <h2>Answer List</h2>
-            <div>
-                Note: does not currently check if the answer is marked as reviewed.<br />
-            </div>
+            <!--<div>
+        Note: does not currently check if the answer is marked as reviewed.<br />
+    </div>-->
+            <div id="selectedQuestion">Question should be displayed here.</div>
             <div id="answerListDisplay">
                 List should go here!
             </div>
@@ -236,7 +224,7 @@
         </div>
 
         <div id="SubmitQuestion" class="contentPanel">
-            <form it="postQuestionForm" onsubmit="submitQuestionHandler(); return false;">
+            <form id="postQuestionForm" onsubmit="submitQuestionHandler(); return false;">
                 <h2>Submit Question</h2>
                <!-- <div>
                     Character limit: questionText: 1000<br />
@@ -311,92 +299,7 @@
         </div>
     </div>
 
-                <div id="AnswerList" class="contentPanel">
-                    <div class="left">Answer List</div>
-                    <div>
-                        Note: does not currently check if the answer is marked as reviewed.<br />
-                    </div>
-                    <div id="answerListDisplay">
-                        List should go here!
-                    </div>
-                    <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
-                    <button onclick="javascript: LogOff();">Log Off</button>
-                </div>
 
-                <div id="SubmitQuestion" class="contentPanel">
-                    <form id="postQuestionForm" onsubmit="submitQuestionHandler(); return false;">
-                        <div class="left">Submit Question</div>
-                        <!-- <div>
-                 Character limit: questionText: 1000<br />
-                 This limit is enforced but the current character count and character limit are not displayed.
-             </div> -->
-                        <div>
-                            <textarea id="questionText" rows="10" cols="50" maxlength="1000" placeholder="Enter question..." required></textarea>
-                        </div>
-                        <div>
-                            Days to live (enter 0 for no expiration): <input type="text" id="daysToLive" size="3" maxlength="3" placeholder="0" />
-                        </div>
-                        <div>
-                            <button type="submit">Save</button>
-                        </div>
-                        <hr />
-                    </form>
-                    <button onclick="javascript: DashboardHandler();">Cancel</button>
-                </div>
-
-                <div id="SubmitAnswer" class="contentPanel">
-                    <form it="postQuestionForm" onsubmit="submitAnswerHandler(); return false;">
-                        <div class="left">Submit Question</div>
-                        <div id="selectedQuestion">Question should be displayed here.</div>
-                        <div>
-                            Character limit: answerText: 1000<br />
-                            This limit is enforced but the current character count and character limit are not displayed.
-                        </div>
-                        <div>
-                            <textarea id="answerText" rows="10" cols="50" maxlength="1000" placeholder="Enter question..." required></textarea>
-                        </div>
-                        <div>
-                            <button type="submit">Save</button>
-                        </div>
-                        <hr />
-                    </form>
-                    <button onclick="javascript: DashboardHandler();">Cancel</button>
-                </div>
-
-                <div id="unsolicitedFeedback" class="contentPanel">
-                    <form id="unsolicitedFeedbackForm" onsubmit="UnsolicitedFeedbackHandler(); return false;">
-                        <div class="left">Submit Unsolicited Feedback</div>
-                        <!--<div>
-                Character limits: problemArea: 20, complaint: 50, proposedSolution: 1000<br />
-                These limits are enforced but the current character counts and character limits are not displayed.
-            </div> -->
-                        <!-- Problem Area dropdown-->
-                        <div>
-                            Problem Area: <select id="problemArea" required></select><!--Changed to select-->
-                        </div>
-
-                        <div>
-                            Complaint: <input type="text" id="complaint" size="50" maxlength="50" required />
-                        </div>
-                        <div>
-                            <textarea id="proposedSolution" rows="10" cols="50" maxlength="1000" placeholder="Enter proposed solution..." required></textarea>
-                        </div>
-                        <div>
-                            <button type="submit">Save</button>
-                        </div>
-                        <hr />
-                    </form>
-                    <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
-
-                </div>
-
-                <div id="accountspanel" class="contentPanel">
-
-                </div>
-
-                <div id="requestspanel" class="contentPanel">
-
-                </div>
 
     <!--YOUR OWN JAVASCRIPT CAN GO RIGHT HERE-->
     <script type="text/javascript">
@@ -804,9 +707,12 @@
                                 for (var i = 0; i < msg.d.length; i++) {
                                     if (issupervisor == 1) {
                                         question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>"
-                                            + "<span class='questionText'>" + msg.d[i].question + "</span><br /> <span class='expiryDate'>Expiry Date: "
-                                            + msg.d[i].expiryDate.split(' ')[0] + " </span> <br /> <span class='optionsTag'><a href='#' onclick='AnswerListHandler("
-                                            + msg.d[i].id + ")'> review responses</a></span> </div> <hr>";
+                                            + "<span class='questionText'>" + msg.d[i].question + "</span><br />"
+                                            + "<span class='expiryDate'>Expiry Date: " + msg.d[i].expiryDate.split(' ')[0] + " </span> <br />"
+                                            + "<span class='optionsTag'><a href='#' onclick='AnswerListHandler(" + msg.d[i].id
+                                            + ",0)'> review responses (" + msg.d[i].numAnswers + ")</a></span>"
+                                            + "<span class='optionsTag'><a href='#' onclick='AnswerListHandler(" + msg.d[i].id
+                                            + ",1)'> see all responses</a></span> </div> <hr>";
                                     }
                                     else {
                                         if (i == 3) {
@@ -883,7 +789,7 @@
                     var responseFromServer = msg.d;
                     if (responseFromServer > 0) {
                         alert("Answer submitted successfully");
-                        DashboardHandler();
+                        QuestionListHandler();
                     }
                     else {
                         alert("Answer submission failed");
@@ -896,11 +802,10 @@
         }
 
         //this is to display answers available to be reviewed
-        function AnswerListHandler(questionID) {
-            showPanel("AnswerList");
-            var webMethod = "ProjectServices.asmx/GetAnswers";
+        function AnswerListHandler(questionID, seeall) {
+            //get the question to display
+            var webMethod = "ProjectServices.asmx/GetQuestionToAnswer";
             var parameters = "{\"questionID\":\"" + questionID + "\"}";
-
             $.ajax({
                 type: "POST",
                 url: webMethod,
@@ -909,22 +814,107 @@
                 dataType: "json",
                 success: function (msg) {
                     if (msg.d.length > 0) {
-                        $("#answerListDisplay").empty();
+                        $("#selectedQuestion").empty();
                         for (var i = 0; i < msg.d.length; i++) {
-                            answer = "<div class='answerRow' id='questR" + msg.d[i].id + "'>" +
-                                "<span class='answerText'>" + msg.d[i].answer +
-                                "</span> <span class='optionsTag'><a href='#' onclick='AnswerHandler(" + msg.d[i].id + ")'>mark as reviewed (not implemented)</a></div> <hr>";
-                            $("#answerListDisplay").append(answer);
+                            question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>" +
+                                "<span class='questionText'>" + msg.d[i].question + "</span> <span id='questNum' style='display:none;'>" + msg.d[i].id + "</span><hr>";
+                            $("#selectedQuestion").append(question);
                         }
+                    }
+                    else {
+                        alert("No question found");
                     }
                 },
                 error: function (e) {
                     alert("boo...");
+                },
+                complete: function () {
+                    //get the answers to display
+                    var webMethod = "ProjectServices.asmx/GetAnswers";
+                    var parameters = "{\"questionID\":\"" + questionID + "\",\"seeall\":\"" + seeall + "\"}";
+
+                    $.ajax({
+                        type: "POST",
+                        url: webMethod,
+                        data: parameters,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (msg) {
+                            if (msg.d.length > 0) {
+                                $("#answerListDisplay").empty();
+                                for (var i = 0; i < msg.d.length; i++) {
+                                    if (msg.d[i].reviewed == 0) {
+                                        answer = "<div class='answerRow' id='answerR" + msg.d[i].id + "'>" + "<span class='answerText'>" + msg.d[i].answer + "</span><br />"
+                                            + "<span class='optionsTag'><a href='#' onclick='MarkAnswer(" + questionID + "," + msg.d[i].id + ",0)'>mark as reviewed</a> </span><br /> "
+                                            + "<span class='optionsTag'><a href='#' onclick='MarkAnswer(" + questionID + "," + msg.d[i].id + ",1)'>discard answer</a> </span> </div> <hr>";
+                                        $("#answerListDisplay").append(answer);
+                                    }
+                                    else {
+                                        answer = "<div class='answerRow' id='answerR" + msg.d[i].id + "'>" + "<span class='answerText'>" + msg.d[i].answer + "</span><br />"
+                                            + "<span>Reviewed </span><br /> "
+                                            + "<span class='optionsTag'><a href='#' onclick='MarkAnswer(" + questionID + "," + msg.d[i].id + ",1)'>discard answer</a> </span> </div> <hr>";
+                                        $("#answerListDisplay").append(answer);
+                                    }
+                                }
+                            }
+                            else {
+                                $("answerListDisplay").empty();
+                                $("answerListDisplay").append("<div class='answerRow' id='answerR0'>No answers found</div><hr>)");
+                            }
+                        },
+                        error: function (e) {
+                            alert("boo...hiss");
+                        },
+                        complete: function () {
+                            showPanel("AnswerList");
+                        }
+                    });
+
                 }
             });
         }
 
-         // Reset Password Handler
+        //this is to mark the answer as reviewed and possibly discarded
+        function MarkAnswer(questionID, answerID, discarded) {
+            var webMethod = "ProjectServices.asmx/AnswerReviewed";
+            var parameters = "{\"questionID\":\"" + questionID + "\",\"answerID\":\"" + answerID + "\",\"discarded\":\"" + discarded + "\"}";
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    if (discarded == 1) {
+                        alert("Answer marked as discarded");
+                    }
+                    else {
+                        alert("Answer marked as reviewed and archived");
+                    }
+                    if (msg.d.length > 0) {
+                        $("#answerListDisplay").empty();
+                        for (var i = 0; i < msg.d.length; i++) {
+                            answer = "<div class='answerRow' id='answerR" + msg.d[i].id + "'>" + "<span class='answerText'>" + msg.d[i].answer + "</span><br />"
+                                + "<span class='optionsTag'><a href='#' onclick='MarkAnswer(" + questionID + "," + msg.d[i].id + ",0)'>mark as reviewed</a> </span><br /> "
+                                + "<span class='optionsTag'><a href='#' onclick='MarkAnswer(" + questionID + "," + msg.d[i].id + ",1)'>discard answer</a> </span> </div> <hr>";
+                            $("#answerListDisplay").append(answer);
+                        }
+                    }
+                    else {
+                        $("#answerListDisplay").empty();
+                        answer = "<div class='answerRow' id='answerR0'>No answers found</div><hr>"
+                        $("#answerListDisplay").append(answer);
+                    }
+                },
+                error: function (e) {
+                    alert("this code will only execute if javascript is unable to access the webservice");
+                },
+                complete: function () {
+                }
+            });
+        }
+
+        // Reset Password Handler
          function resetPasswordHandler() {
             var userId = $('#resetUserId').val();
             var oldPass = $('#oldPass').val();
