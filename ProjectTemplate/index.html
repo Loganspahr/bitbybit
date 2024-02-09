@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <title>Company Feedback System</title>
     <style>
-
         body {
             font-family: 'Arial', sans-serif;
-            /* Updated gradient background to match ASU maroon colors */
-            /* mixed gold with red*/
             background: linear-gradient(to bottom, #8C1D40, #a3555c, #b76e7a, #FFC627);
             margin: 0;
             padding: 0;
@@ -23,8 +20,8 @@
             position: fixed;
             top: 0;
             width: 100%;
-            background: #8C1D40; /* ASU Maroon */
-            color: #FFC627; /* ASU Gold */
+            background: #8C1D40;
+            color: #FFC627;
             padding: 10px 0;
             text-align: center;
             font-size: 24px;
@@ -32,90 +29,177 @@
         }
 
         .menu a {
-            color: #FFC627; /* ASU Gold */
+            color: #FFC627;
             text-decoration: none;
             padding: 5px 10px;
             display: inline-block;
         }
 
         .contentContainer {
-            margin-top: 50px; /* Give space for the fixed header */
+            margin-top: 50px;
             width: 100%;
-            max-width: 400px; /* Adjusted for better spacing */
+            max-width: 600px; /* Adjusted width for better layout */
+            padding: 20px; /* Padding for spacing */
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center align items for consistent button alignment */
         }
 
-        .login-container, .contentPanel {
-            display: none; /* Initially hidden */
+        .login-container,
+        .contentPanel {
+            display: flex;
             flex-direction: column;
             padding: 20px;
-            border: 1px solid #C1BFBF;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border: 2px solid #FFC627; /* Thicker border with gold color */
+            border-radius: 10px; /* Rounded corners for a modern look */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Enhanced shadow for depth */
             background-color: #fff;
             margin-bottom: 20px;
+            align-items: center; /* Center align items for consistent button alignment */
         }
 
             .login-container button,
             .contentPanel button {
-                width: 100%; /* Full width */
-                padding: 10px;
+                width: auto; /* Auto width for buttons */
+                padding: 15px 30px; /* Larger padding for a better touch area */
                 border: none;
-                border-radius: 3px;
-                background-color: #8C1D40; /* ASU Maroon */
-                color: #FFC627; /* ASU Gold */
-                font-size: 16px;
+                border-radius: 5px;
+                background-color: #8C1D40;
+                color: #FFC627;
+                font-size: 18px; /* Larger font size for buttons */
                 cursor: pointer;
-                transition: background-color 0.3s;
-                margin-top: 10px; /* Consistent space between buttons */
+                transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth transition for interaction */
+                margin-top: 20px;
+                align-self: center; /* Center buttons in the flex container */
             }
 
                 /* Button hover effect */
                 .login-container button:hover,
                 .contentPanel button:hover {
-                    background-color: #991F3D; /* A darker shade of ASU Maroon */
+                    background-color: #991F3D;
+                    transform: translateY(-3px); /* Slight lift effect on hover */
+                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Shadow effect on hover */
                 }
 
             .login-container h2,
             .contentPanel h2 {
-                color: #8C1D40; /* ASU Maroon */
+                color: #8C1D40;
                 text-align: center;
                 margin-bottom: 20px;
+                font-size: 28px; /* Larger font size for headers */
+                font-weight: bold; /* Bold font weight for headers */
             }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            width: 100%; /* Ensure form elements fit container width */
         }
 
             .form-group label {
                 display: block;
-                margin-bottom: 5px;
-                color: #5C6670; /* ASU Gray */
+                margin-bottom: 10px;
+                color: #5C6670;
+                font-weight: bold; /* Bold labels for clarity */
             }
 
             /* Ensuring inputs and textareas fit their parent containers */
             .form-group input,
             .form-group textarea {
-                width: calc(100% - 20px); /* Full width - padding */
-                padding: 10px;
+                width: 100%;
+                padding: 15px;
                 margin-bottom: 10px;
                 border: 1px solid #C1BFBF;
-                border-radius: 3px;
-                box-sizing: border-box; /* Include padding in the width */
+                border-radius: 5px;
+                box-sizing: border-box;
+                font-size: 16px; /* Readable font size for inputs */
             }
 
         /* Ensures textareas do not overflow their parent container */
         .contentPanel textarea {
-            width: 100%; /* Adjust width to fit the parent container */
-            height: auto; /* Auto height based on content */
-            resize: none; /* Allows only vertical resizing */
+            resize: vertical; /* Allow only vertical resizing */
         }
 
         .hidden {
             display: none;
         }
 
-    </style>
+        /* Additional styling for flair */
+        /* Style the placeholders to match the theme */
+        ::placeholder {
+            color: #8C1D40;
+            opacity: 0.7; /* Placeholder text slightly lighter than normal text */
+        }
+
+        /* Highlight input borders on focus to improve user experience */
+        input:focus, textarea:focus {
+            border-color: #8C1D40;
+            box-shadow: 0 0 0 2px rgba(140, 29, 64, 0.2);
+        }
+
+        /* Custom styles for feedbackEntry */
+        .feedbackEntry {
+            border: 1px solid #FFC627;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f7f7f7;
+        }
+
+            .feedbackEntry p {
+                margin: 0 0 10px;
+                color: #333;
+                font-size: 16px;
+            }
+
+        /* Enhance visual hierarchy in question and answer lists */
+        .questionRow, .answerRow {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .questionText, .answerText {
+            color: #8C1D40;
+            font-weight: bold;
+        }
+
+        .optionsTag a {
+            color: #FFC627;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        /* Style for showing more questions - more prominent */
+        #questMore {
+            background-color: #FFC627;
+            color: #8C1D40;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        /* Hover effect for links */
+        .optionsTag a:hover {
+            color: #991F3D;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .contentContainer {
+                max-width: 95%;
+                margin: 20px;
+            }
+
+            .login-container,
+            .contentPanel {
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+     </style>
 
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
