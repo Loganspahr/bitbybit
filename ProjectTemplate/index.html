@@ -48,7 +48,7 @@
 
         .login-container,
         .contentPanel {
-            display: flex;
+            display: none; /* WAS display: flex - that flashed each div upon page load - now hides by default instead of flex by default */
             flex-direction: column;
             padding: 20px;
             border: 2px solid #FFC627; /* Thicker border with gold color */
@@ -265,8 +265,9 @@
             <h2>Supervisor Dashboard</h2>
             <!-- Supervisor-specific content goes here -->
             <a href="#" onclick="LogOff()">log off</a> <!--add log off to only show in supervisor screen-->
-            <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I have posted</button>
-            <button onclick="javascript: showPanel('SubmitQuestion')">Click here to submit a question</button>
+            <button onclick="javascript: QuestionListHandler();">Review Questions I Have Posted</button>
+            <button onclick="javascript: showPanel('SubmitQuestion')">Post A New Question</button>
+            <button onclick="javascript: loadUnsolicitedFeedbackReview();">Review Unsolicited Feedback</button>
             <button onclick="javascript: LogOff();">Log Off</button>
         </div>
 
@@ -275,8 +276,8 @@
             <h2>Employee Dashboard</h2>
             <!-- Employee-specific content goes here -->
             <a href="#" onclick="LogOff()">log off</a>
-            <button onclick="javascript: QuestionListHandler();">Click here to see the list of questions I can answer</button>
-            <button onclick="javascript: showPanel('unsolicitedFeedback')">Click here to submit feedback</button>
+            <button onclick="javascript: QuestionListHandler();">Answer Posted Questions</button>
+            <button onclick="javascript: showPanel('unsolicitedFeedback')">Submit Feedback</button>
             <button onclick="javascript: LogOff();">Log Off</button>
         </div>
 
@@ -382,7 +383,7 @@
 
         </div>
         <!-- Added the Unsolicited Feedback Review Section-->
-        <div id="UnsolicitedFeedbackReview" class="contentPanel hidden">
+        <div id="UnsolicitedFeedbackReview" class="contentPanel">
             <h2>Unsolicited Feedback Review</h2>
             <div id="unsolicitedFeedbackDisplay">
                 <!-- Unsolicited feedback entries will be dynamically inserted here -->
@@ -428,7 +429,7 @@
         //we're using a stacked card approach for our main viewing area
         //this array holds the ids of our cards and the method
         //allows us to easly switch the interface from one to the other
-        var contentPanels = ['login-container', 'SupervisorHome', 'EmployeeHome', 'QuestionList', 'AnswerList', 'SubmitAnswer', 'unsolicitedFeedback', 'SubmitQuestion', 'accountspanel', 'requestspanel'];
+        var contentPanels = ['login-container', 'resetPasswordPanel', 'SupervisorHome', 'EmployeeHome', 'QuestionList', 'AnswerList', 'SubmitAnswer', 'unsolicitedFeedback', 'SubmitQuestion', 'UnsolicitedFeedbackReview', 'accountspanel', 'requestspanel'];
         //this function toggles which panel is showing, and also clears data from all panels
         // Toggles which panel is showing, and also clears data from all panels
         function showPanel(panelId) {
@@ -1046,24 +1047,6 @@
             resetPasswordHandler();
         });
 
-        // added show panel to make sure password reset page shows
-        function showPanel(panelId) {
-            var panels = ['login-container', 'resetPasswordPanel', 'SupervisorHome', 'EmployeeHome', 'QuestionList', 'AnswerList', 'SubmitAnswer', 'unsolicitedFeedback', 'SubmitQuestion', 'accountspanel', 'requestspanel'];
-            panels.forEach(function (panel) {
-                var element = document.getElementById(panel);
-                if (element) {
-                    if (panelId === panel) {
-                        element.style.display = 'flex'; // Make sure the correct panel is shown
-                    } else {
-                        element.style.display = 'none'; // Hide all other panels
-                    }
-                } else {
-                    console.error("Panel not found: ", panel);
-                }
-            });
-        }
-
-
         // NOTE THIS IS ONLY HERE BECAUSE I AM A LAZY DEVELOPER AND GOT TIRED OF TYPING IN CREDENTIALS
         // THIS WILL NEED TO BE DELETED BEFORE THE PROJECT IS SUBMITTED
         function lazyloginHandler(role) {
@@ -1122,6 +1105,9 @@
                 error: function (e) {
                     console.error("Error fetching unsolicited feedback: ", e);
                     alert('Error loading unsolicited feedback. Please try again.');
+                },
+                complete: function () {
+                    showPanel('UnsolicitedFeedbackReview');
                 }
             });
         }

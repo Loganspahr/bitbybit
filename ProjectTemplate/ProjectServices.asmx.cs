@@ -578,7 +578,7 @@ namespace ProjectTemplate
             {
                 List<Feedback> feedbackList = new List<Feedback>();
                 string sqlConnectString = ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
-                string sqlSelect = "SELECT * FROM unsolicitedFeedback WHERE reviewed = 0";
+                string sqlSelect = "SELECT * FROM unsolicitedFeedback WHERE reviewed = 0 and complaint <> 'Placeholder'";
 
                 using (MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString))
                 {
