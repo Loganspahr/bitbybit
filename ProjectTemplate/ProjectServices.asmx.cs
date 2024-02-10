@@ -578,6 +578,48 @@ namespace ProjectTemplate
             }
         }
 
+        [WebMethod(EnableSession = true)]
+        public List<Feedback> UnsolicitedReviewed(string feedbackID, string discarded)
+        {//LOGIC: set the reviewed flag to 1, discarded flag to 0 or 1 then return remaining answers
+            if (Convert.ToInt32(Session["id"]) != 0)
+            {
+                int feedbackIDInt = Convert.ToInt32(feedbackID);
+                int discardedInt = Convert.ToInt32(discarded);
+                DataTable sqlDt = new DataTable("feedbackList");
+
+                string sqlSelect = "update unsolicitedFeedback set reviewed=1, reviewedBy=@supervisor, discarded=@discardedValue where id=@feedbackValue;"
+                    + "SELECT * FROM unsolicitedFeedback WHERE reviewed = 0 and complaint <> 'Placeholder'";
+
+                MySqlConnection sqlConnection = new MySqlConnection(getConString());
+                MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+                sqlCommand.Parameters.AddWithValue("@feedbackValue", feedbackIDInt);
+                sqlCommand.Parameters.AddWithValue("@discardedValue", discardedInt);
+                sqlCommand.Parameters.AddWithValue("@supervisor", Convert.ToInt32(Session["id"]));
+
+                MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
+                sqlDa.Fill(sqlDt);
+
+                List<Feedback> feedbackList = new List<Feedback>();
+                for (int i = 0; i < sqlDt.Rows.Count; i++)
+                {
+                    feedbackList.Add(new Feedback
+                    {
+                            id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
+                            problemArea = sqlDt.Rows[i]["problemArea"].ToString(),
+                            complaint = sqlDt.Rows[i]["complaint"].ToString(),
+                            suggestion = sqlDt.Rows[i]["proposedSolution"].ToString(),
+                    });
+                }
+                //convert the list of feedback to an array and return!
+                return feedbackList;
+            }
+            else
+            {
+                return new List<Feedback>();
+            }
+        }
+
         // Note: this is for the dropdown menu for the unsolicited feedback
         [WebMethod(EnableSession = true)]
         public List<string> GetProblemAreas()

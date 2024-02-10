@@ -1125,8 +1125,52 @@
                             feedbackEntry.html(
                                 "<p><strong>Problem Area:</strong> " + feedback.problemArea + "</p>" +
                                 "<p><strong>Complaint:</strong> " + feedback.complaint + "</p>" +
-                                "<p><strong>Proposed Solution:</strong> " + feedback.suggestion + "</p>"
+                                "<p><strong>Proposed Solution:</strong> " + feedback.suggestion + "</p>" +
+                                "<a href='#' onclick='MarkFeedback(" + feedback.id + ",0)'>Mark as Reviewed</a> | " +
+                                "<a href='#' onclick='MarkFeedback(" + feedback.id + ",1)'>Discard</a>"
                          
+                            );
+                            displayArea.append(feedbackEntry);
+                        });
+                    } else {
+                        displayArea.html("<p>No unsolicited feedback available for review.</p>");
+                    }
+                },
+                error: function (e) {
+                    console.error("Error fetching unsolicited feedback: ", e);
+                    alert('Error loading unsolicited feedback. Please try again.');
+                },
+                complete: function () {
+                    showPanel('UnsolicitedFeedbackReview');
+                }
+            });
+        }
+
+        //this is to mark the feedback as reviewed and possibly discarded
+        function MarkFeedback(feedbackID, discarded) {
+            var webMethod = "ProjectServices.asmx/UnsolicitedReviewed";
+            var parameters = "{\"feedbackID\":\"" + feedbackID + "\",\"discarded\":\"" + discarded + "\"}";
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var feedbacks = response.d;
+                    var displayArea = $('#unsolicitedFeedbackDisplay');
+                    displayArea.empty(); // Clear previous entries
+
+                    if (feedbacks.length > 0) {
+                        feedbacks.forEach(function (feedback) {
+                            var feedbackEntry = $("<div class='feedbackEntry'></div>");
+                            feedbackEntry.html(
+                                "<p><strong>Problem Area:</strong> " + feedback.problemArea + "</p>" +
+                                "<p><strong>Complaint:</strong> " + feedback.complaint + "</p>" +
+                                "<p><strong>Proposed Solution:</strong> " + feedback.suggestion + "</p>" +
+                                "<a href='#' onclick='MarkFeedback(" + feedback.id + ",0)'>Mark as Reviewed</a> | " +
+                                "<a href='#' onclick='MarkFeedback(" + feedback.id + ",1)'>Discard</a>"
+
                             );
                             displayArea.append(feedbackEntry);
                         });
