@@ -304,7 +304,7 @@
             <div id="answerListDisplay">
                 List should go here!
             </div>
-            <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
+            <button onclick="javascript: QuestionListHandler();">Return to Question List</button>
             <button onclick="javascript: LogOff();">Log Off</button>
         </div>
 
@@ -345,7 +345,7 @@
                 </div>
                 <hr />
             </form>
-            <button onclick="javascript: DashboardHandler();">Cancel</button>
+            <button onclick="javascript: QuestionListHandler();">Cancel</button>
         </div>
 
         <div id="unsolicitedFeedback" class="contentPanel">
@@ -815,14 +815,14 @@
                                             question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>"
                                                 + "<span class='questionText'>" + msg.d[i].question + "</span><br />"
                                                 + "<span class='expiryDate'>Expiry Date: " + msg.d[i].expiryDate.split(' ')[0] + " </span> <br />"
-                                                + "<span> No responses have been received</span> <br />" + closeq + " </div> <hr>";
+                                                + "<span class='notOptionsTag'> No responses have been received</span> <br />" + closeq + " </div> <hr>";
 
                                         }
                                         else if (msg.d[i].unreviewed == 0) {
                                             question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>"
                                                 + "<span class='questionText'>" + msg.d[i].question + "</span><br />"
                                                 + "<span class='expiryDate'>Expiry Date: " + msg.d[i].expiryDate.split(' ')[0] + " </span> <br />"
-                                                + "<span>No unreviewed responses</span> <br />"
+                                                + "<span class='notOptionsTag'>No unreviewed responses</span> <br />"
                                                 + "<span class='optionsTag'><a href='#' onclick='AnswerListHandler(" + msg.d[i].id
                                                 + ",1)'> see all responses (" + msg.d[i].numAnswers + ")</a></span> <br />" + closeq + "</div> <hr>";
 
@@ -1004,7 +1004,7 @@
                                     }
                                     else {
                                         answer = "<div class='answerRow' id='answerR" + msg.d[i].id + "'>" + "<span class='answerText'>" + msg.d[i].answer + "</span><br />"
-                                            + "<span>Reviewed </span><br /> "
+                                            + "<span class='notOptionsTag'>Reviewed </span><br /> "
                                             + "<span class='optionsTag'><a href='#' onclick='MarkAnswer(" + questionID + "," + msg.d[i].id + ",1)'>discard answer</a> </span> </div> <hr>";
                                         $("#answerListDisplay").append(answer);
                                     }
