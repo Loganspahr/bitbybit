@@ -19,5 +19,7 @@ namespace ProjectTemplate
         public string expiryDate;
         public int numAnswers;
         public int reviewed;
+        public int unreviewed;
+        public bool isExpired;
     }
 }

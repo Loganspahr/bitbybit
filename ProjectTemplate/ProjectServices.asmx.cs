@@ -385,11 +385,11 @@ namespace ProjectTemplate
             else if (Convert.ToInt32(Session["issupervisor"]) == 1)
             {
                 DataTable sqlDt = new DataTable("questionList");
+                DateTime thisDay = DateTime.Today;
 
-                string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
                 //requests just have active set to 0
                 //string sqlSelect = "select id, questionText, expiryDate from questions where submittedBy=@id order by expiryDate";
-                string sqlSelect = "select questions.id, questionText, expiryDate, COUNT(*) as numAnswers from questions, answers where questions.id = answers.question and reviewed=0 GROUP BY question ORDER BY expiryDate;";
+                string sqlSelect = "SELECT questions.id, questionText, expiryDate, COUNT(reviewed) AS numAnswers, IFNULL(COUNT(reviewed) - SUM(reviewed),0) AS unreviewed FROM questions LEFT JOIN answers ON questions.id = answers.question GROUP BY questions.id ORDER BY expiryDate;";
 
                 MySqlConnection sqlConnection = new MySqlConnection(getConString());
                 MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
@@ -402,12 +402,22 @@ namespace ProjectTemplate
                 List<Feedback> questionList = new List<Feedback>();
                 for (int i = 0; i < sqlDt.Rows.Count; i++)
                 {
+                    bool closed = false;
+                    DateTime expiryDate = new DateTime(sqlDt.Rows[i].Field<DateTime>("expiryDate").Year, sqlDt.Rows[i].Field<DateTime>("expiryDate").Month, sqlDt.Rows[i].Field<DateTime>("expiryDate").Day);
+                    if (expiryDate <= thisDay)
+                    {
+                        closed = true;
+                    }
+                    string expiryDateStr = expiryDate.ToString("yyyy-MM-dd");
+
                     questionList.Add(new Feedback
                     {
                         id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
                         question = sqlDt.Rows[i]["questionText"].ToString(),
                         expiryDate = sqlDt.Rows[i]["expiryDate"].ToString(),
                         numAnswers = Convert.ToInt32(sqlDt.Rows[i]["numAnswers"]),
+                        unreviewed = Convert.ToInt32(sqlDt.Rows[i]["unreviewed"]),
+                        isExpired = closed
                     });
                 }
                 //convert the list of accounts to an array and return!
@@ -417,6 +427,36 @@ namespace ProjectTemplate
             {
                 return new Feedback[0];
             }
+        }
+
+        [WebMethod(EnableSession = true)]
+        public bool CloseQuestion(string questionID)
+        { //LOGIC: set the expiry date to today for the question the user selected to close
+            int questionIDInt = Convert.ToInt32(questionID);
+            bool success = false;
+            DataTable sqlDt = new DataTable("question");
+            
+            string sqlSelect = "update questions set expiryDate=CURDATE() where id=@idvalue;";
+            
+            MySqlConnection sqlConnection = new MySqlConnection(getConString());
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+            
+            sqlCommand.Parameters.AddWithValue("@idvalue", questionIDInt);
+            
+            MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
+            sqlDa.Fill(sqlDt);
+            
+            sqlConnection.Open();
+            try
+            {
+                sqlCommand.ExecuteNonQuery();
+                success = true;
+            }
+            catch (Exception e)
+            {
+            }
+            sqlConnection.Close();
+            return success;
         }
 
         [WebMethod(EnableSession = true)]
@@ -629,6 +669,16 @@ namespace ProjectTemplate
                 return -1;
             }
 
+        }
+
+        [WebMethod(EnableSession = true)]
+        public SessionVariables GetSessionVars()
+        {
+            SessionVariables sessionVariables = new SessionVariables();
+            sessionVariables.id = Convert.ToInt32(Session["id"]);
+            sessionVariables.supervisor = Convert.ToInt32(Session["supervisor"]);
+            sessionVariables.issupervisor = Convert.ToInt32(Session["issupervisor"]);
+            return sessionVariables;
         }
     }
 }

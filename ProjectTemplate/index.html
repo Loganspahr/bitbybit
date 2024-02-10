@@ -300,7 +300,7 @@
             <!--<div>
             Note: does not currently check if the answer is marked as reviewed.<br />
         </div>-->
-            <div id="selectedQuestion">Question should be displayed here.</div>
+            <div id="selectedQuestionToReview">Question should be displayed here.</div>
             <div id="answerListDisplay">
                 List should go here!
             </div>
@@ -361,7 +361,7 @@
                 </div>
 
                 <div>
-                    Complaint: <input type="text" id="complaint" size="50" maxlength="50" required />
+                    Complaint: <input type="text" id="complaint" size="39" maxlength="50" required />
                 </div>
                 <div>
                     <textarea id="proposedSolution" rows="10" cols="50" maxlength="1000" placeholder="Enter proposed solution..." required></textarea>
@@ -392,6 +392,10 @@
         </div>
 
     </div>
+
+    <!--This div is only to display the "display session variables" button on each page
+        and should be deleted before project submission-->
+    <div><button onclick="javascript: alertSessionVars();">Alert Session Variables</button></div>
 
 
 
@@ -796,17 +800,42 @@
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         success: function (msg) {
+                            console.log(msg.d.length);
                             if (msg.d.length > 0) {
                                 $("#questionListDisplay").empty();
                                 for (var i = 0; i < msg.d.length; i++) {
                                     if (issupervisor == 1) {
-                                        question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>"
-                                            + "<span class='questionText'>" + msg.d[i].question + "</span><br />"
-                                            + "<span class='expiryDate'>Expiry Date: " + msg.d[i].expiryDate.split(' ')[0] + " </span> <br />"
-                                            + "<span class='optionsTag'><a href='#' onclick='AnswerListHandler(" + msg.d[i].id
-                                            + ",0)'> review responses (" + msg.d[i].numAnswers + ")</a></span>"
-                                            + "<span class='optionsTag'><a href='#' onclick='AnswerListHandler(" + msg.d[i].id
-                                            + ",1)'> see all responses</a></span> </div> <hr>";
+                                        if (msg.d[i].isExpired == true) {
+                                            closeq = "";
+                                        }
+                                        else {
+                                            closeq = "<span class='optionsTag'><a href='#' onclick='CloseQuestion(" + msg.d[i].id + ")'>Close Question</a></span>";
+                                        }
+                                        if (msg.d[i].numAnswers == 0) {
+                                            question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>"
+                                                + "<span class='questionText'>" + msg.d[i].question + "</span><br />"
+                                                + "<span class='expiryDate'>Expiry Date: " + msg.d[i].expiryDate.split(' ')[0] + " </span> <br />"
+                                                + "<span> No responses have been received</span> <br />" + closeq + " </div> <hr>";
+
+                                        }
+                                        else if (msg.d[i].unreviewed == 0) {
+                                            question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>"
+                                                + "<span class='questionText'>" + msg.d[i].question + "</span><br />"
+                                                + "<span class='expiryDate'>Expiry Date: " + msg.d[i].expiryDate.split(' ')[0] + " </span> <br />"
+                                                + "<span>No unreviewed responses</span> <br />"
+                                                + "<span class='optionsTag'><a href='#' onclick='AnswerListHandler(" + msg.d[i].id
+                                                + ",1)'> see all responses (" + msg.d[i].numAnswers + ")</a></span> <br />" + closeq + "</div> <hr>";
+
+                                        }
+                                        else {
+                                            question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>"
+                                                + "<span class='questionText'>" + msg.d[i].question + "</span><br />"
+                                                + "<span class='expiryDate'>Expiry Date: " + msg.d[i].expiryDate.split(' ')[0] + " </span> <br />"
+                                                + "<span class='optionsTag'><a href='#' onclick='AnswerListHandler(" + msg.d[i].id
+                                                + ",0)'> review responses (" + msg.d[i].unreviewed + ")</a></span> <br />"
+                                                + "<span class='optionsTag'><a href='#' onclick='AnswerListHandler(" + msg.d[i].id
+                                                + ",1)'> see all responses (" + msg.d[i].numAnswers + ")</a></span> <br />" + closeq + "</div> <hr>";
+                                        }
                                     }
                                     else {
                                         if (i == 3) {
@@ -841,9 +870,36 @@
             });
         }
 
+        //this is to close a question
+        function CloseQuestion(questionID) {
+            var webMethod = "ProjectServices.asmx/CloseQuestion";
+            var parameters = "{\"questionID\":\"" + questionID + "\"}";
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    if (msg.d) {
+                        alert("Question closed.")
+                    }
+                    else {
+                        alert("Question closure failed.")
+                    }
+                },
+                error: function (e) {
+                    alert("boo...");
+                },
+                complete: function () {
+                    QuestionListHandler();
+                }
+            });
+        }
+
+
         //this is to display question and provide textbox for answer
         function AnswerHandler(questionID) {
-            showPanel("SubmitAnswer");
             var webMethod = "ProjectServices.asmx/GetQuestionToAnswer";
             var parameters = "{\"questionID\":\"" + questionID + "\"}";
             $.ajax({
@@ -864,6 +920,9 @@
                 },
                 error: function (e) {
                     alert("boo...");
+                },
+                complete: function () {
+                    showPanel("SubmitAnswer");
                 }
             });
         }
@@ -908,11 +967,11 @@
                 dataType: "json",
                 success: function (msg) {
                     if (msg.d.length > 0) {
-                        $("#selectedQuestion").empty();
+                        $("#selectedQuestionToReview").empty();
                         for (var i = 0; i < msg.d.length; i++) {
                             question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>" +
                                 "<span class='questionText'>" + msg.d[i].question + "</span> <span id='questNum' style='display:none;'>" + msg.d[i].id + "</span><hr>";
-                            $("#selectedQuestion").append(question);
+                            $("#selectedQuestionToReview").append(question);
                         }
                     }
                     else {
@@ -1047,33 +1106,6 @@
             resetPasswordHandler();
         });
 
-        // NOTE THIS IS ONLY HERE BECAUSE I AM A LAZY DEVELOPER AND GOT TIRED OF TYPING IN CREDENTIALS
-        // THIS WILL NEED TO BE DELETED BEFORE THE PROJECT IS SUBMITTED
-        function lazyloginHandler(role) {
-            var webMethod = "ProjectServices.asmx/Login";
-            var parameters = "{\"role\":\"" + role + "\"}";
-
-            $.ajax({
-                type: "POST",
-                url: webMethod,
-                data: parameters,
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (msg) {
-                    if (msg.d === 1) {
-                        showPanel('SupervisorHome')
-                    } else if (msg.d === 0) {
-                        showPanel('EmployeeHome')
-                    } else {
-                        alert('Login failed: Incorrect username or password.');
-                    }
-                },
-                error: function (e) {
-                    alert("boo...hiss");
-                }
-            });
-        }
-
         // Added the loadUnsolicitedFeedbackReview function
         function loadUnsolicitedFeedbackReview() {
             var webMethod = "ProjectServices.asmx/GetUnsolicitedFeedback";
@@ -1111,6 +1143,55 @@
                 }
             });
         }
+
+        // NOTE THIS IS ONLY HERE BECAUSE I AM A LAZY DEVELOPER AND GOT TIRED OF TYPING IN CREDENTIALS
+        // THIS WILL NEED TO BE DELETED BEFORE THE PROJECT IS SUBMITTED
+        function lazyloginHandler(role) {
+            var webMethod = "ProjectServices.asmx/Login";
+            var parameters = "{\"role\":\"" + role + "\"}";
+
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    if (msg.d === 1) {
+                        showPanel('SupervisorHome')
+                    } else if (msg.d === 0) {
+                        showPanel('EmployeeHome')
+                    } else {
+                        alert('Login failed: Incorrect username or password.');
+                    }
+                },
+                error: function (e) {
+                    alert("boo...hiss");
+                }
+            });
+        }
+
+        //THIS SHOULD ALSO BE DELETED BEFORE PROJECT IS SUBMITTED
+        //This just alerts what the current sesion variables are
+        //This is used to diagnose potential issues with the session variables
+        function alertSessionVars() {
+            var webMethod = "ProjectServices.asmx/GetSessionVars";
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    alert("id: " + msg.d.id + " issupervisor: " + msg.d.issupervisor + " supervisor: " + msg.d.supervisor)
+                },
+                error: function (e) {
+                    alert("boo...hiss");
+                }
+            });
+        }
+
+
+
 
     </script>
 </body>
