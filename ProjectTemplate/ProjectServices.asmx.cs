@@ -157,7 +157,6 @@ namespace ProjectTemplate
 
             return success;
         }
-
         [WebMethod(EnableSession = true)]
         public Account[] GetAccounts()
         {

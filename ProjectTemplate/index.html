@@ -235,6 +235,7 @@
                 <h2>Lazy Quick Developer Logins</h2>
                 <button onclick="javascript: lazyloginHandler('supervisor');">Login as Supervisor</button>
                 <button onclick="javascript: lazyloginHandler('employee');">Login as Employee</button>
+                <button onclick="showPanel('accountspanel')">Create Account</button>
             </form>
         </div>
 
@@ -312,9 +313,9 @@
             <form id="postQuestionForm" onsubmit="submitQuestionHandler(); return false;">
                 <h2>Submit Question</h2>
                 <!-- <div>
-                 Character limit: questionText: 1000<br />
-                 This limit is enforced but the current character count and character limit are not displayed.
-             </div> -->
+                Character limit: questionText: 1000<br />
+                This limit is enforced but the current character count and character limit are not displayed.
+            </div> -->
                 <div>
                     <textarea id="questionText" rows="10" cols="50" maxlength="1000" placeholder="Enter question..." required></textarea>
                 </div>
@@ -376,7 +377,29 @@
         </div>
 
         <div id="accountspanel" class="contentPanel">
-
+            <form onsubmit="CreateAccount($('#newId').val(), $('#newUsername').val(), $('#newPassword').val(), $('#newDeparment').val(), $('#newIssupervisor').val()); return false;">
+                <div class="left">Request Account</div>
+                <hr />
+                <div>
+                    ID: <input type="text" id="newId" />
+                </div>
+                <div>
+                    Username: <input type="text" id="newUsername" />
+                </div>
+                <div>
+                    Password: <input type="password" id="newPassword" />
+                </div>
+                <div>
+                    Department: <input type="text" id="newDeparment" />
+                </div>
+                <div>
+                    Issupervisor: <input type="text" id="newIsssupervisor" />
+                </div>
+                <hr />
+                <div>
+                    <button type="submit">Create Account</button>
+                </div>
+            </form>
         </div>
 
         <div id="requestspanel" class="contentPanel">
@@ -401,6 +424,27 @@
 
     <!--YOUR OWN JAVASCRIPT CAN GO RIGHT HERE-->
     <script type="text/javascript">
+
+        //Calls requestaccount and creates an account
+        function CreateAccount(id, uid, pass, department, issupervisor) {
+            var webMethod = "ProjectServices.asmx/RequestAccount";
+            var parameters = "{\"id\":\"" + encodeURI(id) + "{\"uid\":\"" + encodeURI(uid) + "\",\"pass\":\"" + encodeURI(pass) + "\",\"department\":\"" + encodeURI(department) + "\",\"issupervisor\":\"" + encodeURI(issupervisor) + "\"}";
+
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    showPanel('accountspanel');
+                    alert("Account created");
+                },
+                error: function (e) {
+                    alert("Account Creation Failed");
+                }
+            });
+        }
 
         //this function executes once jQuery has successfully loaded and is
         //ready for business.  Usually, if we're wiring up event handlers via jQuery
