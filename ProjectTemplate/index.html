@@ -236,6 +236,7 @@
                 <button onclick="javascript: lazyloginHandler('supervisor');">Login as Supervisor</button>
                 <button onclick="javascript: lazyloginHandler('employee');">Login as Employee</button>
                 <button onclick="showPanel('accountspanel')">Create Account</button>
+                <button onclick="showPanel('editAccountPanel')">Edit Account</button>
             </form>
         </div>
 
@@ -402,6 +403,36 @@
             </form>
         </div>
 
+        <div id="editAccountPanel" class="contentPanel newAccountPanel">
+            <div class="newAccountBox">
+                <form onsubmit="EditAccount(); return false;">
+                    <div class="left">Edit Account</div>
+                    <div><a href="#" onclick="DeactivateAccount()" class="tinyLink">...or deactivate</a></div>
+                    <hr />
+                    <div>
+                        ID: <input type="text" id="editLogonId" />
+                    </div>
+                    <div>
+                        Pwd: <input type="password" id="editLogonPassword" />
+                    </div>
+                    <div>
+                        First: <input type="text" id="editLogonFName" />
+                    </div>
+                    <div>
+                        Last: <input type="text" id="editLogonLName" />
+                    </div>
+                    <div>
+                        Email: <input type="text" id="editLogonEmail" />
+                    </div>
+                    <hr />
+                    <div>
+                        <button type="submit">Save</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
         <div id="requestspanel" class="contentPanel">
 
         </div>
@@ -414,11 +445,14 @@
             <button onclick="javascript: DashboardHandler();">Return to Dashboard</button>
         </div>
 
+
+
     </div>
 
     <!--This div is only to display the "display session variables" button on each page
         and should be deleted before project submission-->
     <div><button onclick="javascript: alertSessionVars();">Alert Session Variables</button></div>
+
 
 
 
@@ -477,7 +511,7 @@
         //we're using a stacked card approach for our main viewing area
         //this array holds the ids of our cards and the method
         //allows us to easly switch the interface from one to the other
-        var contentPanels = ['login-container', 'resetPasswordPanel', 'SupervisorHome', 'EmployeeHome', 'QuestionList', 'AnswerList', 'SubmitAnswer', 'unsolicitedFeedback', 'SubmitQuestion', 'UnsolicitedFeedbackReview', 'accountspanel', 'requestspanel'];
+        var contentPanels = ['login-container', 'resetPasswordPanel', 'SupervisorHome', 'EmployeeHome', 'QuestionList', 'AnswerList', 'SubmitAnswer', 'unsolicitedFeedback', 'SubmitQuestion', 'UnsolicitedFeedbackReview', 'accountspanel', 'requestspanel', 'editAccountPanel'];
         //this function toggles which panel is showing, and also clears data from all panels
         // Toggles which panel is showing, and also clears data from all panels
         function showPanel(panelId) {
@@ -1278,6 +1312,27 @@
             });
         }
 
+
+        //ajax to edit account
+        function EditAccount() {
+            var webMethod = "ProjectServices.asmx/UpdateAccount";
+            var parameters = "{\"id\":\"" + encodeURI(currentAccount.id) + "\",\"uid\":\"" + encodeURI($('#editLogonId').val()) + "\",\"pass\":\"" + encodeURI($('#editLogonPassword').val()) + "\",\"department\":\"" + encodeURI($('#editDepartment').val()) + "\",\"issupervisor\":\"" + encodeURI($('#editIssupervisor').val()) + "\"}";
+
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    showPanel('accountsPanel');
+                    LoadAccounts();
+                },
+                error: function (e) {
+                    alert("Your profile update failed");
+                }
+            });
+        }
 
 
 

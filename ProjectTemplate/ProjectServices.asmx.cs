@@ -10,6 +10,7 @@ using System.Data.SqlClient;
 using System.Security.Principal;
 using System.Text.RegularExpressions;
 using System.Configuration;
+using System.Security.Cryptography;
 
 namespace ProjectTemplate
 {
@@ -123,6 +124,43 @@ namespace ProjectTemplate
             }
             return success;
         }
+
+
+        [WebMethod(EnableSession = true)]
+        public void UpdateAccount(string pid, string userid, string pass, string department, string issupervisor)
+        {
+            //WRAPPING THE WHOLE THING IN AN IF STATEMENT TO CHECK IF THEY ARE AN ADMIN!
+            if (Convert.ToInt32(Session["admin"]) == 1)
+            {
+                string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+                //this is a simple update, with parameters to pass in values
+                string sqlSelect = "update users set userid=@uidValue, pass=@passValue, department=@department, issupervisor=@issupervisor where id=@idValue";
+
+                MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+                MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+                sqlCommand.Parameters.AddWithValue("@idValue", HttpUtility.UrlDecode(pid));
+                sqlCommand.Parameters.AddWithValue("@uidValue", HttpUtility.UrlDecode(userid));
+                sqlCommand.Parameters.AddWithValue("@passValue", HttpUtility.UrlDecode(pass));
+                sqlCommand.Parameters.AddWithValue("@departmentValue", HttpUtility.UrlDecode(department));
+                sqlCommand.Parameters.AddWithValue("@issupervisorValue", HttpUtility.UrlDecode(issupervisor));
+
+                sqlConnection.Open();
+                //we're using a try/catch so that if the query errors out we can handle it gracefully
+                //by closing the connection and moving on
+                try
+                {
+                    sqlCommand.ExecuteNonQuery();
+                }
+                catch (Exception e)
+                {
+                }
+                sqlConnection.Close();
+            }
+        }
+
+
+
 
 
         //EXAMPLE OF AN INSERT QUERY WITH PARAMS PASSED IN.  BONUS GETTING THE INSERTED ID FROM THE DB!
