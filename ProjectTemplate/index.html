@@ -394,7 +394,7 @@
                     Department: <input type="text" id="newDeparment" />
                 </div>
                 <div>
-                    Issupervisor: <input type="text" id="newIsssupervisor" />
+                    Issupervisor: <input type="text" id="newIssupervisor" />
                 </div>
                 <hr />
                 <div>
@@ -462,7 +462,7 @@
         //Calls requestaccount and creates an account
         function CreateAccount(id, uid, pass, department, issupervisor) {
             var webMethod = "ProjectServices.asmx/RequestAccount";
-            var parameters = "{\"id\":\"" + encodeURI(id) + "{\"uid\":\"" + encodeURI(uid) + "\",\"pass\":\"" + encodeURI(pass) + "\",\"department\":\"" + encodeURI(department) + "\",\"issupervisor\":\"" + encodeURI(issupervisor) + "\"}";
+            var parameters = "{\"pid\":\"" + encodeURI(id) + "\",\"userid\":\"" + encodeURI(uid) + "\",\"pass\":\"" + encodeURI(pass) + "\",\"department\":\"" + encodeURI(department) + "\",\"issupervisor\":\"" + encodeURI(issupervisor) + "\"}";
 
             $.ajax({
                 type: "POST",
