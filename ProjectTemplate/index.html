@@ -199,6 +199,120 @@
             }
         }
 
+        /* Activity List Styles */
+        #ActivityList {
+            background-color: #fff; /* White background for contrast */
+            padding: 20px;
+            border: 2px solid #FFC627; /* Border color to match existing style */
+            border-radius: 10px; /* Rounded corners to match existing style */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Shadow to match existing style */
+            margin: 20px 0; /* Margin for spacing */
+            width: auto; /* To ensure it does not stretch beyond the max-width of contentContainer */
+        }
+
+        #activityListDescription {
+            color: #8C1D40; /* Maroon color for the text */
+            font-size: 18px; /* Size to match similar elements */
+            margin-bottom: 20px; /* Margin for spacing */
+            text-align: center; /* Centering the text */
+            font-weight: bold; /* Bold for emphasis */
+        }
+
+        #activityListTable {
+            width: 100%; /* Full width */
+            border-collapse: collapse; /* Collapse borders for a clean look */
+            background-color: #fff; /* White background for the table */
+        }
+
+            #activityListTable th,
+            #activityListTable td {
+                padding: 10px;
+                text-align: left; /* Align text to the left for readability */
+                border: 1px solid #FFC627; /* Border color to match the theme */
+            }
+
+        #activityListHead {
+            background-color: #8C1D40; /* Background color for header to match the theme */
+            color: #FFC627; /* Text color for header to match the theme */
+            font-size: 16px; /* Slightly smaller font size for the header */
+        }
+
+        .listRow:nth-child(odd) {
+            background-color: #f7f7f7; /* Zebra striping for rows, light grey */
+        }
+
+        .listRow:nth-child(even) {
+            background-color: #fff; /* White for contrast in zebra striping */
+        }
+
+        .listRow:hover {
+            background-color: #FFC627; /* Hover effect with the theme's gold color */
+            color: #8C1D40; /* Text color change on hover for better visibility */
+        }
+
+        /* Responsive styles for activity list */
+        @media (max-width: 768px) {
+            #ActivityList {
+                width: 95%; /* Full width on smaller screens for better visibility */
+                margin: 20px auto; /* Centering the box */
+                overflow-x: auto; /* Allowing horizontal scrolling on small screens */
+            }
+        }
+
+        /*Testing Added CSS code*/
+        /* Styles for radio buttons and their labels */
+        .radio-group {
+            color: #8C1D40; /* Text color for labels */
+            font-weight: bold;
+        }
+
+            .radio-group input[type="radio"] {
+                accent-color: #8C1D40; /* Color of the radio button */
+            }
+
+            .radio-group label {
+                display: block;
+                margin: 5px 0px;
+                font-size: 16px;
+                cursor: pointer;
+            }
+
+        /* Button styles to match theme */
+        .button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #8C1D40;
+            color: #FFC627;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px; /* Adjust as needed */
+            align-self: center; /* Center the button if within a flex container */
+        }
+
+            .button:hover {
+                background-color: #991F3D; /* Darker shade on hover */
+            }
+
+        /* Common styles for headers */
+        .header-text {
+            color: #8C1D40; /* Matching the theme's header color */
+            font-size: 20px; /* Adjust the size as needed */
+            font-weight: bold;
+            margin-bottom: 20px; /* Spacing after the header */
+            text-align: center; /* Center align the header */
+        }
+
+        /* Styling for the container of the form elements */
+        .form-container {
+            background-color: #fff; /* White background for the form container */
+            padding: 20px; /* Padding inside the container */
+            border-radius: 10px; /* Rounded corners for the form container */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+            margin: 20px 0; /* Spacing around the container */
+        }
+
      </style>
 
 
@@ -446,27 +560,28 @@
             <button onclick="javascript: DashboardHandler();">Return to Dashboard</button>
         </div>
 
+        <!--Modified this section of html-->
         <div id="activityReportQuery" class="contentPanel">
-            <!--<form id="activityReportForm" onsubmit="ActivityReportHandler(); return false;">-->
-                <h2>Generate Activity Report</h2>
-                <div>
-                    Report Type:<br />
-                    <input type="radio" name="reportType" value="answers" />Answers<br />
-                    <input type="radio" name="reportType" value="unsolicitedFeedback" />Unsolicited Feedback<br />
-                    <input type="radio" name="reportType" value="combined" />Combined<br />
+            <h2 class="header-text">Generate Activity Report</h2>
+            <div class="form-container">
+                <div class="radio-group">
+                    <span>Report Type:</span><br />
+                    <label><input type="radio" name="reportType" value="answers" />Answers</label><br />
+                    <label><input type="radio" name="reportType" value="unsolicitedFeedback" />Unsolicited Feedback</label><br />
+                    <label><input type="radio" name="reportType" value="combined" />Combined</label>
                 </div>
-                <br />
-                <div>
-                    Departments to Include:<br />
-                    <input type="radio" name="reportDepartment" value="all" />All<br />
-                    <input type="radio" name="reportDepartment" value="mine" />My Department
-                </div>
-            <button onclick="javascript: ActivityReportHandler();">Generate Report</button>
-<!--                <button type="submit">Generate Report</button>
-            </form> -->
-            <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
 
+                <div class="radio-group">
+                    <span>Departments to Include:</span><br />
+                    <label><input type="radio" name="reportDepartment" value="all" />All</label><br />
+                    <label><input type="radio" name="reportDepartment" value="mine" />My Department</label>
+                </div>
+
+                <input type="button" value="Generate Report" onclick="javascript: ActivityReportHandler();" class="button text-center" />
+                <input type="button" value="Return to dashboard" onclick="javascript: DashboardHandler();" class="button text-center" />
+            </div>
         </div>
+
 
         <div id="ActivityList" class="contentPanel">
             <h2>Activity Report</h2>
