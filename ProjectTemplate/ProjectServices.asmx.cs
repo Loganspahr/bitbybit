@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Configuration;
 using System.Security.Cryptography;
 using System.EnterpriseServices;
+using Google.Protobuf.WellKnownTypes;
 
 namespace ProjectTemplate
 {
@@ -737,33 +738,33 @@ namespace ProjectTemplate
             {
                 if (department == "mine")
                 {
-                       sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numAnswers DESC LIMIT 3;";
+                       sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) AND discarded = 0 GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numAnswers DESC LIMIT 3;";
                 }
                 else
                 {
-                    sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numAnswers DESC LIMIT 3;";
+                    sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy WHERE discarded = 0 GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numAnswers DESC LIMIT 3;";
                 }
             }
             else if (reportType == "unsolicitedFeedback")
             {
                 if (department == "mine")
                 {
-                    sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numUSF FROM users LEFT JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numUSF DESC LIMIT 3;";
+                    sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numUSF FROM users LEFT JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) AND discarded = 0 GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numUSF DESC LIMIT 3;";
                 }
                 else
                 {
-                    sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numUSF FROM users LEFT JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numUSF DESC LIMIT 3;";
+                    sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numUSF FROM users LEFT JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE discarded = 0 GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numUSF DESC LIMIT 3;";
                 }
             }
             else
             {
                 if (department == "mine")
                 {
-                    sqlSelect = "SELECT AnswersList.idNum AS id, AnswersList.userid AS userid, numAnswers, numUSF, (numAnswers + numUSF) as numTotal FROM (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) GROUP BY users.id ORDER BY numAnswers DESC) as AnswersList JOIN (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numUSF FROM users LEFT JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) GROUP BY users.id ORDER BY numUSF DESC) AS USFList ON AnswersList.idNum = USFList.idNum WHERE numAnswers > 0 or numUSF > 0 ORDER BY numAnswers + numUSF DESC LIMIT 3;";
+                    sqlSelect = "SELECT AnswersList.idNum AS id, AnswersList.userid AS userid, numAnswers, numUSF, (numAnswers + numUSF) as numTotal FROM (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numAnswers FROM users JOIN answers ON users.id = answers.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) AND discarded = 0 GROUP BY users.id ORDER BY numAnswers DESC) as AnswersList JOIN (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numUSF FROM users JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) AND discarded = 0 GROUP BY users.id ORDER BY numUSF DESC) AS USFList ON AnswersList.idNum = USFList.idNum WHERE numAnswers > 0 or numUSF > 0 ORDER BY numAnswers + numUSF DESC LIMIT 3;";
                 }
                 else
                 {
-                    sqlSelect = "SELECT AnswersList.idNum AS id, AnswersList.userid AS userid, numAnswers, numUSF, (numAnswers + numUSF) as numTotal FROM (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy GROUP BY users.id ORDER BY numAnswers DESC) as AnswersList JOIN (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numUSF FROM users LEFT JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy GROUP BY users.id ORDER BY numUSF DESC) AS USFList ON AnswersList.idNum = USFList.idNum WHERE numAnswers > 0 or numUSF > 0 ORDER BY numAnswers + numUSF DESC LIMIT 3;";
+                    sqlSelect = "SELECT users.id AS id, users.userid AS userid, IFNULL(numAnswers,0) AS numAnswers, IFNULL(numUSF,0) AS numUSF, (IFNULL(numAnswers, 0) + IFNULL(numUSF,0)) AS numTotal FROM users LEFT JOIN (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy WHERE discarded = 0 GROUP BY users.id ORDER BY numAnswers DESC) as AnswersList ON users.id = AnswersList.idNum LEFT JOIN (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numUSF FROM users LEFT JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE discarded = 0 GROUP BY users.id ORDER BY numUSF DESC) AS USFList ON users.id = USFList.idNum WHERE numAnswers > 0 or numUSF > 0 ORDER BY numTotal DESC LIMIT 3;";
                 }
             }
 
@@ -816,6 +817,33 @@ namespace ProjectTemplate
             }
             return activityList.ToArray();
         }
+
+        [WebMethod(EnableSession = true)]
+        public Activity GetMyActivity()
+        {
+            DataTable sqlDt = new DataTable("activity");
+
+            string sqlSelect = "SELECT users.id AS id, users.userid AS userid, IFNULL(numAnswers, 0) AS numAnswers, IFNULL(numUSF, 0) AS numUSF, (IFNULL(numAnswers, 0) + IFNULL(numUSF, 0)) AS numTotal FROM users LEFT JOIN(SELECT users.id as idNum, userid, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy WHERE users.id = @idValue AND discarded = 0 GROUP BY users.id) as AnswersList ON users.id = AnswersList.idNum LEFT JOIN(SELECT users.id as idNum, userid, COUNT(submittedBy) AS numUSF FROM users LEFT JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE users.id = @idValue AND discarded = 0 GROUP BY users.id) AS USFList ON users.id = USFList.idNum WHERE users.id = @idValue;";
+
+            MySqlConnection sqlConnection = new MySqlConnection(getConString());
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+            sqlCommand.Parameters.AddWithValue("@idValue", Convert.ToInt32(Session["id"]));
+
+            MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
+            sqlDa.Fill(sqlDt);
+
+            Activity myActivity = new Activity
+            {
+                id = Convert.ToInt32(sqlDt.Rows[0]["id"]),
+                userId = sqlDt.Rows[0]["userid"].ToString(),
+                numAnswers = Convert.ToInt32(sqlDt.Rows[0]["numAnswers"]),
+                numUSF = Convert.ToInt32(sqlDt.Rows[0]["numUSF"]),
+                numTotal = Convert.ToInt32(sqlDt.Rows[0]["numTotal"])
+            };
+            return myActivity;
+        }
+
 
         // NOTE: THIS IS ONLY HERE FOR LAZY DEVS TO ONE-CLICK SIGN IN - NEEDS TO BE REMOVED FROM FINAL CODE
         [WebMethod(EnableSession = true)]

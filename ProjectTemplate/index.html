@@ -281,6 +281,7 @@
             <a href="#" onclick="LogOff()">log off</a>
             <button onclick="javascript: QuestionListHandler();">Answer Posted Questions</button>
             <button onclick="javascript: showPanel('unsolicitedFeedback')">Submit Feedback</button>
+            <button onclick="javascript: MyActivityHandler();">View My Activity</button>
             <button onclick="javascript: LogOff();">Log Off</button>
         </div>
 
@@ -448,22 +449,22 @@
 
         <div id="activityReportQuery" class="contentPanel">
             <!--<form id="activityReportForm" onsubmit="ActivityReportHandler(); return false;">-->
-                <h2>Generate Activity Report</h2>
-                <div>
-                    Report Type:<br />
-                    <input type="radio" name="reportType" value="answers" />Answers<br />
-                    <input type="radio" name="reportType" value="unsolicitedFeedback" />Unsolicited Feedback<br />
-                    <input type="radio" name="reportType" value="combined" />Combined<br />
-                </div>
-                <br />
-                <div>
-                    Departments to Include:<br />
-                    <input type="radio" name="reportDepartment" value="all" />All<br />
-                    <input type="radio" name="reportDepartment" value="mine" />My Department
-                </div>
+            <h2>Generate Activity Report</h2>
+            <div>
+                Report Type:<br />
+                <input type="radio" name="reportType" value="answers" />Answers<br />
+                <input type="radio" name="reportType" value="unsolicitedFeedback" />Unsolicited Feedback<br />
+                <input type="radio" name="reportType" value="combined" />Combined<br />
+            </div>
+            <br />
+            <div>
+                Departments to Include:<br />
+                <input type="radio" name="reportDepartment" value="all" />All<br />
+                <input type="radio" name="reportDepartment" value="mine" />My Department
+            </div>
             <button onclick="javascript: ActivityReportHandler();">Generate Report</button>
-<!--                <button type="submit">Generate Report</button>
-            </form> -->
+            <!--                <button type="submit">Generate Report</button>
+                    </form> -->
             <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
 
         </div>
@@ -477,7 +478,18 @@
                 List of most active users should go here
             </div>
             <button onclick="showPanel('activityReportQuery')">Back to Activity List Options</button>
-            <button onclick="showPanel('SupervisorHome')">Back to Dashboard</button>
+            <button onclick="DashboardHandler()">Back to Dashboard</button>
+        </div>
+
+        <div id="MyActivity" class="contentPanel">
+            <h2>Activity Report</h2>
+            <div id="MyActivityList">
+                List heading should go here
+            </div>
+            <div id="MostActiveLists">
+                List of most active users should go here
+            </div>
+            <button onclick="DashboardHandler()">Back to Dashboard</button>
         </div>
 
 
@@ -547,7 +559,7 @@
         //we're using a stacked card approach for our main viewing area
         //this array holds the ids of our cards and the method
         //allows us to easly switch the interface from one to the other
-        var contentPanels = ['login-container', 'resetPasswordPanel', 'SupervisorHome', 'EmployeeHome', 'QuestionList', 'AnswerList', 'SubmitAnswer', 'unsolicitedFeedback', 'SubmitQuestion', 'UnsolicitedFeedbackReview', 'accountspanel', 'requestspanel', 'editAccountPanel', 'activityReportQuery', 'ActivityList'];
+        var contentPanels = ['login-container', 'resetPasswordPanel', 'SupervisorHome', 'EmployeeHome', 'QuestionList', 'AnswerList', 'SubmitAnswer', 'unsolicitedFeedback', 'SubmitQuestion', 'UnsolicitedFeedbackReview', 'accountspanel', 'requestspanel', 'editAccountPanel', 'activityReportQuery', 'ActivityList', 'MyActivity'];
         //this function toggles which panel is showing, and also clears data from all panels
         // Toggles which panel is showing, and also clears data from all panels
         function showPanel(panelId) {
@@ -1381,6 +1393,108 @@
                 }
             });
         }
+
+
+        function MyActivityHandler() {
+            var webMethod = "ProjectServices.asmx/GetMyActivity";
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    myID = msg.d.id;
+                    $("#MyActivityList").empty();
+                    myActivity = "<div id='activityListDescription' class='listDescription'>Your activity:</div><br /><table id='activityListTable' class='listTable'>"
+                        + "<tr id='activityListHead' class='listHead'><th>Answers</th><th>Unsolicited Feedback</th><th>Combined</th></tr>"
+                        + "<tr id = 'listR0' class='listRow'><td>" + msg.d.numAnswers + "</td><td>" + msg.d.numUSF + "</td><td>" + msg.d.numTotal + "</td></tr></table><br />";
+                    $("#MyActivityList").append(myActivity);
+                },
+                error: function (e) {
+                    alert("boo...");
+                },
+                complete: function () {
+                    reportType = "combined";
+                    department = "mine";
+                    var webMethod = "ProjectServices.asmx/GetMostActiveUsers";
+                    var parameters = "{\"reportType\":\"" + encodeURI(reportType) + "\",\"department\":\"" + encodeURI(department) + "\"}";
+                    $.ajax({
+                        type: "POST",
+                        url: webMethod,
+                        data: parameters,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (msg) {
+                            if (msg.d.length > 0) {
+                                $("#MostActiveLists").empty();
+                                myDeptActivity = "<div id='activityListDescription' class='listDescription'>Most active users in my department.</div><br />"
+                                    + "<table id='activityListTable' class='listTable'><tr id='activityListHead' class='listHead'><th>Rank</th><th>User ID</th><th>Answers</th><th>Unsolicited Feedback</th><th>Combined</th></tr>";
+                                for (var i = 0; i < msg.d.length; i++) {
+                                    numberstoreport = msg.d[i].numAnswers + "</td><td>" + msg.d[i].numUSF + "</td><td>" + msg.d[i].numTotal;
+                                    if (myID == msg.d[i].id) {
+                                        userIdToDisplay = "You";
+                                    }
+                                    else {
+                                        userIdToDisplay = "Someone Else";
+                                    }
+                                    myDeptActivity += "<tr id='listR" + (i + 1) + "' class='listRow'><td>" + (i + 1) + "</td><td>" + userIdToDisplay + "</td><td>" + numberstoreport + "</td></tr>";
+                                }
+                                myDeptActivity += "</table><br />";
+                                $("#MostActiveLists").append(myDeptActivity);
+                            }
+                            else {
+                                alert("No activity found");
+                            }
+                        },
+                        error: function (e) {
+                            alert("boo...");
+                        },
+                        complete: function () {
+                            reportType = "combined";
+                            department = "all";
+                            var webMethod = "ProjectServices.asmx/GetMostActiveUsers";
+                            var parameters = "{\"reportType\":\"" + encodeURI(reportType) + "\",\"department\":\"" + encodeURI(department) + "\"}";
+                            $.ajax({
+                                type: "POST",
+                                url: webMethod,
+                                data: parameters,
+                                contentType: "application/json; charset=utf-8",
+                                dataType: "json",
+                                success: function (msg) {
+                                    if (msg.d.length > 0) {
+                                        myDeptActivity = "<div id='activityListDescription' class='listDescription'>Most active users in all departments.</div><br />"
+                                            + "<table id='activityListTable' class='listTable'><tr id='activityListHead' class='listHead'><th>Rank</th><th>User ID</th><th>Answers</th><th>Unsolicited Feedback</th><th>Combined</th></tr>";
+                                        for (var i = 0; i < msg.d.length; i++) {
+                                            numberstoreport = msg.d[i].numAnswers + "</td><td>" + msg.d[i].numUSF + "</td><td>" + msg.d[i].numTotal;
+                                            if (myID == msg.d[i].id) {
+                                                userIdToDisplay = "You";
+                                            }
+                                            else {
+                                                userIdToDisplay = "Someone Else";
+                                            }
+                                            myDeptActivity += "<tr id='listR" + (i + 1) + "' class='listRow'><td>" + (i + 1) + "</td><td>" + userIdToDisplay + "</td><td>" + numberstoreport + "</td></tr>";
+                                        }
+                                        myDeptActivity += "</table>";
+                                        $("#MostActiveLists").append(myDeptActivity);
+                                    }
+                                    else {
+                                        alert("No activity found");
+                                    }
+                                },
+                                error: function (e) {
+                                    alert("boo...");
+                                },
+                                complete: function () {
+                                    showPanel("MyActivity");
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+
 
         // NOTE THIS IS ONLY HERE BECAUSE I AM A LAZY DEVELOPER AND GOT TIRED OF TYPING IN CREDENTIALS
         // THIS WILL NEED TO BE DELETED BEFORE THE PROJECT IS SUBMITTED
