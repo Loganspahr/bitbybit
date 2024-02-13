@@ -270,6 +270,7 @@
             <button onclick="javascript: QuestionListHandler();">Review Questions I Have Posted</button>
             <button onclick="javascript: showPanel('SubmitQuestion')">Post A New Question</button>
             <button onclick="javascript: loadUnsolicitedFeedbackReview();">Review Unsolicited Feedback</button>
+            <button onclick="javascript: showPanel('activityReportQuery');">Generate Activity List</button>
             <button onclick="javascript: LogOff();">Log Off</button>
         </div>
 
@@ -445,13 +446,48 @@
             <button onclick="javascript: DashboardHandler();">Return to Dashboard</button>
         </div>
 
+        <div id="activityReportQuery" class="contentPanel">
+            <!--<form id="activityReportForm" onsubmit="ActivityReportHandler(); return false;">-->
+                <h2>Generate Activity Report</h2>
+                <div>
+                    Report Type:<br />
+                    <input type="radio" name="reportType" value="answers" />Answers<br />
+                    <input type="radio" name="reportType" value="unsolicitedFeedback" />Unsolicited Feedback<br />
+                    <input type="radio" name="reportType" value="combined" />Combined<br />
+                </div>
+                <br />
+                <div>
+                    Departments to Include:<br />
+                    <input type="radio" name="reportDepartment" value="all" />All<br />
+                    <input type="radio" name="reportDepartment" value="mine" />My Department
+                </div>
+            <button onclick="javascript: ActivityReportHandler();">Generate Report</button>
+<!--                <button type="submit">Generate Report</button>
+            </form> -->
+            <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
+
+        </div>
+
+        <div id="ActivityList" class="contentPanel">
+            <h2>Activity Report</h2>
+            <div id="selectedActivityList">
+                List heading should go here
+            </div>
+            <div id="displayedActivityList">
+                List of most active users should go here
+            </div>
+            <button onclick="showPanel('activityReportQuery')">Back to Activity List Options</button>
+            <button onclick="showPanel('SupervisorHome')">Back to Dashboard</button>
+        </div>
+
 
 
     </div>
 
     <!--This div is only to display the "display session variables" button on each page
-        and should be deleted before project submission-->
+        and should be deleted before project submission
     <div><button onclick="javascript: alertSessionVars();">Alert Session Variables</button></div>
+        -->
 
 
 
@@ -511,7 +547,7 @@
         //we're using a stacked card approach for our main viewing area
         //this array holds the ids of our cards and the method
         //allows us to easly switch the interface from one to the other
-        var contentPanels = ['login-container', 'resetPasswordPanel', 'SupervisorHome', 'EmployeeHome', 'QuestionList', 'AnswerList', 'SubmitAnswer', 'unsolicitedFeedback', 'SubmitQuestion', 'UnsolicitedFeedbackReview', 'accountspanel', 'requestspanel', 'editAccountPanel'];
+        var contentPanels = ['login-container', 'resetPasswordPanel', 'SupervisorHome', 'EmployeeHome', 'QuestionList', 'AnswerList', 'SubmitAnswer', 'unsolicitedFeedback', 'SubmitQuestion', 'UnsolicitedFeedbackReview', 'accountspanel', 'requestspanel', 'editAccountPanel', 'activityReportQuery', 'ActivityList'];
         //this function toggles which panel is showing, and also clears data from all panels
         // Toggles which panel is showing, and also clears data from all panels
         function showPanel(panelId) {
@@ -854,6 +890,11 @@
         $('#postQuestionForm').submit(function (e) {
             e.preventDefault(); // Prevent the default form submission
             submitQuestionHandler();
+        });
+
+        $('#activityReportForm').submit(function (e) {
+            e.preventDefault(); // Prevent the default form submission
+            ActivityReportHandler();
         });
 
         $('#unsolicitedFeedbackForm').submit(function (e) {
@@ -1262,6 +1303,81 @@
                 },
                 complete: function () {
                     showPanel('UnsolicitedFeedbackReview');
+                }
+            });
+        }
+
+        
+        function ActivityReportHandler() {
+            var ele = document.getElementsByName('reportType');
+            for (i = 0; i < ele.length; i++) {
+                if (ele[i].checked) {
+                    reportType = ele[i].value;
+                }
+            }
+            ele = document.getElementsByName('reportDepartment');
+            for (i = 0; i < ele.length; i++) {
+                if (ele[i].checked) {
+                    department = ele[i].value;
+                }
+            }
+            var webMethod = "ProjectServices.asmx/GetMostActiveUsers";
+            var parameters = "{\"reportType\":\"" + encodeURI(reportType) + "\",\"department\":\"" + encodeURI(department) + "\"}";
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                data: parameters,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (msg) {
+                    if (msg.d.length > 0) {
+                        $("#selectedActivityList").empty();
+                        if (department == "mine")
+                            dept = "your department";
+                        else
+                            dept = "all departments";
+                        if (reportType == "answers") {
+                            reptype = "Questions Answered";
+                            activityType = "Answers";
+                        }
+                        else if (reportType == "unsolicitedFeedback") {
+                            reptype = "Unsolicited Feedback Submitted";
+                            activityType = "Unsolicited Feedback";
+                        }
+                        else {
+                            reptype = "All Activity";
+                            activityType = "Answers</th><th>Unsolicited Feedback</th><th>Combined";
+                        }
+                        selectedlist = "<div id='activityListDescription' class='listDescription'>Most active users for " + reptype + " in " + dept + ".</div><br />";
+                        $("#selectedActivityList").append(selectedlist);
+
+                        $("#displayedActivityList").empty();
+                        listcontent = "<table id='activityListTable' class='listTable'><tr id='activityListHead' class='listHead'><th>Rank</th><th>User ID</th><th>" + activityType + "</th></tr>";
+
+                        for (var i = 0; i < msg.d.length; i++) {
+                            if (reportType == "answers") {
+                                numberstoreport = msg.d[i].numAnswers;
+                            }
+                            else if (reportType == "unsolicitedFeedback") {
+                                numberstoreport = msg.d[i].numUSF;
+                            }
+                            else {
+                                numberstoreport = msg.d[i].numAnswers + "</td><td>" + msg.d[i].numUSF + "</td><td>" + msg.d[i].numTotal;
+                            }
+                            listcontent += "<tr id='listR" + (i+1) + "' class='listRow'><td>" + (i + 1) + "</td><td>" + msg.d[i].userId + "</td><td>" + numberstoreport + "</td></tr>";
+                        }
+                        listcontent += "</table>";
+                        $("#displayedActivityList").append(listcontent);
+                    }
+                    else {
+                        alert("No activity found");
+                    }
+                },
+                error: function (e) {
+                    alert("boo...");
+                },
+                complete: function () {
+                    showPanel("ActivityList");
                 }
             });
         }

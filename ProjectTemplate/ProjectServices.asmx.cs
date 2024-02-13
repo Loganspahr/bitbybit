@@ -11,6 +11,7 @@ using System.Security.Principal;
 using System.Text.RegularExpressions;
 using System.Configuration;
 using System.Security.Cryptography;
+using System.EnterpriseServices;
 
 namespace ProjectTemplate
 {
@@ -724,6 +725,96 @@ namespace ProjectTemplate
                 // Return empty list or handle accordingly if the user is not a supervisor
                 return new List<Feedback>();
             }
+        }
+
+        [WebMethod(EnableSession = true)]
+        public Activity[] GetMostActiveUsers(string reportType, string department)
+        {
+            DataTable sqlDt = new DataTable("activity");
+
+            string sqlSelect;
+            if (reportType == "answers")
+            {
+                if (department == "mine")
+                {
+                       sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numAnswers DESC LIMIT 3;";
+                }
+                else
+                {
+                    sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numAnswers DESC LIMIT 3;";
+                }
+            }
+            else if (reportType == "unsolicitedFeedback")
+            {
+                if (department == "mine")
+                {
+                    sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numUSF FROM users LEFT JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numUSF DESC LIMIT 3;";
+                }
+                else
+                {
+                    sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numUSF FROM users LEFT JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numUSF DESC LIMIT 3;";
+                }
+            }
+            else
+            {
+                if (department == "mine")
+                {
+                    sqlSelect = "SELECT AnswersList.idNum AS id, AnswersList.userid AS userid, numAnswers, numUSF, (numAnswers + numUSF) as numTotal FROM (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) GROUP BY users.id ORDER BY numAnswers DESC) as AnswersList JOIN (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numUSF FROM users LEFT JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) GROUP BY users.id ORDER BY numUSF DESC) AS USFList ON AnswersList.idNum = USFList.idNum WHERE numAnswers > 0 or numUSF > 0 ORDER BY numAnswers + numUSF DESC LIMIT 3;";
+                }
+                else
+                {
+                    sqlSelect = "SELECT AnswersList.idNum AS id, AnswersList.userid AS userid, numAnswers, numUSF, (numAnswers + numUSF) as numTotal FROM (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy GROUP BY users.id ORDER BY numAnswers DESC) as AnswersList JOIN (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numUSF FROM users LEFT JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy GROUP BY users.id ORDER BY numUSF DESC) AS USFList ON AnswersList.idNum = USFList.idNum WHERE numAnswers > 0 or numUSF > 0 ORDER BY numAnswers + numUSF DESC LIMIT 3;";
+                }
+            }
+
+            MySqlConnection sqlConnection = new MySqlConnection(getConString());
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+            sqlCommand.Parameters.AddWithValue("@idValue", Convert.ToInt32(Session["id"]));
+
+            MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
+            sqlDa.Fill(sqlDt);
+
+            List<Activity> activityList = new List<Activity>();
+            if (reportType == "answers")
+            {
+                for (int i = 0; i < sqlDt.Rows.Count; i++)
+                {
+                    activityList.Add(new Activity
+                    {
+                        id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
+                        userId = sqlDt.Rows[i]["userid"].ToString(),
+                        numAnswers = Convert.ToInt32(sqlDt.Rows[i]["numAnswers"]),
+                    });
+                }
+            }
+            else if (reportType == "unsolicitedFeedback")
+            {
+                for (int i = 0; i < sqlDt.Rows.Count; i++)
+                {
+                    activityList.Add(new Activity
+                    {
+                        id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
+                        userId = sqlDt.Rows[i]["userid"].ToString(),
+                        numUSF = Convert.ToInt32(sqlDt.Rows[i]["numUSF"]),
+                    });
+                }
+            }
+            else
+            {
+                for (int i = 0; i < sqlDt.Rows.Count; i++)
+                {
+                    activityList.Add(new Activity
+                    {
+                        id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
+                        userId = sqlDt.Rows[i]["userid"].ToString(),
+                        numAnswers = Convert.ToInt32(sqlDt.Rows[i]["numAnswers"]),
+                        numUSF = Convert.ToInt32(sqlDt.Rows[i]["numUSF"]),
+                        numTotal = Convert.ToInt32(sqlDt.Rows[i]["numTotal"])
+                    });
+                }
+            }
+            return activityList.ToArray();
         }
 
         // NOTE: THIS IS ONLY HERE FOR LAZY DEVS TO ONE-CLICK SIGN IN - NEEDS TO BE REMOVED FROM FINAL CODE
