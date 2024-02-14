@@ -259,7 +259,6 @@
             }
         }
 
-        /*Testing Added CSS code*/
         /* Styles for radio buttons and their labels */
         .radio-group {
             color: #8C1D40; /* Text color for labels */
@@ -380,10 +379,12 @@
         <div id="SupervisorHome" class="contentPanel">
             <h2>Supervisor Dashboard</h2>
             <!-- Supervisor-specific content goes here -->
-            <a href="#" onclick="LogOff()">log off</a> <!--add log off to only show in supervisor screen-->
+            <!-- <a href="#" onclick="LogOff()">log off</a> <!--add log off to only show in supervisor screen-->
             <button onclick="javascript: QuestionListHandler();">Review Questions I Have Posted</button>
             <button onclick="javascript: showPanel('SubmitQuestion')">Post A New Question</button>
             <button onclick="javascript: loadUnsolicitedFeedbackReview();">Review Unsolicited Feedback</button>
+            <!--Added Configure Employee Questions button-->
+            <button type="button" onclick="showResponseTypeConfig()" class="button">Configure Employee Questions</button>
             <button onclick="javascript: showPanel('activityReportQuery');">Generate Activity List</button>
             <button onclick="javascript: LogOff();">Log Off</button>
         </div>
@@ -392,7 +393,7 @@
         <div id="EmployeeHome" class="contentPanel">
             <h2>Employee Dashboard</h2>
             <!-- Employee-specific content goes here -->
-            <a href="#" onclick="LogOff()">log off</a>
+            <!-- <a href="#" onclick="LogOff()">log off</a> -->
             <button onclick="javascript: QuestionListHandler();">Answer Posted Questions</button>
             <button onclick="javascript: showPanel('unsolicitedFeedback')">Submit Feedback</button>
             <button onclick="javascript: MyActivityHandler();">View My Activity</button>
@@ -491,6 +492,22 @@
             </form>
             <button onclick="javascript: DashboardHandler();">Return to dashboard</button>
 
+        </div>
+
+        <!--NEWLY ADDED SECTION-->
+        <!-- Placed the new configuration section here -->
+        <div id="questionConfig" class="contentPanel hidden">
+            <h2>Configure Question Types</h2>
+            <div class="form-container">
+                <div class="radio-group">
+                    <span>Response Type:</span><br />
+                    <label><input type="radio" name="responseType" value="freeResponse"> Free Response</label><br />
+                    <label><input type="radio" name="responseType" value="multipleChoice"> Multiple Choice</label><br />
+                    <label><input type="radio" name="responseType" value="numberRange"> Number between 1-10</label>
+                </div>
+                <button type="button" onclick="saveQuestionConfig()" class="button">Save Configuration</button>
+                <button type="button" onclick="DashboardHandler();" class="button">Back to Dashboard</button>
+            </div>
         </div>
 
         <div id="accountspanel" class="contentPanel">
@@ -607,18 +624,12 @@
             <button onclick="DashboardHandler()">Back to Dashboard</button>
         </div>
 
-
-
     </div>
 
     <!--This div is only to display the "display session variables" button on each page
         and should be deleted before project submission
     <div><button onclick="javascript: alertSessionVars();">Alert Session Variables</button></div>
         -->
-
-
-
-
     <!--YOUR OWN JAVASCRIPT CAN GO RIGHT HERE-->
     <script type="text/javascript">
 
@@ -1374,7 +1385,7 @@
                                 "<p><strong>Proposed Solution:</strong> " + feedback.suggestion + "</p>" +
                                 "<a href='#' onclick='MarkFeedback(" + feedback.id + ",0)'>Mark as Reviewed</a> | " +
                                 "<a href='#' onclick='MarkFeedback(" + feedback.id + ",1)'>Discard</a>"
-                         
+
                             );
                             displayArea.append(feedbackEntry);
                         });
@@ -1434,7 +1445,7 @@
             });
         }
 
-        
+
         function ActivityReportHandler() {
             var ele = document.getElementsByName('reportType');
             for (i = 0; i < ele.length; i++) {
@@ -1491,7 +1502,7 @@
                             else {
                                 numberstoreport = msg.d[i].numAnswers + "</td><td>" + msg.d[i].numUSF + "</td><td>" + msg.d[i].numTotal;
                             }
-                            listcontent += "<tr id='listR" + (i+1) + "' class='listRow'><td>" + (i + 1) + "</td><td>" + msg.d[i].userId + "</td><td>" + numberstoreport + "</td></tr>";
+                            listcontent += "<tr id='listR" + (i + 1) + "' class='listRow'><td>" + (i + 1) + "</td><td>" + msg.d[i].userId + "</td><td>" + numberstoreport + "</td></tr>";
                         }
                         listcontent += "</table>";
                         $("#displayedActivityList").append(listcontent);
@@ -1679,7 +1690,42 @@
             });
         }
 
+        // NEW JS
+        // Function to show different panels based on the button clicked
+        function showPanel(panelId) {
+            $('.contentPanel').hide(); // Hide all panels
+            $('#' + panelId).show(); // Show the specified panel
+        }
 
+        // Function to show the response type configuration panel
+        function showResponseTypeConfig() {
+            showPanel('questionConfig');
+        }
+
+        // Function to save the question configuration
+        function saveQuestionConfig() {
+            var responseType = $('input[name="responseType"]:checked').val();
+            // Saving response
+            console.log('Saving response type configuration:', responseType);
+            // Assuming an AJAX call to your backend
+            var webMethod = "YourBackendEndpoint/SaveQuestionConfig"; // This needs to be changed to the actual webMethod if necessary
+            var parameters = "{\"responseType\":\"" + responseType + "\"}";
+
+            $.ajax({
+                type: "POST",
+                url: webMethod,
+                contentType: "application/json; charset=utf-8",
+                data: parameters,
+                dataType: "json",
+                success: function (msg) {
+                    alert("Configuration saved successfully.");
+                    DashboardHandler(); // Navigate back to the dashboard or relevant page
+                },
+                error: function (e) {
+                    alert("Error saving configuration.");
+                }
+            });
+        }
 
     </script>
 </body>
