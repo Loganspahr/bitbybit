@@ -21,5 +21,6 @@ namespace ProjectTemplate
         public int reviewed;
         public int unreviewed;
         public bool isExpired;
+        public string questionType;
     }
 }

@@ -13,6 +13,7 @@ using System.Configuration;
 using System.Security.Cryptography;
 using System.EnterpriseServices;
 using Google.Protobuf.WellKnownTypes;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace ProjectTemplate
 {
@@ -295,7 +296,7 @@ namespace ProjectTemplate
         }
 
         [WebMethod(EnableSession = true)]
-        public int SubmitQuestion(string questionText, string daysToLive)
+        public int SubmitQuestion(string questionText, string daysToLive, string questionType)
         {
             int questionID = -333;
             int daysToLiveInt = 0;
@@ -313,8 +314,8 @@ namespace ProjectTemplate
                 daysToLiveInt = 99999;
             }
 
-            string sqlSelect = "insert into questions (questionText, expiryDate, submittedBy) " +
-                "values(@questionTextValue, @expiryDateValue, @idValue); SELECT LAST_INSERT_ID();";
+            string sqlSelect = "insert into questions (questionText, expiryDate, submittedBy, questionType) " +
+                "values(@questionTextValue, @expiryDateValue, @idValue, @questionType); SELECT LAST_INSERT_ID();";
             DateTime thisDay = DateTime.Today;
             DateTime expiryDate = thisDay.AddDays(daysToLiveInt);
             string expiryDateStr = expiryDate.ToString("yyyy-MM-dd");
@@ -325,6 +326,7 @@ namespace ProjectTemplate
 
             sqlCommand.Parameters.AddWithValue("@questionTextValue", HttpUtility.UrlDecode(questionText));
             sqlCommand.Parameters.AddWithValue("@expiryDateValue", HttpUtility.UrlDecode(expiryDateStr));
+            sqlCommand.Parameters.AddWithValue("@questionType", HttpUtility.UrlDecode(questionType));
             sqlCommand.Parameters.AddWithValue("@idValue", Convert.ToInt32(Session["id"]));
 
             sqlConnection.Open();
@@ -348,6 +350,41 @@ namespace ProjectTemplate
             //return value will be the questionID of the row we just inserted.  If the insert failed,
             //it will be -1 instead.  This value can be used to display the question back to the user after
             //they submit it, or to display a message if the submission failed.
+        }
+
+        [WebMethod(EnableSession = true)]
+        public int SubmitMultipleChoice(List<string> array)
+        {
+            //{ "array":[95,"One","Two"]}
+            int questionID = Convert.ToInt32(array[0]);
+            int responseID = -333;
+            for (int i = 1; i < array.Count; i++)
+            {
+                string sqlSelect = "insert into multipleChoice (question, choice) " +
+                    "values(@questionValue, @choiceValue); SELECT LAST_INSERT_ID();";
+
+                MySqlConnection sqlConnection = new MySqlConnection(getConString());
+                MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+                sqlCommand.Parameters.AddWithValue("@questionValue", questionID);
+                sqlCommand.Parameters.AddWithValue("@choiceValue", HttpUtility.UrlDecode(array[i]));
+
+                sqlConnection.Open();
+                try
+                {
+                    responseID = Convert.ToInt32(sqlCommand.ExecuteScalar());
+                }
+                catch (Exception e)
+                {
+                    responseID = -1;
+                    //something went wrong, so we don't have a responseID to work with
+                    //so we need to set it to something that we can check for later
+                    //in this case, -1 will (hopefully) never be a valid responseID
+                    //so we can check for that later when this method is called
+                }
+                sqlConnection.Close();
+            }
+            return responseID;
         }
 
         [WebMethod(EnableSession = true)]
@@ -504,8 +541,7 @@ namespace ProjectTemplate
             int questionIDInt = Convert.ToInt32(questionID);
             DataTable sqlDt = new DataTable("question");
 
-            string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
-            string sqlSelect = "select id, questionText, expiryDate from questions where id=@idvalue;";
+            string sqlSelect = "select id, questionText, expiryDate, questionType from questions where id=@idvalue;";
 
             MySqlConnection sqlConnection = new MySqlConnection(getConString());
             MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
@@ -523,10 +559,35 @@ namespace ProjectTemplate
                     id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
                     question = sqlDt.Rows[i]["questionText"].ToString(),
                     expiryDate = sqlDt.Rows[i]["expiryDate"].ToString(),
+                    questionType = sqlDt.Rows[i]["questionType"].ToString()
                 });
             }
             //convert the list of accounts to an array and return!
             return question.ToArray();
+        }
+
+        [WebMethod(EnableSession = true)]
+        public string[] GetMultipleChoiceOptions(string questionID)
+        {
+            int questionIDInt = Convert.ToInt32(questionID);
+            DataTable sqlDt = new DataTable("multipleChoice");
+
+            string sqlSelect = "select choice from multipleChoice where question=@idvalue;";
+
+            MySqlConnection sqlConnection = new MySqlConnection(getConString());
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+            sqlCommand.Parameters.AddWithValue("@idvalue", questionIDInt);
+
+            MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
+            sqlDa.Fill(sqlDt);
+
+            List<string> multipleChoice = new List<string>();
+            for (int i = 0; i < sqlDt.Rows.Count; i++)
+            {
+                multipleChoice.Add(sqlDt.Rows[i]["choice"].ToString());
+            }
+            return multipleChoice.ToArray();
         }
 
         [WebMethod(EnableSession = true)]
