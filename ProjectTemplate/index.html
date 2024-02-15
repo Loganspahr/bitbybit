@@ -449,10 +449,11 @@
                         <option value="numberRange">Number Range (1-10)</option>
                     </select>
                 </div>
-                <div id="multipleChoiceOptions" style="display:none;">
+                <div id="multipleChoiceOptions" class="contentPanel" style="display: none;">
                     <h3>Enter options for Multiple Choice</h3>
                     <input type="text" id="option1" placeholder="Option 1">
                     <input type="text" id="option2" placeholder="Option 2">
+                    <span id="extraOptions"></span>
                     <button type="button" onclick="addMoreOptions()">Add more options</button>
                 </div>
                 <div>
@@ -647,6 +648,25 @@
         -->
     <!--YOUR OWN JAVASCRIPT CAN GO RIGHT HERE-->
     <script type="text/javascript">
+
+        function addMoreOptions() {
+            var i = 3;
+            while (i > 0) {
+                var elem = document.getElementById('option' + i);
+                if (JSON.stringify(elem) === JSON.stringify(null)) {
+                    var newElem = document.createElement('input');
+                    newElem.type = 'text';
+                    newElem.id = 'option' + i;
+                    newElem.placeholder = 'Option ' + i;
+                    document.getElementById('extraOptions').appendChild(newElem);
+                    var newBR = document.createElement('br');
+                    document.getElementById('extraOptions').appendChild(newBR);
+                    break;
+                } else {
+                    i++;
+                }
+            }
+        }
 
         //Calls requestaccount and creates an account
         function CreateAccount(id, uid, pass, department, issupervisor) {
@@ -1053,6 +1073,18 @@
             e.preventDefault(); // Prevent the default form submission
             unsolicitedFeedbackHandler();
         });
+
+        $('#responseType').on('change', function () {
+            var element = document.getElementById('multipleChoiceOptions');
+            var selectedValue = $('#responseType').val();
+            console.log(selectedValue);
+            if (selectedValue === 'multipleChoice') {
+                element.style.display = 'flex';
+            } else {
+                element.style.display = 'none';
+            }
+        });
+
 
         //this is to display questions available to be answered or reviewed
         function QuestionListHandler() {
