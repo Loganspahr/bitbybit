@@ -384,7 +384,7 @@
             <button onclick="javascript: showPanel('SubmitQuestion')">Post A New Question</button>
             <button onclick="javascript: loadUnsolicitedFeedbackReview();">Review Unsolicited Feedback</button>
             <!--Added Configure Employee Questions button-->
-            <button type="button" onclick="showResponseTypeConfig()" class="button">Configure Employee Questions</button>
+           <!-- <button type="button" onclick="showResponseTypeConfig()" class="button">Configure Employee Questions</button> -->
             <button onclick="javascript: showPanel('activityReportQuery');">Generate Activity List</button>
             <button onclick="javascript: LogOff();">Log Off</button>
         </div>
@@ -431,14 +431,29 @@
             <form id="postQuestionForm" onsubmit="submitQuestionHandler(); return false;">
                 <h2>Submit Question</h2>
                 <!-- <div>
-                Character limit: questionText: 1000<br />
-                This limit is enforced but the current character count and character limit are not displayed.
-            </div> -->
+        Character limit: questionText: 1000<br />
+        This limit is enforced but the current character count and character limit are not displayed.
+    </div> -->
                 <div>
                     <textarea id="questionText" rows="10" cols="50" maxlength="1000" placeholder="Enter question..." required></textarea>
                 </div>
                 <div>
                     Days to live (enter 0 for no expiration): <input type="text" id="daysToLive" size="3" maxlength="3" placeholder="0" />
+                </div>
+                <div>
+                    <!-- ADDED THIS SECTION TO THE PAGE-->
+                    Response Type:
+                    <select id="responseType">
+                        <option value="freeResponse">Free Response</option>
+                        <option value="multipleChoice">Multiple Choice</option>
+                        <option value="numberRange">Number Range (1-10)</option>
+                    </select>
+                </div>
+                <div id="multipleChoiceOptions" style="display:none;">
+                    <h3>Enter options for Multiple Choice</h3>
+                    <input type="text" id="option1" placeholder="Option 1">
+                    <input type="text" id="option2" placeholder="Option 2">
+                    <button type="button" onclick="addMoreOptions()">Add more options</button>
                 </div>
                 <div>
                     <button type="submit">Save</button>
@@ -496,7 +511,7 @@
 
         <!--NEWLY ADDED SECTION-->
         <!-- Placed the new configuration section here -->
-        <div id="questionConfig" class="contentPanel hidden">
+       <!-- <div id="questionConfig" class="contentPanel hidden">
             <h2>Configure Question Types</h2>
             <div class="form-container">
                 <div class="radio-group">
@@ -508,7 +523,7 @@
                 <button type="button" onclick="saveQuestionConfig()" class="button">Save Configuration</button>
                 <button type="button" onclick="DashboardHandler();" class="button">Back to Dashboard</button>
             </div>
-        </div>
+        </div> -->
 
         <div id="accountspanel" class="contentPanel">
             <form onsubmit="CreateAccount($('#newId').val(), $('#newUsername').val(), $('#newPassword').val(), $('#newDeparment').val(), $('#newIssupervisor').val()); return false;">
@@ -935,7 +950,7 @@
             }
         }
 
-        function submitQuestionHandler() {
+       function submitQuestionHandler() {
             var webMethod = "ProjectServices.asmx/SubmitQuestion";
             var parameters = "{}";
             var parameters = "{\"questionText\":\"" + encodeURI($('#questionText').val()) + "\",\"daysToLive\":\"" + encodeURI($('#daysToLive').val()) + "\"}";
@@ -962,7 +977,6 @@
                 }
             });
         }
-
 
         // Modified UnsolicitedFeedbackHandler to use problemArea dropdown value
         function UnsolicitedFeedbackHandler() {
@@ -1686,43 +1700,6 @@
                 },
                 error: function (e) {
                     alert("Your profile update failed");
-                }
-            });
-        }
-
-        // NEW JS
-        // Function to show different panels based on the button clicked
-        function showPanel(panelId) {
-            $('.contentPanel').hide(); // Hide all panels
-            $('#' + panelId).show(); // Show the specified panel
-        }
-
-        // Function to show the response type configuration panel
-        function showResponseTypeConfig() {
-            showPanel('questionConfig');
-        }
-
-        // Function to save the question configuration
-        function saveQuestionConfig() {
-            var responseType = $('input[name="responseType"]:checked').val();
-            // Saving response
-            console.log('Saving response type configuration:', responseType);
-            // Assuming an AJAX call to your backend
-            var webMethod = "YourBackendEndpoint/SaveQuestionConfig"; // This needs to be changed to the actual webMethod if necessary
-            var parameters = "{\"responseType\":\"" + responseType + "\"}";
-
-            $.ajax({
-                type: "POST",
-                url: webMethod,
-                contentType: "application/json; charset=utf-8",
-                data: parameters,
-                dataType: "json",
-                success: function (msg) {
-                    alert("Configuration saved successfully.");
-                    DashboardHandler(); // Navigate back to the dashboard or relevant page
-                },
-                error: function (e) {
-                    alert("Error saving configuration.");
                 }
             });
         }
