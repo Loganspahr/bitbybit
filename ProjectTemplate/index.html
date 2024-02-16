@@ -312,6 +312,204 @@
             margin: 20px 0; /* Spacing around the container */
         }
 
+        /* Style for the multiple-choice dropdown in the Employee submit answer page */
+        #answerText {
+            background-color: #fff; /* White background for clarity */
+            border: 2px solid #8C1D40; /* Thicker border with the theme's maroon color */
+            border-radius: 8px; /* Rounded corners for a modern, friendly look */
+            padding: 10px 15px; /* Adequate padding for a touch-friendly design */
+            width: calc(100% - 30px); /* Full width minus padding */
+            font-size: 16px; /* Comfortable reading size */
+            color: #8C1D40; /* Text color matching the theme */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+            outline: none; /* Remove the default focus outline */
+            margin-bottom: 20px; /* Space below the dropdown */
+            cursor: pointer; /* Indicates the element is interactive */
+        }
+        
+        input[type='number'] {
+            background-color: #fff; /* White background for clarity */
+            border: 2px solid #8C1D40; /* Thicker border with the theme's maroon color */
+            border-radius: 8px; /* Rounded corners for a friendly look */
+            padding: 10px; /* Adequate padding inside the input */
+            width: 100%; /* Full width of its container */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+            font-size: 16px; /* Comfortable reading size */
+            color: #8C1D40; /* Text color to match the theme */
+            outline: none; /* Remove the default focus outline */
+            text-align: center; /* Centers the text/number inside */
+            -moz-appearance: textfield; /* Fixes appearance in Firefox */
+        }
+
+        /* Ensure that the number input is not too wide on desktop */
+        @media (min-width: 768px) {
+            input[type='number'] {
+                max-width: 200px; /* Maximum width for the number input */
+                margin: 0 auto; /* Centers the number input */
+            }
+        }
+
+        /* Add focus styles for both dropdown and number input for accessibility */
+        input[type='number']:focus {
+            border-color: #FFC627; /* Highlight color when focused */
+            box-shadow: 0 0 0 2px rgba(255, 198, 39, 0.5); /* Glow effect for focus */
+        }
+
+        /* Style for the question list container */
+        #questionListDisplay {
+            overflow-y: auto; /* Adds a scrollbar if content overflows vertically */
+            max-height: calc(100vh - 300px); /* Adjusted height to account for header and buttons */
+            width: 100%; /* Full width */
+            padding: 15px; /* Padding inside the container */
+            box-sizing: border-box; /* Includes padding in width calculation */
+            margin-bottom: 20px; /* Space below the container before buttons */
+        }
+
+        /* Style for individual question entries */
+        .questionRow {
+            background-color: #fff; /* White background for contrast */
+            border-bottom: 1px solid #ddd; /* Bottom border for each question */
+            padding: 10px; /* Padding inside each question */
+            margin-bottom: 10px; /* Space between questions */
+        }
+
+        /* Enhancements for question text */
+        .questionText {
+            color: #8C1D40; /* Text color to match the theme */
+            font-weight: bold; /* Bold font for question text */
+            display: block; /* Ensures full width */
+            margin-bottom: 5px; /* Space below the question text */
+        }
+
+        /* Style adjustments for small screens */
+        @media (max-width: 768px) {
+            #questionListDisplay {
+                max-height: calc(100vh - 210px); /* Adjusted max height for smaller screens */
+            }
+        }
+
+        /* Ensuring the body does not scroll */
+        body {
+            overflow-x: hidden; /* No horizontal scrollbar for the body */
+            overflow-y: hidden; /* No vertical scrollbar for the body */
+        }
+
+        /* Centers everything in the login container */
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+         /* Additional styles for buttons within the login container to ensure they take full width */
+        .login-container button {
+            width: 100%; /* Makes buttons full width */
+            margin: 10px 0; /* Adds space between buttons */
+        }
+
+        /* Wraps buttons in a flex container to center them */
+        .login-buttons-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        #button-container-id {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* Additional CSS for centering Save buttons */
+        .save-button {
+            align-self: center; /* Center the button in a flex container */
+            margin: 10px auto; /* Adds top and bottom margin, and auto left/right margins */
+            display: block; /* Will ensure the button is a block-level element */
+        }
+
+        /*TESTING NEW CSS CODE*/
+
+        /* Create Account & Edit Account Common Styles */
+        #accountspanel, #editAccountPanel {
+            display: none; /* Initial state set to not display */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+            #accountspanel form,
+            #editAccountPanel form {
+                width: 100%;
+                max-width: 600px; /* To match other forms */
+                margin: 0 auto; /* Center the form in the panel */
+            }
+
+            /* Input fields styling */
+            #accountspanel input[type='text'],
+            #accountspanel input[type='password'],
+            #editAccountPanel input[type='text'],
+            #editAccountPanel input[type='password'] {
+                width: 100%; /* Full width to match container */
+                padding: 10px; /* Comfortable padding */
+                margin-bottom: 10px; /* Space between form fields */
+                border: 1px solid #C1BFBF; /* Consistent border */
+                border-radius: 5px; /* Rounded corners */
+                box-sizing: border-box; /* Include padding in width */
+                font-size: 16px; /* Readable font size */
+            }
+
+            /* Button styling */
+            #accountspanel button,
+            #editAccountPanel button {
+                width: auto; /* Auto width for buttons */
+                padding: 10px 30px; /* Padding for a larger touch area */
+                border: none;
+                border-radius: 5px;
+                background-color: #8C1D40; /* Consistent button color */
+                color: #FFC627; /* Consistent text color */
+                font-size: 16px; /* Readable font size */
+                cursor: pointer; /* Indicates an action can be taken */
+                transition: background-color 0.3s ease; /* Smooth transition for interaction */
+                margin-top: 20px; /* Space above the button */
+                align-self: center; /* Center the button */
+            }
+
+                #accountspanel button:hover,
+                #editAccountPanel button:hover {
+                    background-color: #991F3D; /* Darker shade on hover */
+                }
+
+            /* Header within the account panels */
+            #accountspanel .left,
+            #editAccountPanel .left {
+                font-size: 24px; /* Header size */
+                font-weight: bold; /* Bold for header */
+                color: #8C1D40; /* Consistent text color */
+                margin-bottom: 20px; /* Space below the header */
+                text-align: center; /* Center the text */
+            }
+
+            /*TESTING NEW CSS STYLES*/
+            .button {
+                padding: 10px 15px;
+                border: none;
+                border-radius: 5px;
+                background-color: #8C1D40; /* Adjust the color to match your theme */
+                color: #FFC627; /* Adjust text color to match your theme */
+                font-size: 16px;
+                cursor: pointer;
+                transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            }
+
+            .button:hover {
+                background-color: #991F3D; /* Darker shade on hover for visual feedback */
+                transform: translateY(-3px); /* Moves the button up */
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Adds shadow for depth */
+            }
+
      </style>
 
 
@@ -457,7 +655,9 @@
                     <button type="button" onclick="addMoreOptions()">Add more options</button>
                 </div>
                 <div>
-                    <button type="submit">Save</button>
+                    <!--<button type="submit">Save</button> -->
+                    <button type="submit" class="button save-button">Save</button>
+
                 </div>
                 <hr />
             </form>
@@ -476,7 +676,9 @@
                     <!--This will be dynamically generated by the Handler based on the question type-->
                 </div>
                 <div>
-                    <button type="submit">Save</button>
+                    <!-- <button type="submit">Save</button> -->
+                    <button type="submit" class="button save-button">Save</button>
+
                 </div>
                 <hr />
             </form>
@@ -502,7 +704,9 @@
                     <textarea id="proposedSolution" rows="10" cols="50" maxlength="1000" placeholder="Enter proposed solution..." required></textarea>
                 </div>
                 <div>
-                    <button type="submit">Save</button>
+                    <!--<button type="submit">Save</button>-->
+                    <button type="submit" class="button save-button">Save</button>
+
                 </div>
                 <hr />
             </form>
@@ -575,7 +779,9 @@
                     </div>
                     <hr />
                     <div>
-                        <button type="submit">Save</button>
+                        <!--<button type="submit">Save</button>-->
+                        <button type="submit" class="button save-button">Save</button>
+
                     </div>
                 </form>
 
