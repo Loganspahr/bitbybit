@@ -511,17 +511,17 @@ namespace ProjectTemplate
             int questionIDInt = Convert.ToInt32(questionID);
             bool success = false;
             DataTable sqlDt = new DataTable("question");
-            
+
             string sqlSelect = "update questions set expiryDate=CURDATE() where id=@idvalue;";
-            
+
             MySqlConnection sqlConnection = new MySqlConnection(getConString());
             MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
-            
+
             sqlCommand.Parameters.AddWithValue("@idvalue", questionIDInt);
-            
+
             MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
             sqlDa.Fill(sqlDt);
-            
+
             sqlConnection.Open();
             try
             {
@@ -705,10 +705,10 @@ namespace ProjectTemplate
                 {
                     feedbackList.Add(new Feedback
                     {
-                            id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
-                            problemArea = sqlDt.Rows[i]["problemArea"].ToString(),
-                            complaint = sqlDt.Rows[i]["complaint"].ToString(),
-                            suggestion = sqlDt.Rows[i]["proposedSolution"].ToString(),
+                        id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
+                        problemArea = sqlDt.Rows[i]["problemArea"].ToString(),
+                        complaint = sqlDt.Rows[i]["complaint"].ToString(),
+                        suggestion = sqlDt.Rows[i]["proposedSolution"].ToString(),
                     });
                 }
                 //convert the list of feedback to an array and return!
@@ -799,7 +799,7 @@ namespace ProjectTemplate
             {
                 if (department == "mine")
                 {
-                       sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) AND discarded = 0 GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numAnswers DESC LIMIT 3;";
+                    sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) AND discarded = 0 GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numAnswers DESC LIMIT 3;";
                 }
                 else
                 {
@@ -905,6 +905,38 @@ namespace ProjectTemplate
             return myActivity;
         }
 
+        // Note: this is for the dropdown menu for selecting different departments
+        // TESTING NEW WEB METHOD
+        // NEED HELP EDITING THIS, GENERATE REPORT DOES NOT WORK NOW
+        [WebMethod(EnableSession = true)]
+        public List<string> GetDepartments()
+        {
+            List<string> departments = new List<string>();
+            string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+            // Select distinct departments from the users table
+            string sqlSelect = "SELECT DISTINCT department FROM users WHERE department IS NOT NULL AND department != '' ORDER BY department";
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+            try
+            {
+                sqlConnection.Open();
+                MySqlDataReader reader = sqlCommand.ExecuteReader();
+                while (reader.Read())
+                {
+                    departments.Add(reader["department"].ToString());
+                }
+            }
+            catch (Exception e)
+            {
+                // Handle the exception
+            }
+            finally
+            {
+                sqlConnection.Close();
+            }
+            return departments;
+        }
 
         // NOTE: THIS IS ONLY HERE FOR LAZY DEVS TO ONE-CLICK SIGN IN - NEEDS TO BE REMOVED FROM FINAL CODE
         [WebMethod(EnableSession = true)]

@@ -430,8 +430,6 @@
             display: block; /* Will ensure the button is a block-level element */
         }
 
-        /*TESTING NEW CSS CODE*/
-
         /* Create Account & Edit Account Common Styles */
         #accountspanel, #editAccountPanel {
             display: none; /* Initial state set to not display */
@@ -492,7 +490,6 @@
                 text-align: center; /* Center the text */
             }
 
-            /*TESTING NEW CSS STYLES*/
             .button {
                 padding: 10px 15px;
                 border: none;
@@ -510,6 +507,43 @@
                 box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Adds shadow for depth */
             }
 
+            /*TESTING NEW CSS CODE*/
+            /* Style for the option container */
+            .option-container {
+               display: flex;
+               align-items: center;
+               margin-bottom: 5px;
+            }
+
+            /* Style for the delete button within the option */
+            .delete-option-btn {
+               margin-left: 10px;
+               padding: 0; /* Remove padding */
+               font-size: 16px; /* Larger font size for 'X' character */
+               line-height: 1; /* Adjust line height to ensure the 'X' is centered */
+               color: #FFFFFF;
+               background-color: #FF4136; /* A red color for the delete button */
+               border: none;
+               border-radius: 50%; /* Make it round */
+               cursor: pointer;
+               transition: background-color 0.3s ease;
+               height: 20px; /* Smaller height for the button */
+               width: 20px; /* Smaller width for the button */
+               display: flex;
+               align-items: center;
+               justify-content: center;
+            }
+
+            .delete-option-btn:hover {
+                background-color: #FF851B; /* Slightly lighter red on hover */
+            }
+
+
+
+
+
+
+
      </style>
 
 
@@ -524,15 +558,15 @@
          </div>
      </div> -->
     <!--  <a href="#" onclick="LogOff()">log off</a> -->
-
     <!--THIS NEEDS TO BE ADJUSTED PLEASE, HAVING ISSUES WITH THIS BUTTON-->
-    <div class="titleContainer">
+    <!--Temporarily commented out this button, we can try to problem solve another day-->
+    <!--<div class="titleContainer">
         <div id="menu" class="menu">
 
             <a href="#" onclick="GoBack()">HOME</a>
         </div>
     </div>
-    <a href="#" onclick="GoBack()">HOME</a>
+    <a href="#" onclick="GoBack()">HOME</a>-->
 
     <div class="contentContainer">
         <!-- Login Section -->
@@ -819,11 +853,23 @@
                     <label><input type="radio" name="reportType" value="combined" />Combined</label>
                 </div>
 
+                <!--EDITED RADIO BUTTON SECTION-->
                 <div class="radio-group">
+                    <span>Department:</span><br />
+                    <label><input type="radio" name="reportDepartment" value="all" />All</label><br />
+                    <label><input type="radio" name="reportDepartment" value="mine" />My Department</label><br />
+                    <!-- New radio button for selecting other department -->
+                    <label><input type="radio" name="reportDepartment" value="other" onchange="toggleDepartmentDropdown(this.checked)" />Other Department:</label>
+                    <select id="departmentSelect" style="display: none;"></select>
+                </div>
+
+
+                <!--KEPT THIS JUST IN CASE IT DIDN"T WORK-->
+                <!--<div class="radio-group">
                     <span>Departments to Include:</span><br />
                     <label><input type="radio" name="reportDepartment" value="all" />All</label><br />
                     <label><input type="radio" name="reportDepartment" value="mine" />My Department</label>
-                </div>
+                </div> -->
 
                 <input type="button" value="Generate Report" onclick="javascript: ActivityReportHandler();" class="button text-center" />
                 <input type="button" value="Return to dashboard" onclick="javascript: DashboardHandler();" class="button text-center" />
@@ -2066,6 +2112,86 @@
                         alert("boo...");
                     }
                 });
+            });
+        }
+
+        // Add More Options Function
+        function addMoreOptions() {
+            var i = 3;
+            while (i > 0) {
+                var elem = document.getElementById('option' + i);
+                if (elem === null) {
+                    var newDiv = document.createElement('div');
+                    newDiv.id = 'optionDiv' + i;
+                    newDiv.className = 'option-container';
+
+                    var newInput = document.createElement('input');
+                    newInput.type = 'text';
+                    newInput.id = 'option' + i;
+                    newInput.placeholder = 'Option ' + i;
+                    newDiv.appendChild(newInput);
+
+                    // Updated to create a smaller button
+                    var deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = '×'; // Using a multiplication sign as 'X'
+                    deleteBtn.className = 'delete-option-btn';
+                    deleteBtn.type = 'button';
+                    deleteBtn.onclick = function () { removeOption(this); }; // Updated to pass 'this'
+                    newDiv.appendChild(deleteBtn);
+
+                    document.getElementById('extraOptions').appendChild(newDiv);
+                    break;
+                } else {
+                    i++;
+                }
+            }
+        }
+
+        // Remove Option Function
+        function removeOption(button) {
+            var optionContainer = button.closest('.option-container'); // Find the closest .option-container
+            optionContainer.remove(); // Remove the container
+        }
+
+
+        // TESTING NEW JS CODE 
+        // NEED HELP EDITING THIS
+        function toggleDepartmentDropdown(checked) {
+            if (checked) {
+                populateDepartmentDropdown();
+                $('#departmentSelect').show();
+            } else {
+                $('#departmentSelect').hide();
+            }
+        }
+
+        function ActivityReportHandler() {
+            var reportType = $("input[name='reportType']:checked").val();
+            var departmentOption = $("input[name='reportDepartment']:checked").val();
+            var department = departmentOption === "other" ? $("#departmentSelect").val() : departmentOption;
+
+        }
+
+        function populateDepartmentDropdown() {
+            $.ajax({
+                type: "POST",
+                url: "ProjectServices.asmx/GetDepartments",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var departments = response.d;
+                    var $departmentSelect = $("#departmentSelect");
+                    $departmentSelect.empty(); // Clear existing options
+                    $.each(departments, function (index, department) {
+                        $departmentSelect.append($('<option>', {
+                            value: department,
+                            text: department
+                        }));
+                    });
+                },
+                error: function (error) {
+                    console.error("Error fetching departments: ", error);
+                }
             });
         }
 
