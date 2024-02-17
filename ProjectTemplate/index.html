@@ -551,22 +551,12 @@
 </head>
 <body>
 
-    <!-- <div class="titleContainer">
-         <div id="menu" class="menu">
-
-             <a href="#" onclick="LogOff()">log off</a>
-         </div>
-     </div> -->
-    <!--  <a href="#" onclick="LogOff()">log off</a> -->
-    <!--THIS NEEDS TO BE ADJUSTED PLEASE, HAVING ISSUES WITH THIS BUTTON-->
-    <!--Temporarily commented out this button, we can try to problem solve another day-->
     <div class="titleContainer">
         <div id="menu" class="menu">
 
             <a href="#" onclick="GoBack()">HOME</a>
         </div>
     </div>
-    <a href="#" onclick="GoBack()">HOME</a>
 
     <div class="contentContainer">
         <!-- Login Section -->
@@ -863,7 +853,7 @@
                     <label><input type="radio" name="reportDepartment" value="all" />All</label><br />
                     <label><input type="radio" name="reportDepartment" value="mine" />My Department</label><br />
                     <!-- New radio button for selecting other department -->
-                    <label><input type="radio" name="reportDepartment" value="other" onchange="toggleDepartmentDropdown(this.checked)" />Other Department:</label>
+                    <label><input type="radio" name="reportDepartment" value="other" />Choose a Department:</label>
                     <select id="departmentSelect" style="display: none;"></select>
                 </div>
 
@@ -1401,6 +1391,16 @@
             }
         });
 
+        $('input[name="reportDepartment"]').change(function (e) {
+            var element = document.getElementById('departmentSelect');
+            var selectedValue = $(this).val();
+            if (selectedValue === 'other') {
+                populateDepartmentDropdown();
+                element.style.display = 'flex';
+            } else {
+                element.style.display = 'none';
+            }
+        });
 
         //this is to display questions available to be answered or reviewed
         function QuestionListHandler() {
@@ -1863,8 +1863,12 @@
             for (i = 0; i < ele.length; i++) {
                 if (ele[i].checked) {
                     department = ele[i].value;
+                    if (department === 'other') {
+                        department = $('#departmentSelect').val();
+                    }
                 }
             }
+            var activityFound = true;
             var webMethod = "ProjectServices.asmx/GetMostActiveUsers";
             var parameters = "{\"reportType\":\"" + encodeURI(reportType) + "\",\"department\":\"" + encodeURI(department) + "\"}";
             $.ajax({
@@ -1878,8 +1882,10 @@
                         $("#selectedActivityList").empty();
                         if (department == "mine")
                             dept = "your department";
-                        else
+                        else if (department == "all")
                             dept = "all departments";
+                        else
+                            dept = department + " department";
                         if (reportType == "answers") {
                             reptype = "Questions Answered";
                             activityType = "Answers";
@@ -1915,13 +1921,17 @@
                     }
                     else {
                         alert("No activity found");
+                        activityFound = false;
+
                     }
                 },
                 error: function (e) {
                     alert("boo...");
                 },
                 complete: function () {
-                    showPanel("ActivityList");
+                    if (activityFound) {
+                        showPanel("ActivityList");
+                    }
                 }
             });
         }
@@ -2166,21 +2176,6 @@
 
         // TESTING NEW JS CODE 
         // NEED HELP EDITING THIS
-        function toggleDepartmentDropdown(checked) {
-            if (checked) {
-                populateDepartmentDropdown();
-                $('#departmentSelect').show();
-            } else {
-                $('#departmentSelect').hide();
-            }
-        }
-
-        function ActivityReportHandler() {
-            var reportType = $("input[name='reportType']:checked").val();
-            var departmentOption = $("input[name='reportDepartment']:checked").val();
-            var department = departmentOption === "other" ? $("#departmentSelect").val() : departmentOption;
-
-        }
 
         function populateDepartmentDropdown() {
             $.ajax({
