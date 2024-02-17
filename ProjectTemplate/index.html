@@ -560,13 +560,13 @@
     <!--  <a href="#" onclick="LogOff()">log off</a> -->
     <!--THIS NEEDS TO BE ADJUSTED PLEASE, HAVING ISSUES WITH THIS BUTTON-->
     <!--Temporarily commented out this button, we can try to problem solve another day-->
-    <!--<div class="titleContainer">
+    <div class="titleContainer">
         <div id="menu" class="menu">
 
             <a href="#" onclick="GoBack()">HOME</a>
         </div>
     </div>
-    <a href="#" onclick="GoBack()">HOME</a>-->
+    <a href="#" onclick="GoBack()">HOME</a>
 
     <div class="contentContainer">
         <!-- Login Section -->
@@ -2106,8 +2106,14 @@
                         if (msg.d === 1) {
                             showPanel('SupervisorHome');
                         } else {
-                            showPanel('EmployeeHome');
-                        }
+                            if (msg.d === 0) {
+                                showPanel('EmployeeHome');
+                            }
+                            else {
+                                alert("Must login");
+                            }
+                            }
+                            
                     },
                     error: function (e) {
                         alert("boo...");
