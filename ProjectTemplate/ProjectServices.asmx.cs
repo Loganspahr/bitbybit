@@ -57,6 +57,7 @@ namespace ProjectTemplate
             DataTable sqlDt = new DataTable();
             sqlDa.Fill(sqlDt);
 
+
             if (sqlDt.Rows.Count > 0)
             {
 
@@ -130,14 +131,14 @@ namespace ProjectTemplate
 
 
         [WebMethod(EnableSession = true)]
-        public void UpdateAccount(string pid, string userid, string pass, string department, string issupervisor)
+        public void UpdateAccount(string pid, string userid, string pass, string department, string supervisor, string issupervisor)
         {
             //WRAPPING THE WHOLE THING IN AN IF STATEMENT TO CHECK IF THEY ARE AN ADMIN!
             if (Convert.ToInt32(Session["admin"]) == 1)
             {
                 string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
                 //this is a simple update, with parameters to pass in values
-                string sqlSelect = "update users set userid=@uidValue, pass=@passValue, department=@department, issupervisor=@issupervisor where id=@idValue";
+                string sqlSelect = "update users set userid=@uidValue, pass=@passValue, department=@department, supervisor=@supervisor, issupervisor=@issupervisor where id=@idValue";
 
                 MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
                 MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
@@ -146,6 +147,7 @@ namespace ProjectTemplate
                 sqlCommand.Parameters.AddWithValue("@uidValue", HttpUtility.UrlDecode(userid));
                 sqlCommand.Parameters.AddWithValue("@passValue", HttpUtility.UrlDecode(pass));
                 sqlCommand.Parameters.AddWithValue("@departmentValue", HttpUtility.UrlDecode(department));
+                sqlCommand.Parameters.AddWithValue("@supervisor", HttpUtility.UrlDecode(supervisor));
                 sqlCommand.Parameters.AddWithValue("@issupervisorValue", HttpUtility.UrlDecode(issupervisor));
 
                 sqlConnection.Open();

@@ -809,16 +809,19 @@
                         ID: <input type="text" id="editLogonId" />
                     </div>
                     <div>
-                        Pwd: <input type="password" id="editLogonPassword" />
+                        Username: <input type="text" id="editLogonUsername" />
                     </div>
                     <div>
-                        First: <input type="text" id="editLogonFName" />
+                        Password: <input type="password" id="editLogonPassword" />
                     </div>
                     <div>
-                        Last: <input type="text" id="editLogonLName" />
+                        Deparment: <input type="text" id="editLogonDepartment" />
                     </div>
                     <div>
-                        Email: <input type="text" id="editLogonEmail" />
+                        Supervisor: <input type="text" id="editLogonSupervisor" />
+                    </div>
+                    <div>
+                        Is a supervisor: <input type="text" id="editLogonIssupervisor" />
                     </div>
                     <hr />
                     <div>
@@ -1224,10 +1227,10 @@
             //set up our inputs
             if (currentAccount != null) {
                 $('#editLogonId').val(currentAccount.userId);
-                $('#editpass').val(currentAccount.pass);
-                $('#editdepartment').val(currentAccount.department);
-                $('#editsupervisor').val(currentAccount.supervisor);
-                $('#editissupervisor').val(currentAccount.issupervisor);
+                $('#editPass').val(currentAccount.pass);
+                $('#editDepartment').val(currentAccount.department);
+                $('#editSupervisor').val(currentAccount.supervisor);
+                $('#editIssupervisor').val(currentAccount.issupervisor);
             }
         }
 
@@ -2075,7 +2078,7 @@
         //ajax to edit account
         function EditAccount() {
             var webMethod = "ProjectServices.asmx/UpdateAccount";
-            var parameters = "{\"id\":\"" + encodeURI(currentAccount.id) + "\",\"uid\":\"" + encodeURI($('#editLogonId').val()) + "\",\"pass\":\"" + encodeURI($('#editLogonPassword').val()) + "\",\"department\":\"" + encodeURI($('#editDepartment').val()) + "\",\"issupervisor\":\"" + encodeURI($('#editIssupervisor').val()) + "\"}";
+            var parameters = "{\"id\":\"" + encodeURI(currentAccount.id) + "\",\"uid\":\"" + encodeURI($('#editLogonId').val()) + "\",\"pass\":\"" + encodeURI($('#editLogonPassword').val()) + "\",\"department\":\"" + encodeURI($('#editDepartment').val()) + "\",\"supervisor\":\"" + encodeURI($('#editSupervisor').val()) + "\",\"issupervisor\":\"" + encodeURI($('#editIssupervisor').val()) + "\"}";
 
             $.ajax({
                 type: "POST",
