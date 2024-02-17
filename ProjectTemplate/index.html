@@ -785,6 +785,7 @@
                 <hr />
                 <div>
                     <button type="submit">Create Account</button>
+                    <button onclick="javascript: DashboardHandler();">Cancel</button>
                 </div>
             </form>
         </div>
@@ -817,7 +818,7 @@
                     <div>
                         <!--<button type="submit">Save</button>-->
                         <button type="submit" class="button save-button">Save</button>
-
+                        <button onclick="javascript: DashboardHandler();">Cancel</button>
                     </div>
                 </form>
 
@@ -1459,8 +1460,14 @@
                                     else {
                                         if (i == 3) {
                                             try {
-                                                question = "<div class='questionRow' id='questMore'><span class='questionText'> You have " + (msg.d.length - i) +
-                                                    " more questions available.  Please respond to the above questions first.</span></div> <hr>";
+                                                if (msg.d.length - i == 1) {
+                                                    question = "<div class='questionRow' id='questMore'><span class='questionText'> You have " + (msg.d.length - i) +
+                                                        " more question available.  Please respond to the above questions first.</span></div> <hr>";
+                                                }
+                                                else {
+                                                    question = "<div class='questionRow' id='questMore'><span class='questionText'> You have " + (msg.d.length - i) +
+                                                        " more questions available.  Please respond to the above questions first.</span></div> <hr>";
+                                                }
                                                 $("#questionListDisplay").append(question);
                                             }
                                             finally {
