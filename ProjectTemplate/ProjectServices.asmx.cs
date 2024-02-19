@@ -14,6 +14,7 @@ using System.Security.Cryptography;
 using System.EnterpriseServices;
 using Google.Protobuf.WellKnownTypes;
 using Org.BouncyCastle.Asn1.Ocsp;
+using System.Web.Services.Description;
 
 namespace ProjectTemplate
 {
@@ -131,75 +132,87 @@ namespace ProjectTemplate
 
 
         [WebMethod(EnableSession = true)]
-        public void UpdateAccount(string pid, string userid, string pass, string department, string supervisor, string issupervisor)
+        public Account UpdateAccount(string pid, string userid, string pass, string department, string supervisor, string issupervisor)
         {
-            //WRAPPING THE WHOLE THING IN AN IF STATEMENT TO CHECK IF THEY ARE AN ADMIN!
-            if (Convert.ToInt32(Session["admin"]) == 1)
+            DataTable sqlDt = new DataTable("userData");
+
+            string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+            string sqlSelect;
+            if (Convert.ToInt32(issupervisor) == 1)
             {
-                string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
-                //this is a simple update, with parameters to pass in values
-                string sqlSelect = "update users set userid=@uidValue, pass=@passValue, department=@department, supervisor=@supervisor, issupervisor=@issupervisor where id=@idValue";
-
-                MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
-                MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
-
-                sqlCommand.Parameters.AddWithValue("@idValue", HttpUtility.UrlDecode(pid));
-                sqlCommand.Parameters.AddWithValue("@uidValue", HttpUtility.UrlDecode(userid));
-                sqlCommand.Parameters.AddWithValue("@passValue", HttpUtility.UrlDecode(pass));
-                sqlCommand.Parameters.AddWithValue("@departmentValue", HttpUtility.UrlDecode(department));
-                sqlCommand.Parameters.AddWithValue("@supervisor", HttpUtility.UrlDecode(supervisor));
-                sqlCommand.Parameters.AddWithValue("@issupervisorValue", HttpUtility.UrlDecode(issupervisor));
-
-                sqlConnection.Open();
-                //we're using a try/catch so that if the query errors out we can handle it gracefully
-                //by closing the connection and moving on
-                try
-                {
-                    sqlCommand.ExecuteNonQuery();
-                }
-                catch (Exception e)
-                {
-                }
-                sqlConnection.Close();
+                sqlSelect = "update users set userid=@uidValue, pass=@passValue, department=@departmentValue, supervisor=NULL, issupervisor=@issupervisorValue where id=@idValue; SELECT id, userid, pass, department, issupervisor, supervisor from users where id=111137;";
             }
+            else
+            {
+                sqlSelect = "update users set userid=@uidValue, pass=@passValue, department=@departmentValue, supervisor=@supervisorValue, issupervisor=@issupervisorValue where id=@idValue; SELECT id, userid, pass, department, issupervisor, supervisor from users where id=111137;";
+            }
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+            sqlCommand.Parameters.AddWithValue("@idValue", Convert.ToInt32(pid));
+            sqlCommand.Parameters.AddWithValue("@uidValue", HttpUtility.UrlDecode(userid));
+            sqlCommand.Parameters.AddWithValue("@passValue", HttpUtility.UrlDecode(pass));
+            sqlCommand.Parameters.AddWithValue("@departmentValue", HttpUtility.UrlDecode(department));
+            sqlCommand.Parameters.AddWithValue("@supervisorValue", Convert.ToInt32(supervisor));
+            sqlCommand.Parameters.AddWithValue("@issupervisorValue", Convert.ToInt32(issupervisor));
+
+            MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
+            sqlDa.Fill(sqlDt);
+
+            Account userData = new Account();
+            for (int i = 0; i < sqlDt.Rows.Count; i++)
+            {
+                userData.id = Convert.ToInt32(sqlDt.Rows[i]["id"]);
+                userData.userId = sqlDt.Rows[i]["userid"].ToString();
+                userData.pass = sqlDt.Rows[i]["pass"].ToString();
+                userData.department = sqlDt.Rows[i]["department"].ToString();
+                userData.issupervisor = sqlDt.Rows[i]["issupervisor"].ToString();
+                userData.supervisor = sqlDt.Rows[i]["supervisor"] != DBNull.Value ? Convert.ToInt32(sqlDt.Rows[i]["supervisor"]) : 0;
+            }
+            return userData;
         }
-
-
-
-
 
         //EXAMPLE OF AN INSERT QUERY WITH PARAMS PASSED IN.  BONUS GETTING THE INSERTED ID FROM THE DB!
         [WebMethod(EnableSession = true)]
-        public bool RequestAccount(string pid, string userid, string pass, string department, string issupervisor)
+        public int RequestAccount(string userid, string pass, string department, string issupervisor, string supervisor)
         {
-            bool success = false;
+            var newAccountID = -333;
             string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
-            string sqlSelect = "INSERT into users (id, userid, pass, department, issupervisor) Values(@idValue, @uidValue, @passValue, @departmentValue, @issupervisorValue)";
+            string sqlSelect;
+            if (Convert.ToInt32(issupervisor) == 1)
+            {
+                sqlSelect = "INSERT into users (userid, pass, department, issupervisor) Values(@uidValue, @passValue, @departmentValue, @issupervisorValue); SELECT LAST_INSERT_ID();";
+            }
+            else
+            {
+                sqlSelect = "INSERT into users (userid, pass, department, issupervisor, supervisor) Values(@uidValue, @passValue, @departmentValue, @issupervisorValue, @supervisorValue); SELECT LAST_INSERT_ID();";
+            }
 
             MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
             MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
 
-            sqlCommand.Parameters.AddWithValue("@idValue", HttpUtility.UrlDecode(pid));
             sqlCommand.Parameters.AddWithValue("@uidValue", HttpUtility.UrlDecode(userid));
             sqlCommand.Parameters.AddWithValue("@passValue", HttpUtility.UrlDecode(pass));
             sqlCommand.Parameters.AddWithValue("@departmentValue", HttpUtility.UrlDecode(department));
             sqlCommand.Parameters.AddWithValue("@issupervisorValue", HttpUtility.UrlDecode(issupervisor));
+            sqlCommand.Parameters.AddWithValue("@supervisorValue", Convert.ToInt32(supervisor));
 
 
             sqlConnection.Open();
 
             try
             {
-                sqlCommand.ExecuteScalar();
-                success = true;
+                newAccountID = Convert.ToInt32(sqlCommand.ExecuteScalar());
             }
             catch (Exception e)
             {
+                newAccountID = -1;
             }
             sqlConnection.Close();
 
-            return success;
+            return newAccountID;
         }
+
         [WebMethod(EnableSession = true)]
         public Account[] GetAccounts()
         {
@@ -751,6 +764,87 @@ namespace ProjectTemplate
                 sqlConnection.Close();
             }
             return problemAreas;
+        }
+
+        // Note: this is for the dropdown menu for the supervisor list
+        [WebMethod(EnableSession = true)]
+        public Account[] GetSupervisorList()
+        {
+            DataTable sqlDt = new DataTable("supervisorList");
+
+            string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+            string sqlSelect = "SELECT id, userid FROM users WHERE issupervisor = 1 ORDER BY userid";
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+            MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
+            sqlDa.Fill(sqlDt);
+
+            List<Account> supervisorList = new List<Account>();
+            for (int i = 0; i < sqlDt.Rows.Count; i++)
+            {
+                supervisorList.Add(new Account
+                {
+                    id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
+                    userId = sqlDt.Rows[i]["userid"].ToString(),
+                });
+            }
+            return supervisorList.ToArray();
+        }
+
+        // Note: this is for the dropdown menu for the user list
+        [WebMethod(EnableSession = true)]
+        public Account[] GetUserList()
+        {
+            DataTable sqlDt = new DataTable("userList");
+
+            string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+            string sqlSelect = "SELECT id, userid FROM users ORDER BY userid";
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+            MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
+            sqlDa.Fill(sqlDt);
+
+            List<Account> userList = new List<Account>();
+            for (int i = 0; i < sqlDt.Rows.Count; i++)
+            {
+                userList.Add(new Account
+                {
+                    id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
+                    userId = sqlDt.Rows[i]["userid"].ToString(),
+                });
+            }
+            return userList.ToArray();
+        }
+
+        // Note: this is to populate a user for editing
+        [WebMethod(EnableSession = true)]
+        public Account GetUser(string id)
+        {
+            DataTable sqlDt = new DataTable("userData");
+
+            string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
+            string sqlSelect = "SELECT id, userid, pass, department, issupervisor, supervisor FROM users where id = @idValue";
+            MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
+            MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
+
+            sqlCommand.Parameters.AddWithValue("@idValue", Convert.ToInt32(id));
+
+            MySqlDataAdapter sqlDa = new MySqlDataAdapter(sqlCommand);
+            sqlDa.Fill(sqlDt);
+
+            Account userData = new Account();
+            for (int i = 0; i < sqlDt.Rows.Count; i++)
+            {
+                userData.id = Convert.ToInt32(sqlDt.Rows[i]["id"]);
+                userData.userId = sqlDt.Rows[i]["userid"].ToString();
+                userData.pass = sqlDt.Rows[i]["pass"].ToString();
+                userData.department = sqlDt.Rows[i]["department"].ToString();
+                userData.issupervisor = sqlDt.Rows[i]["issupervisor"].ToString();
+                userData.supervisor = sqlDt.Rows[i]["supervisor"] != DBNull.Value ? Convert.ToInt32(sqlDt.Rows[i]["supervisor"]) : 0;
+            }
+            return userData;
         }
 
         // New web method for Unsolicited Feedback
