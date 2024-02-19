@@ -801,45 +801,45 @@ namespace ProjectTemplate
             {
                 if (department == "mine")
                 {
-                    sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) AND discarded = 0 GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numAnswers DESC LIMIT 3;";
+                    sqlSelect = "SELECT users.id, userid, department, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) AND discarded = 0 GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numAnswers DESC LIMIT 3;";
                 }
                 else if (department == "all")
                 {
-                    sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy WHERE discarded = 0 GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numAnswers DESC LIMIT 3;";
+                    sqlSelect = "SELECT users.id, userid, department, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy WHERE discarded = 0 GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numAnswers DESC LIMIT 3;";
                 }
                 else
                 {
-                    sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy WHERE department = @departmentValue AND discarded = 0 GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numAnswers DESC LIMIT 3;";
+                    sqlSelect = "SELECT users.id, userid, department, COUNT(submittedBy) AS numAnswers FROM users LEFT JOIN answers ON users.id = answers.submittedBy WHERE department = @departmentValue AND discarded = 0 GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numAnswers DESC LIMIT 3;";
                 }
             }
             else if (reportType == "unsolicitedFeedback")
             {
                 if (department == "mine")
                 {
-                    sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numUSF FROM users LEFT JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) AND discarded = 0 GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numUSF DESC LIMIT 3;";
+                    sqlSelect = "SELECT users.id, userid, department, COUNT(submittedBy) AS numUSF FROM users LEFT JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) AND discarded = 0 GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numUSF DESC LIMIT 3;";
                 }
                 else if (department == "all")
                 {
-                    sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numUSF FROM users LEFT JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE discarded = 0 GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numUSF DESC LIMIT 3;";
+                    sqlSelect = "SELECT users.id, userid, department, COUNT(submittedBy) AS numUSF FROM users LEFT JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE discarded = 0 GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numUSF DESC LIMIT 3;";
                 }
                 else
                 {
-                    sqlSelect = "SELECT users.id, userid, COUNT(submittedBy) AS numUSF FROM users LEFT JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE department = @departmentValue AND discarded = 0 GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numUSF DESC LIMIT 3;";
+                    sqlSelect = "SELECT users.id, userid, department, COUNT(submittedBy) AS numUSF FROM users LEFT JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE department = @departmentValue AND discarded = 0 GROUP BY users.id HAVING COUNT(submittedBy) > 0 ORDER BY numUSF DESC LIMIT 3;";
                 }
             }
             else
             {
                 if (department == "mine")
                 {
-                    sqlSelect = "SELECT users.id AS id, users.userid AS userid, IFNULL(numAnswers,0) AS numAnswers, IFNULL(numUSF,0) AS numUSF, (IFNULL(numAnswers, 0) + IFNULL(numUSF,0)) AS numTotal FROM users LEFT JOIN (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numAnswers FROM users JOIN answers ON users.id = answers.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) AND discarded = 0 GROUP BY users.id ORDER BY numAnswers DESC) as AnswersList ON users.id = AnswersList.idNum LEFT JOIN (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numUSF FROM users JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) AND discarded = 0 GROUP BY users.id ORDER BY numUSF DESC) AS USFList ON users.id = USFList.idNum WHERE numAnswers > 0 or numUSF > 0 ORDER BY numAnswers + numUSF DESC LIMIT 3;";
+                    sqlSelect = "SELECT users.id AS id, users.userid AS userid, department, IFNULL(numAnswers,0) AS numAnswers, IFNULL(numUSF,0) AS numUSF, (IFNULL(numAnswers, 0) + IFNULL(numUSF,0)) AS numTotal FROM users LEFT JOIN (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numAnswers FROM users JOIN answers ON users.id = answers.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) AND discarded = 0 GROUP BY users.id ORDER BY numAnswers DESC) as AnswersList ON users.id = AnswersList.idNum LEFT JOIN (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numUSF FROM users JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE department = (SELECT department FROM users WHERE id = @idValue) AND discarded = 0 GROUP BY users.id ORDER BY numUSF DESC) AS USFList ON users.id = USFList.idNum WHERE numAnswers > 0 or numUSF > 0 ORDER BY numAnswers + numUSF DESC LIMIT 3;";
                 }
                 else if (department == "all")
                 {
-                    sqlSelect = "SELECT users.id AS id, users.userid AS userid, IFNULL(numAnswers,0) AS numAnswers, IFNULL(numUSF,0) AS numUSF, (IFNULL(numAnswers, 0) + IFNULL(numUSF,0)) AS numTotal FROM users LEFT JOIN (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numAnswers FROM users JOIN answers ON users.id = answers.submittedBy WHERE discarded = 0 GROUP BY users.id ORDER BY numAnswers DESC) as AnswersList ON users.id = AnswersList.idNum LEFT JOIN (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numUSF FROM users JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE discarded = 0 GROUP BY users.id ORDER BY numUSF DESC) AS USFList ON users.id = USFList.idNum WHERE numAnswers > 0 or numUSF > 0 ORDER BY numTotal DESC LIMIT 3;";
+                    sqlSelect = "SELECT users.id AS id, users.userid AS userid, department, IFNULL(numAnswers,0) AS numAnswers, IFNULL(numUSF,0) AS numUSF, (IFNULL(numAnswers, 0) + IFNULL(numUSF,0)) AS numTotal FROM users LEFT JOIN (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numAnswers FROM users JOIN answers ON users.id = answers.submittedBy WHERE discarded = 0 GROUP BY users.id ORDER BY numAnswers DESC) as AnswersList ON users.id = AnswersList.idNum LEFT JOIN (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numUSF FROM users JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE discarded = 0 GROUP BY users.id ORDER BY numUSF DESC) AS USFList ON users.id = USFList.idNum WHERE numAnswers > 0 or numUSF > 0 ORDER BY numTotal DESC LIMIT 3;";
                 }
                 else
                 {
-                    sqlSelect = "SELECT users.id AS id, users.userid AS userid, IFNULL(numAnswers,0) AS numAnswers, IFNULL(numUSF,0) AS numUSF, (IFNULL(numAnswers, 0) + IFNULL(numUSF,0)) AS numTotal FROM users LEFT JOIN (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numAnswers FROM users JOIN answers ON users.id = answers.submittedBy WHERE department = @departmentValue AND discarded = 0 GROUP BY users.id ORDER BY numAnswers DESC) as AnswersList ON users.id = AnswersList.idNum LEFT JOIN (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numUSF FROM users JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE department = @departmentValue AND discarded = 0 GROUP BY users.id ORDER BY numUSF DESC) AS USFList ON users.id = USFList.idNum WHERE numAnswers > 0 or numUSF > 0 ORDER BY numAnswers + numUSF DESC LIMIT 3;";
+                    sqlSelect = "SELECT users.id AS id, users.userid AS userid, department, IFNULL(numAnswers,0) AS numAnswers, IFNULL(numUSF,0) AS numUSF, (IFNULL(numAnswers, 0) + IFNULL(numUSF,0)) AS numTotal FROM users LEFT JOIN (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numAnswers FROM users JOIN answers ON users.id = answers.submittedBy WHERE department = @departmentValue AND discarded = 0 GROUP BY users.id ORDER BY numAnswers DESC) as AnswersList ON users.id = AnswersList.idNum LEFT JOIN (SELECT users.id as idNum, userid, COUNT(submittedBy) AS numUSF FROM users JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy WHERE department = @departmentValue AND discarded = 0 GROUP BY users.id ORDER BY numUSF DESC) AS USFList ON users.id = USFList.idNum WHERE numAnswers > 0 or numUSF > 0 ORDER BY numAnswers + numUSF DESC LIMIT 3;";
                 }
             }
 
@@ -861,7 +861,10 @@ namespace ProjectTemplate
                     {
                         id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
                         userId = sqlDt.Rows[i]["userid"].ToString(),
+                        department = sqlDt.Rows[i]["department"].ToString(),
                         numAnswers = Convert.ToInt32(sqlDt.Rows[i]["numAnswers"]),
+                        numUSF = 0,
+                        numTotal = 0
                     });
                 }
             }
@@ -873,7 +876,10 @@ namespace ProjectTemplate
                     {
                         id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
                         userId = sqlDt.Rows[i]["userid"].ToString(),
+                        department = sqlDt.Rows[i]["department"].ToString(),
+                        numAnswers = 0,
                         numUSF = Convert.ToInt32(sqlDt.Rows[i]["numUSF"]),
+                        numTotal = 0
                     });
                 }
             }
@@ -885,6 +891,7 @@ namespace ProjectTemplate
                     {
                         id = Convert.ToInt32(sqlDt.Rows[i]["id"]),
                         userId = sqlDt.Rows[i]["userid"].ToString(),
+                        department = sqlDt.Rows[i]["department"].ToString(),
                         numAnswers = Convert.ToInt32(sqlDt.Rows[i]["numAnswers"]),
                         numUSF = Convert.ToInt32(sqlDt.Rows[i]["numUSF"]),
                         numTotal = Convert.ToInt32(sqlDt.Rows[i]["numTotal"])

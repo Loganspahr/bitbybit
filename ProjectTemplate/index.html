@@ -610,7 +610,7 @@
             <!-- Supervisor-specific content goes here -->
             <!-- <a href="#" onclick="LogOff()">log off</a> <!--add log off to only show in supervisor screen-->
             <button onclick="javascript: QuestionListHandler();">Review Questions I Have Posted</button>
-            <button onclick="javascript: showPanel('SubmitQuestion')">Post A New Question</button>
+            <button onclick="javascript: showSubmitQuestion()">Post A New Question</button>
             <button onclick="javascript: loadUnsolicitedFeedbackReview();">Review Unsolicited Feedback</button>
             <!--Added Configure Employee Questions button-->
             <!-- <button type="button" onclick="showResponseTypeConfig()" class="button">Configure Employee Questions</button> -->
@@ -662,9 +662,9 @@
             <form id="postQuestionForm" onsubmit="submitQuestionHandler(); return false;">
                 <h2>Submit Question</h2>
                 <!-- <div>
-                    Character limit: questionText: 1000<br />
-                    This limit is enforced but the current character count and character limit are not displayed.
-                </div> -->
+        Character limit: questionText: 1000<br />
+        This limit is enforced but the current character count and character limit are not displayed.
+    </div> -->
                 <div>
                     <textarea id="questionText" rows="10" cols="50" maxlength="1000" placeholder="Enter question..." required></textarea>
                 </div>
@@ -904,23 +904,10 @@
     <!--YOUR OWN JAVASCRIPT CAN GO RIGHT HERE-->
     <script type="text/javascript">
 
-        function addMoreOptions() {
-            var i = 3;
-            while (i > 0) {
-                var elem = document.getElementById('option' + i);
-                if (JSON.stringify(elem) === JSON.stringify(null)) {
-                    var newElem = document.createElement('input');
-                    newElem.type = 'text';
-                    newElem.id = 'option' + i;
-                    newElem.placeholder = 'Option ' + i;
-                    document.getElementById('extraOptions').appendChild(newElem);
-                    var newBR = document.createElement('br');
-                    document.getElementById('extraOptions').appendChild(newBR);
-                    break;
-                } else {
-                    i++;
-                }
-            }
+        function showSubmitQuestion() {
+            defaultMCO = "<h3>Enter options for Multiple Choice</h3><input type='text' id='option1' placeholder='Option 1'><input type='text' id='option2' placeholder='Option 2'><span id='extraOptions'></span><button type='button' onclick='addMoreOptions()'>Add more options</button>";
+            $('#multipleChoiceOptions').html(defaultMCO);
+            showPanel('SubmitQuestion');
         }
 
         //Calls requestaccount and creates an account
@@ -1945,6 +1932,7 @@
 
 
         function MyActivityHandler() {
+            var animals = ['Dog', 'Cow', 'Cat', 'Horse', 'Donkey', 'Tiger', 'Lion', 'Panther', 'Leopard', 'Cheetah', 'Bear', 'Elephant', 'Polar bear', 'Turtle', 'Tortoise', 'Crocodile', 'Rabbit', 'Porcupine', 'Hare', 'Hen', 'Pigeon', 'Albatross', 'Crow', 'Fish', 'Dolphin', 'Frog', 'Whale', 'Alligator', 'Eagle', 'Flying squirrel', 'Ostrich', 'Fox', 'Goat', 'Jackal', 'Emu', 'Armadillo', 'Eel', 'Goose', 'Arctic fox', 'Wolf', 'Beagle', 'Gorilla', 'Chimpanzee', 'Monkey', 'Beaver', 'Orangutan', 'Antelope', 'Bat', 'Badger', 'Giraffe', 'Hermit Crab', 'Giant Panda', 'Hamster', 'Cobra', 'Hammerhead shark', 'Camel', 'Hawk', 'Deer', 'Chameleon', 'Hippopotamus', 'Jaguar', 'Chihuahua', 'King Cobra', 'Ibex', 'Lizard', 'Koala', 'Kangaroo', 'Iguana', 'Llama', 'Chinchillas', 'Dodo', 'Jellyfish', 'Rhinoceros', 'Hedgehog', 'Zebra', 'Possum', 'Wombat', 'Bison', 'Bull', 'Buffalo', 'Sheep', 'Meerkat', 'Mouse', 'Otter', 'Sloth', 'Owl', 'Vulture', 'Flamingo', 'Racoon', 'Mole', 'Duck', 'Swan', 'Lynx', 'Monitor lizard', 'Elk', 'Boar', 'Lemur', 'Mule', 'Baboon', 'Mammoth', 'Blue whale', 'Rat', 'Snake', 'Peacock'];
             var webMethod = "ProjectServices.asmx/GetMyActivity";
             $.ajax({
                 type: "POST",
@@ -1984,7 +1972,9 @@
                                         userIdToDisplay = "You";
                                     }
                                     else {
-                                        userIdToDisplay = "Someone Else";
+                                        //userIdToDisplay = "Someone Else";
+                                        randomAnimalIndex = (msg.d[i].id + msg.d[i].numAnswers + msg.d[i].numUSF + msg.d[i].numTotal) % animals.length;
+                                        userIdToDisplay = msg.d[i].department + " " + animals[randomAnimalIndex];
                                     }
                                     myDeptActivity += "<tr id='listR" + (i + 1) + "' class='listRow'><td>" + (i + 1) + "</td><td>" + userIdToDisplay + "</td><td>" + numberstoreport + "</td></tr>";
                                 }
@@ -2019,7 +2009,9 @@
                                                 userIdToDisplay = "You";
                                             }
                                             else {
-                                                userIdToDisplay = "Someone Else";
+                                                //userIdToDisplay = "Someone Else";
+                                                randomAnimalIndex = (msg.d[i].id + msg.d[i].numAnswers + msg.d[i].numUSF + msg.d[i].numTotal) % animals.length;
+                                                userIdToDisplay = msg.d[i].department + " " + animals[randomAnimalIndex];
                                             }
                                             myDeptActivity += "<tr id='listR" + (i + 1) + "' class='listRow'><td>" + (i + 1) + "</td><td>" + userIdToDisplay + "</td><td>" + numberstoreport + "</td></tr>";
                                         }
@@ -2142,6 +2134,29 @@
             });
         }
 
+        function addMoreOptions() {
+            var i = 3;
+            while (i > 0) {
+                var elem = document.getElementById('option' + i);
+                if (i > 10) {
+                    alert('Maximum number of options reached');
+                    break;
+                } else if (JSON.stringify(elem) === JSON.stringify(null)) {
+                    var newElem = document.createElement('input');
+                    newElem.type = 'text';
+                    newElem.id = 'option' + i;
+                    newElem.placeholder = 'Option ' + i;
+                    document.getElementById('extraOptions').appendChild(newElem);
+                    var newBR = document.createElement('br');
+                    document.getElementById('extraOptions').appendChild(newBR);
+                    break;
+                } else {
+                    i++;
+                }
+            }
+        }
+/*      Commented this out because we decided to get rid of the "delete option" button but wanted to keep the code
+        in case we decide to re-implement it later.  Can be deleted if we decide to keep it out.
         // Add More Options Function
         function addMoreOptions() {
             var i = 3;
@@ -2173,7 +2188,7 @@
                 }
             }
         }
-
+*/
         // Remove Option Function
         function removeOption(button) {
             var optionContainer = button.closest('.option-container'); // Find the closest .option-container
