@@ -750,18 +750,18 @@
         <!--NEWLY ADDED SECTION-->
         <!-- Placed the new configuration section here -->
         <!-- <div id="questionConfig" class="contentPanel hidden">
-         <h2>Configure Question Types</h2>
-         <div class="form-container">
-             <div class="radio-group">
-                 <span>Response Type:</span><br />
-                 <label><input type="radio" name="responseType" value="freeResponse"> Free Response</label><br />
-                 <label><input type="radio" name="responseType" value="multipleChoice"> Multiple Choice</label><br />
-                 <label><input type="radio" name="responseType" value="numberRange"> Number between 1-10</label>
-             </div>
-             <button type="button" onclick="saveQuestionConfig()" class="button">Save Configuration</button>
-             <button type="button" onclick="DashboardHandler();" class="button">Back to Dashboard</button>
-         </div>
-     </div> -->
+        <h2>Configure Question Types</h2>
+        <div class="form-container">
+            <div class="radio-group">
+                <span>Response Type:</span><br />
+                <label><input type="radio" name="responseType" value="freeResponse"> Free Response</label><br />
+                <label><input type="radio" name="responseType" value="multipleChoice"> Multiple Choice</label><br />
+                <label><input type="radio" name="responseType" value="numberRange"> Number between 1-10</label>
+            </div>
+            <button type="button" onclick="saveQuestionConfig()" class="button">Save Configuration</button>
+            <button type="button" onclick="DashboardHandler();" class="button">Back to Dashboard</button>
+        </div>
+    </div> -->
 
         <div id="accountspanel" class="contentPanel">
             <form onsubmit="CreateAccount($('#newUsername').val(), $('#newPassword').val(), $('#newDeparment').val(), $('#newIssupervisor').val(), $('#newSupervisor').val()); return false;">
@@ -842,28 +842,58 @@
             <button onclick="javascript: DashboardHandler();">Return to Dashboard</button>
         </div>
 
-        <!--Modified this section of html-->
+        <!--TESTING HTML CODE-->
+        <!-- Modified this section of html -->
         <div id="activityReportQuery" class="contentPanel">
             <h2 class="header-text">Generate Activity Report</h2>
             <div class="form-container">
-                <div class="radio-group">
-                    <span>Report Type:</span><br />
-                    <label><input type="radio" name="reportType" value="answers" />Answers</label><br />
-                    <label><input type="radio" name="reportType" value="unsolicitedFeedback" />Unsolicited Feedback</label><br />
-                    <label><input type="radio" name="reportType" value="combined" />Combined</label>
+                <!-- Dropdown for Report Type -->
+                <div class="form-group">
+                    <label for="reportTypeSelect">Report Type:</label>
+                    <select id="reportTypeSelect" name="reportType">
+                        <option value="answers">Answers</option>
+                        <option value="unsolicitedFeedback">Unsolicited Feedback</option>
+                        <option value="combined">Combined</option>
+                    </select>
                 </div>
 
-                <!--EDITED RADIO BUTTON SECTION-->
-                <div class="radio-group">
-                    <span>Department:</span><br />
-                    <label><input type="radio" name="reportDepartment" value="all" />All</label><br />
-                    <label><input type="radio" name="reportDepartment" value="mine" />My Department</label><br />
-                    <!-- New radio button for selecting other department -->
-                    <label><input type="radio" name="reportDepartment" value="other" />Choose a Department:</label>
-                    <select id="departmentSelect" style="display: none;"></select>
+                <!-- Dropdown for Department -->
+                <div class="form-group">
+                    <label for="reportDepartmentSelect">Department:</label>
+                    <select id="reportDepartmentSelect" name="reportDepartment">
+                        <option value="all">All</option>
+                        <option value="mine">My Department</option>
+                        <option value="other">Choose a Department:</option>
+                    </select>
+                </div>
+
+                <!-- This dropdown will be dynamically filled and shown based on the selection above -->
+                <div class="form-group" id="departmentSelectContainer" style="display: none;">
+                    <label for="departmentSelect">Select Department:</label>
+                    <select id="departmentSelect"></select>
                 </div>
 
 
+                <!--COMMENTING OUT SECTION TO TEST-->
+                <!--Modified this section of html-->
+                <!---  <div id="activityReportQuery" class="contentPanel">
+              <h2 class="header-text">Generate Activity Report</h2>
+              <div class="form-container">
+                  <div class="radio-group">
+                      <span>Report Type:</span><br />
+                      <label><input type="radio" name="reportType" value="answers" />Answers</label><br />
+                      <label><input type="radio" name="reportType" value="unsolicitedFeedback" />Unsolicited Feedback</label><br />
+                      <label><input type="radio" name="reportType" value="combined" />Combined</label>
+                  </div>
+            <!--EDITED RADIO BUTTON SECTION-->
+                <!--- <div class="radio-group">
+            <span>Department:</span><br />
+            <label><input type="radio" name="reportDepartment" value="all" />All</label><br />
+            <label><input type="radio" name="reportDepartment" value="mine" />My Department</label><br />
+            <!-- New radio button for selecting other department -->
+                <!-- <label><input type="radio" name="reportDepartment" value="other" />Choose a Department:</label>
+                <select id="departmentSelect" style="display: none;"></select>
+            </div>
                 <!--KEPT THIS JUST IN CASE IT DIDN"T WORK-->
                 <!--<div class="radio-group">
                 <span>Departments to Include:</span><br />
@@ -2344,12 +2374,10 @@
             var optionContainer = button.closest('.option-container'); // Find the closest .option-container
             optionContainer.remove(); // Remove the container
         }
-
-
-        // TESTING NEW JS CODE 
+      
         // NEED HELP EDITING THIS
 
-        function populateDepartmentDropdown() {
+         function populateDepartmentDropdown() {
             $.ajax({
                 type: "POST",
                 url: "ProjectServices.asmx/GetDepartments",
@@ -2370,7 +2398,71 @@
                     console.error("Error fetching departments: ", error);
                 }
             });
-        }
+        } 
+
+
+
+        // TESTING NEW JS CODE
+       $(document).ready(function () {
+            // Populate the 'Choose a Department' dropdown on page load
+            $.ajax({
+                type: "POST",
+                url: "ProjectServices.asmx/GetDepartments",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var departments = response.d;
+                    var $departmentSelect = $('#departmentSelect');
+                    departments.forEach(function (department) {
+                        $departmentSelect.append($('<option></option>').val(department).text(department));
+                    });
+                },
+                error: function (e) {
+                    console.log(e);
+                }
+            });
+
+            // Show the 'Select Department' dropdown when 'Choose a Department' is selected
+            $('#reportDepartmentSelect').change(function () {
+                var selectedValue = $(this).val();
+                if (selectedValue === 'other') {
+                    $('#departmentSelectContainer').show();
+                } else {
+                    $('#departmentSelectContainer').hide();
+                }
+            });
+
+            // Event handler for Generate Report button
+            $('#generateReportButton').click(function () {
+                var selectedReportType = $('#reportTypeSelect').val();
+                var selectedReportDepartment = $('#reportDepartmentSelect').val();
+                var selectedDepartment = $('#departmentSelect').val();
+
+                // If 'Choose a Department' is selected, use the selected department from the 'Select Department' dropdown
+                if (selectedReportDepartment === 'other') {
+                    selectedReportDepartment = selectedDepartment;
+                }
+
+                // Call backend method to generate report
+                $.ajax({
+                    type: "POST",
+                    url: "ProjectServices.asmx/GetMostActiveUsers",
+                    data: JSON.stringify({ reportType: selectedReportType, department: selectedReportDepartment }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        var reportData = response.d;
+                        // Implement how you want to display this data
+                        console.log(reportData);
+                    },
+                    error: function (e) {
+                        console.log(e);
+                    }
+                });
+            });
+        });
+
+
 
     </script>
 </body>
