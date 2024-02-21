@@ -221,7 +221,6 @@ namespace ProjectTemplate
 
                 string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
                 string sqlSelect = "select id, userid, pass,department,supervisor, issupervisor from users where id > 0  order by department";
-                // note - i need to add a line possibly in this code to check the accountlocked, where accountlocked < 3 and hang the code above
                 MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
                 MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
 
@@ -368,7 +367,6 @@ namespace ProjectTemplate
         [WebMethod(EnableSession = true)]
         public int SubmitMultipleChoice(List<string> array)
         {
-            //{ "array":[95,"One","Two"]}
             int questionID = Convert.ToInt32(array[0]);
             int responseID = -333;
             for (int i = 1; i < array.Count; i++)
@@ -476,8 +474,6 @@ namespace ProjectTemplate
                 DataTable sqlDt = new DataTable("questionList");
                 DateTime thisDay = DateTime.Today;
 
-                //requests just have active set to 0
-                //string sqlSelect = "select id, questionText, expiryDate from questions where submittedBy=@id order by expiryDate";
                 string sqlSelect = "SELECT questions.id, questionText, expiryDate, COUNT(reviewed) AS numAnswers, IFNULL(COUNT(reviewed) - SUM(reviewed),0) AS unreviewed FROM questions LEFT JOIN answers ON questions.id = answers.question  where questions.submittedBy=@id GROUP BY questions.id ORDER BY expiryDate;";
 
                 MySqlConnection sqlConnection = new MySqlConnection(getConString());
@@ -614,7 +610,6 @@ namespace ProjectTemplate
                 DataTable sqlDt = new DataTable("answerList");
 
                 string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
-                //requests just have active set to 0
                 string sqlSelect = "select id, feedback, reviewed from answers where question=@questionValue and reviewed <> 1 and discarded <> 1;";
                 if (seeallInt == 1)
                 {
@@ -739,7 +734,6 @@ namespace ProjectTemplate
         {
             List<string> problemAreas = new List<string>();
             string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
-            // Modified to select distinct problem areas from unsolicitedFeedback table
             string sqlSelect = "SELECT DISTINCT problemArea FROM unsolicitedFeedback WHERE problemArea IS NOT NULL AND problemArea != '' ORDER BY problemArea";
             MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
             MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
@@ -1020,15 +1014,11 @@ namespace ProjectTemplate
         }
 
         // Note: this is for the dropdown menu for selecting different departments
-        // TESTING NEW WEB METHOD
-        // NEED HELP EDITING THIS, GENERATE REPORT DOES NOT WORK NOW
         [WebMethod(EnableSession = true)]
         public List<string> GetDepartments()
         {
             List<string> departments = new List<string>();
             string sqlConnectString = System.Configuration.ConfigurationManager.ConnectionStrings["myDB"].ConnectionString;
-            // Select distinct departments from the users table
-            //string sqlSelect = "SELECT DISTINCT department FROM users WHERE department IS NOT NULL AND department != '' ORDER BY department";
             string sqlSelect = "SELECT users.department, AnswerList.numAnswers, USFList.numUSF FROM users LEFT JOIN(SELECT department, IFNULL(COUNT(answers.id), 0) as numAnswers FROM users JOIN answers ON users.id = answers.submittedBy GROUP BY department) as AnswerList ON users.department = AnswerList.department LEFT JOIN(SELECT department, IFNULL(COUNT(unsolicitedFeedback.id),0) as numUSF FROM users JOIN unsolicitedFeedback ON users.id = unsolicitedFeedback.submittedBy GROUP BY department) as USFList ON users.department = USFList.department GROUP BY department HAVING numAnswers > 0 OR numUSF > 0";
             MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
             MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
@@ -1074,17 +1064,6 @@ namespace ProjectTemplate
             {
                 return -1;
             }
-
-        }
-
-        [WebMethod(EnableSession = true)]
-        public SessionVariables GetSessionVars()
-        {
-            SessionVariables sessionVariables = new SessionVariables();
-            sessionVariables.id = Convert.ToInt32(Session["id"]);
-            sessionVariables.supervisor = Convert.ToInt32(Session["supervisor"]);
-            sessionVariables.issupervisor = Convert.ToInt32(Session["issupervisor"]);
-            return sessionVariables;
         }
     }
 }
