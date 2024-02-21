@@ -854,13 +854,7 @@
                     <div class="left">Edit Account</div>
                     <hr />
                     <div>
-                        <select id="selectUser"></select><br />
-                    </div>
-                    <div id="editLogonUsernameDiv" style="display: none">
-                        Username: <input type="text" id="editLogonUsername" />
-                    </div>
-                    <div id="editLogonPasswordDiv" style="display: none">
-                        Password: <input type="password" id="editLogonPassword" />
+                        <select id="selectUser"></select><br /><br />
                     </div>
                     <div id="editDepartmentDiv" style="display: none">
                         Deparment: <input type="text" id="editDepartment" />
@@ -1068,13 +1062,9 @@
             $('editLogonUsername').val("");
             $('editLogonPassword').val("");
             $('editDepartment').val("");
-            $('#editLogonUsername').val('');
-            $('#editLogonPassword').val('');
             $('#editDepartment').val('');
             $('#editSupervisor').val('1');
             $('#editIssupervisor').val('0');
-            $('#editLogonUsernameDiv').css("display", "none");
-            $('#editLogonPasswordDiv').css("display", "none");
             $('#editDepartmentDiv').css("display", "none");
             $('#editSupervisorDiv').css("display", "none");
             $('#editIsSupervisorDiv').css("display", "none");
@@ -1624,28 +1614,28 @@
                                         }
                                         if (msg.d[i].numAnswers == 0) {
                                             question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>"
-                                                + "<span class='questionText'>" + msg.d[i].question + "</span><br />"
+                                                + "<span class='questionText'>" + msg.d[i].question + "</span>"
                                                 + "<span class='expiryDate'>Expiry Date: " + msg.d[i].expiryDate.split(' ')[0] + " </span> <br />"
-                                                + "<span class='notOptionsTag'> No responses have been received</span> <br />" + closeq + " </div> <hr>";
+                                                + "<span class='notOptionsTag'> No responses have been received</span> <br />" + closeq + " </div>";
 
                                         }
                                         else if (msg.d[i].unreviewed == 0) {
                                             question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>"
-                                                + "<span class='questionText'>" + msg.d[i].question + "</span><br />"
+                                                + "<span class='questionText'>" + msg.d[i].question + "</span>"
                                                 + "<span class='expiryDate'>Expiry Date: " + msg.d[i].expiryDate.split(' ')[0] + " </span> <br />"
                                                 + "<span class='notOptionsTag'>No unreviewed responses</span> <br />"
                                                 + "<span class='optionsTag'><a href='#' onclick='AnswerListHandler(" + msg.d[i].id
-                                                + ",1)'> see all responses (" + msg.d[i].numAnswers + ")</a></span> <br />" + closeq + "</div> <hr>";
+                                                + ",1)'> see all responses (" + msg.d[i].numAnswers + ")</a></span> <br />" + closeq + "</div>";
 
                                         }
                                         else {
                                             question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>"
-                                                + "<span class='questionText'>" + msg.d[i].question + "</span><br />"
+                                                + "<span class='questionText'>" + msg.d[i].question + "</span>"
                                                 + "<span class='expiryDate'>Expiry Date: " + msg.d[i].expiryDate.split(' ')[0] + " </span> <br />"
                                                 + "<span class='optionsTag'><a href='#' onclick='AnswerListHandler(" + msg.d[i].id
                                                 + ",0)'> review responses (" + msg.d[i].unreviewed + ")</a></span> <br />"
                                                 + "<span class='optionsTag'><a href='#' onclick='AnswerListHandler(" + msg.d[i].id
-                                                + ",1)'> see all responses (" + msg.d[i].numAnswers + ")</a></span> <br />" + closeq + "</div> <hr>";
+                                                + ",1)'> see all responses (" + msg.d[i].numAnswers + ")</a></span> <br />" + closeq + "</div>";
                                         }
                                     }
                                     else {
@@ -1666,8 +1656,8 @@
                                             }
                                         }
                                         question = "<div class='questionRow' id='questR" + msg.d[i].id + "'>" + "<span class='questionText'>" + msg.d[i].question
-                                            + "<br /> <span class='expiryDate'>Expiry Date: " + msg.d[i].expiryDate.split(' ')[0] + "</span>"
-                                            + "</span><br /> <span class='optionsTag'><a href='#' onclick='AnswerHandler(" + msg.d[i].id + ")'>respond</a> </div> <hr>";
+                                            + "<br /></span> <span class='expiryDate'>Expiry Date: " + msg.d[i].expiryDate.split(' ')[0] + "</span> <br />"
+                                            + "<span class='optionsTag'><a href='#' onclick='AnswerHandler(" + msg.d[i].id + ")'>respond</a> </div>";
                                     }
                                     $("#questionListDisplay").append(question);
                                 }
@@ -2282,7 +2272,7 @@
         //ajax to edit account
         function EditAccount() {
             var webMethod = "ProjectServices.asmx/UpdateAccount";
-            var parameters = "{\"pid\":\"" + encodeURI($('#selectUser').val()) + "\",\"userid\":\"" + encodeURI($('#editLogonUsername').val()) + "\",\"pass\":\"" + encodeURI($('#editLogonPassword').val()) + "\",\"department\":\"" + encodeURI($('#editDepartment').val()) + "\",\"supervisor\":\"" + encodeURI($('#editSupervisor').val()) + "\",\"issupervisor\":\"" + encodeURI($('#editIssupervisor').val()) + "\"}";
+            var parameters = "{\"pid\":\"" + encodeURI($('#selectUser').val()) + "\",\"department\":\"" + encodeURI($('#editDepartment').val()) + "\",\"supervisor\":\"" + encodeURI($('#editSupervisor').val()) + "\",\"issupervisor\":\"" + encodeURI($('#editIssupervisor').val()) + "\"}";
 
             $.ajax({
                 type: "POST",

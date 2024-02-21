@@ -132,7 +132,7 @@ namespace ProjectTemplate
 
 
         [WebMethod(EnableSession = true)]
-        public Account UpdateAccount(string pid, string userid, string pass, string department, string supervisor, string issupervisor)
+        public Account UpdateAccount(string pid, string department, string supervisor, string issupervisor)
         {
             DataTable sqlDt = new DataTable("userData");
 
@@ -140,18 +140,16 @@ namespace ProjectTemplate
             string sqlSelect;
             if (Convert.ToInt32(issupervisor) == 1)
             {
-                sqlSelect = "update users set userid=@uidValue, pass=@passValue, department=@departmentValue, supervisor=NULL, issupervisor=@issupervisorValue where id=@idValue; SELECT id, userid, pass, department, issupervisor, supervisor from users where id=111137;";
+                sqlSelect = "update users set department=@departmentValue, supervisor=NULL, issupervisor=@issupervisorValue where id=@idValue; SELECT id, userid, pass, department, issupervisor, supervisor from users where id=111137;";
             }
             else
             {
-                sqlSelect = "update users set userid=@uidValue, pass=@passValue, department=@departmentValue, supervisor=@supervisorValue, issupervisor=@issupervisorValue where id=@idValue; SELECT id, userid, pass, department, issupervisor, supervisor from users where id=111137;";
+                sqlSelect = "update users set department=@departmentValue, supervisor=@supervisorValue, issupervisor=@issupervisorValue where id=@idValue; SELECT id, userid, pass, department, issupervisor, supervisor from users where id=111137;";
             }
             MySqlConnection sqlConnection = new MySqlConnection(sqlConnectString);
             MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
 
             sqlCommand.Parameters.AddWithValue("@idValue", Convert.ToInt32(pid));
-            sqlCommand.Parameters.AddWithValue("@uidValue", HttpUtility.UrlDecode(userid));
-            sqlCommand.Parameters.AddWithValue("@passValue", HttpUtility.UrlDecode(pass));
             sqlCommand.Parameters.AddWithValue("@departmentValue", HttpUtility.UrlDecode(department));
             sqlCommand.Parameters.AddWithValue("@supervisorValue", Convert.ToInt32(supervisor));
             sqlCommand.Parameters.AddWithValue("@issupervisorValue", Convert.ToInt32(issupervisor));
@@ -480,7 +478,7 @@ namespace ProjectTemplate
 
                 //requests just have active set to 0
                 //string sqlSelect = "select id, questionText, expiryDate from questions where submittedBy=@id order by expiryDate";
-                string sqlSelect = "SELECT questions.id, questionText, expiryDate, COUNT(reviewed) AS numAnswers, IFNULL(COUNT(reviewed) - SUM(reviewed),0) AS unreviewed FROM questions LEFT JOIN answers ON questions.id = answers.question GROUP BY questions.id ORDER BY expiryDate;";
+                string sqlSelect = "SELECT questions.id, questionText, expiryDate, COUNT(reviewed) AS numAnswers, IFNULL(COUNT(reviewed) - SUM(reviewed),0) AS unreviewed FROM questions LEFT JOIN answers ON questions.id = answers.question  where questions.submittedBy=@id GROUP BY questions.id ORDER BY expiryDate;";
 
                 MySqlConnection sqlConnection = new MySqlConnection(getConString());
                 MySqlCommand sqlCommand = new MySqlCommand(sqlSelect, sqlConnection);
