@@ -840,15 +840,6 @@
             }
         }
 
-        /* Prehistoric Trees Inside Containers */
-        .contentContainer::before, .feedbackEntry::before, #ActivityList::before,
-        .contentContainer::after, .feedbackEntry::after, #ActivityList::after {
-            content: '🌴';
-            position: absolute;
-            font-size: 2.5rem; /* Slightly smaller to fit inside containers */
-            animation: appear 0.5s ease forwards;
-        }
-
         .contentContainer::before, .feedbackEntry::before, #ActivityList::before {
             top: 10px; /* Positioning inside the top left */
             left: 10px;
@@ -857,15 +848,6 @@
         .contentContainer::after, .feedbackEntry::after, #ActivityList::after {
             bottom: 10px; /* Positioning inside the bottom right */
             right: 10px;
-        }
-
-        /* Dinosaur Eggs Inside Containers */
-        .login-container::before, .form-container::before, .option-container::before,
-        .login-container::after, .form-container::after, .option-container::after {
-            content: '🥚';
-            position: absolute;
-            font-size: 1.5rem; /* Adjusted size for fitting inside */
-            animation: appear 0.5s ease forwards;
         }
 
         .login-container::before, .form-container::before, .option-container::before {
