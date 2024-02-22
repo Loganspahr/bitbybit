@@ -941,11 +941,6 @@
                 <button type="submit">Sign In</button>
                 <button type="button" onclick="showPanel('resetPasswordPanel')">Reset Password</button>
                 <br />
-                <hr />
-                <h2>Lazy Quick Developer Logins</h2>
-                <button onclick="javascript: lazyloginHandler('supervisor');">Login as Supervisor</button>
-                <button onclick="javascript: lazyloginHandler('employee');">Login as Employee</button>
-
             </form>
         </div>
 
@@ -2478,35 +2473,6 @@
                             });
                         }
                     });
-                }
-            });
-        }
-
-
-
-        // NOTE THIS IS ONLY HERE BECAUSE I AM A LAZY DEVELOPER AND GOT TIRED OF TYPING IN CREDENTIALS
-        // THIS WILL NEED TO BE DELETED BEFORE THE PROJECT IS SUBMITTED
-        function lazyloginHandler(role) {
-            var webMethod = "ProjectServices.asmx/Login";
-            var parameters = "{\"role\":\"" + role + "\"}";
-
-            $.ajax({
-                type: "POST",
-                url: webMethod,
-                data: parameters,
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (msg) {
-                    if (msg.d === 1) {
-                        showPanel('SupervisorHome')
-                    } else if (msg.d === 0) {
-                        showPanel('EmployeeHome')
-                    } else {
-                        alert('Login failed: Incorrect username or password.');
-                    }
-                },
-                error: function (e) {
-                    alert("boo...hiss");
                 }
             });
         }

@@ -1042,28 +1042,5 @@ namespace ProjectTemplate
             }
             return departments;
         }
-
-        // NOTE: THIS IS ONLY HERE FOR LAZY DEVS TO ONE-CLICK SIGN IN - NEEDS TO BE REMOVED FROM FINAL CODE
-        [WebMethod(EnableSession = true)]
-        public int Login(string role)
-        {
-            if (role == "supervisor")
-            {
-                Session["id"] = 5;
-                Session["issupervisor"] = 1;
-                return Convert.ToInt32(Session["issupervisor"]);
-            }
-            else if (role == "employee")
-            {
-                Session["id"] = 1;
-                Session["issupervisor"] = 0;
-                Session["supervisor"] = 5;
-                return Convert.ToInt32(Session["issupervisor"]);
-            }
-            else
-            {
-                return -1;
-            }
-        }
     }
 }
