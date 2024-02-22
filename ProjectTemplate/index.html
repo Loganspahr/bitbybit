@@ -1088,13 +1088,13 @@
                 <div class="left">Request Account</div>
                 <hr />
                 <div>
-                    Username: <input type="text" id="newUsername" />
+                    Username: <input type="text" id="newUsername" / required>
                 </div>
                 <div>
-                    Password: <input type="password" id="newPassword" />
+                    Password: <input type="password" id="newPassword" / required>
                 </div>
                 <div>
-                    Department: <input type="text" id="newDeparment" />
+                    Department: <input type="text" id="newDeparment" / required>
                 </div>
                 <div>
                     <select id="newIssupervisor">
@@ -1122,7 +1122,7 @@
                         <select id="selectUser"></select><br /><br />
                     </div>
                     <div id="editDepartmentDiv" style="display: none">
-                        Deparment: <input type="text" id="editDepartment" />
+                        Deparment: <input type="text" id="editDepartment" / required>
                     </div>
                     <div id="editIsSupervisorDiv" style="display: none">
                         <select id="editIssupervisor">
@@ -1229,6 +1229,12 @@
         function CreateAccount(uid, pass, department, issupervisor, supervisor) {
             var webMethod = "ProjectServices.asmx/RequestAccount";
             var parameters = "{\"userid\":\"" + encodeURI(uid) + "\",\"pass\":\"" + encodeURI(pass) + "\",\"department\":\"" + encodeURI(department) + "\",\"issupervisor\":\"" + encodeURI(issupervisor) + "\",\"supervisor\":\"" + encodeURI(supervisor) + "\"}";
+            if (issupervisor == 0) {
+                if (supervisor == 0) {
+                    alert("Supervisor must be selected");
+                    return;
+                }
+            }
 
             $.ajax({
                 type: "POST",
@@ -2501,7 +2507,15 @@
         function EditAccount() {
             var webMethod = "ProjectServices.asmx/UpdateAccount";
             var parameters = "{\"pid\":\"" + encodeURI($('#selectUser').val()) + "\",\"department\":\"" + encodeURI($('#editDepartment').val()) + "\",\"supervisor\":\"" + encodeURI($('#editSupervisor').val()) + "\",\"issupervisor\":\"" + encodeURI($('#editIssupervisor').val()) + "\"}";
-
+            if ($('#editIssupervisor').val() == 0) {
+                if ($('#editSupervisor').val() == 0) {
+                    alert("Supervisor must be selected");
+                    return;
+                }
+            }
+            else {
+                $('#editSupervisor').val("");
+            }
             $.ajax({
                 type: "POST",
                 url: webMethod,
