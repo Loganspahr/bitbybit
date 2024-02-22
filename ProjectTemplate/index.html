@@ -756,52 +756,6 @@
             }
         }
 
-        /* Apply Footprint Trails to Various Containers */
-        .titleContainer::before, .contentContainer::before, #ActivityList::before {
-            content: '🦕 🦖';
-            position: absolute;
-            font-size: 2rem;
-            top: 10px;
-            left: 10px;
-            white-space: nowrap;
-            overflow: hidden;
-            animation: footprints 3s ease-in-out forwards;
-        }
-
-        .contentContainer::after, #ActivityList::after {
-            content: '🦖 🦕';
-            position: absolute;
-            font-size: 2rem;
-            bottom: 10px;
-            right: 10px;
-            white-space: nowrap;
-            overflow: hidden;
-            animation: footprints 3s ease-in-out forwards;
-        }
-
-        /* Enhance Specific Sections with Footprint Background */
-        .feedbackEntry::before, .login-container::before {
-            content: '🦖';
-            position: absolute;
-            font-size: 4rem;
-            opacity: 0.1;
-            top: -20px;
-            right: -20px;
-            z-index: -1;
-            transform: rotate(45deg);
-        }
-
-        /* Trail of Footprints for Navigation and Footer */
-        .menu::after, .footer::before {
-            content: '🦕 🦖 🦕 🦖';
-            display: block;
-            text-align: center;
-            font-size: 1.5rem;
-            color: #FFC627;
-            opacity: 0.5;
-            animation: none; /* Override any previous animations for a steady appearance */
-        }
-
         /* Adjusting the Look and Feel of Footprints for Readability */
         .menu a:hover, .footer a:hover {
             color: #8C1D40;
@@ -885,22 +839,8 @@
 
         /*NEW CSS EFFECTS*/
 
-        /* Prehistoric Environment Enhancements */
-        body::after {
-            content: "";
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 20%;
-            background: url('dinosaur-silhouette-landscape.png') no-repeat bottom center;
-            background-size: cover;
-            opacity: 0.1;
-            z-index: -2;
-        }
-
         /* Subtle Dinosaur Silhouettes for Backgrounds */
-        .contentPanel, .login-container, .feedbackEntry, #ActivityList {
+       /* .contentPanel, .login-container, .feedbackEntry, #ActivityList {
             position: relative;
         }
 
@@ -935,12 +875,12 @@
         }
 
         /* Decorative Footprints Along Borders */
-        .menu, .titleContainer {
+      /*  .menu, .titleContainer {
             border-image: url('footprints-border.png') 30 stretch;
         }
 
             /* Enhanced Navigation and Footer with Dinosaur Patterns */
-            .menu a::before, .footer a::before {
+           /* .menu a::before, .footer a::before {
                 content: '🦕';
                 font-size: 20px;
                 margin-right: 5px;
